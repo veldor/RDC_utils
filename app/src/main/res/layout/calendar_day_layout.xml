@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_columnWeight="1"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp">
+    <RelativeLayout
+        android:padding="3dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/dayNum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="0dp"
+            android:text="3"
+            android:textAlignment="center"
+            android:textSize="30sp" />
+        <ImageView
+            android:id="@+id/shiftRound"
+            android:layout_below="@id/dayNum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/shift_circle"
+            android:contentDescription="@string/shift_image"
+            android:paddingBottom="10dp"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

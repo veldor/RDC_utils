@@ -1,0 +1,18 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+        android:fragment="net.velor.rdc_utils.SettingsActivity$SecurityPreferenceFragment"
+        android:icon="@drawable/ic_security_black_24dp"
+        android:title="@string/security" />
+    <header
+        android:fragment="net.velor.rdc_utils.SettingsActivity$SalaryPreferenceFragment"
+        android:icon="@drawable/ic_attach_money_black_24dp"
+        android:title="@string/salary_tab_name" />
+    <header
+        android:fragment="net.velor.rdc_utils.SettingsActivity$SchedulePreferenceFragment"
+        android:icon="@drawable/ic_today_black_24dp"
+        android:title="@string/schedule" />
+
+</preference-headers>

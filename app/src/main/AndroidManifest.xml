@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="net.velor.rdc_utils">
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
+    <application
+        android:name="utils.App"
+        android:allowBackup="true"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/main_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
+        tools:replace="android:icon">
+        <activity android:name=".AboutActivity">
+
+        </activity>
+        <activity
+            android:name=".SalaryShiftsInfoActivity"
+            android:parentActivityName=".SalaryActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.velor.rdc_utils.SalaryActivity" />
+        </activity>
+        <activity
+            android:name=".SalaryDayActivity"
+            android:label="@string/edit_salary_day"
+            android:parentActivityName=".SalaryActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.velor.rdc_utils.SalaryActivity" />
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".SalaryActivity"
+            android:icon="@drawable/logo"
+            android:label="@string/name_salary"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/salary_shortcuts" />
+        </activity>
+        <activity
+            android:name=".ShiftEditActivity"
+            android:label="@string/title_activity_shift_edit"
+            android:parentActivityName=".ShiftSettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.velor.rdc_utils.ShiftSettingsActivity" />
+        </activity>
+        <activity
+            android:name=".ShiftSettingsActivity"
+            android:label="@string/title_activity_shift_settings">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.velor.rdc_utils.MainActivity" />
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/salary"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="utils.EditPin"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity
+            android:name="utils.LoginActivity"
+            android:label="@string/need_authentication"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <service android:name=".ServiceApplication" />
+
+        <receiver android:name=".BroadcastBootCompletedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receivers.AlarmStartReceiver"
+            android:exported="false">
+        </receiver>
+
+        <receiver
+            android:name=".widgets.SalaryWidget"
+            android:icon="@drawable/widget_preview"
+            android:label="@string/my_widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_metadata"/>
+        </receiver>
+    </application>
+
+</manifest>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:baselineAligned="false">
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/dayDate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="60sp"/>
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/revenueSumm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/test"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/salarySumm"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/salarySumm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/test"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/centerName"
+            app:layout_constraintTop_toBottomOf="@+id/revenueSumm" />
+
+        <TextView
+            android:id="@+id/centerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/test"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/salarySumm" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/contrastsSumm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/contrast_mini"
+            android:gravity="center"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/dynamicContrastsSumm"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/dynamicContrastsSumm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/contrast_plus_mini"
+            android:gravity="center"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/oncoscreeningsSumm"
+            app:layout_constraintTop_toBottomOf="@+id/contrastsSumm" />
+
+        <TextView
+            android:id="@+id/oncoscreeningsSumm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/human_mini"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dynamicContrastsSumm" />
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>

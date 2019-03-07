@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="addSalaryDay"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_black_24dp"
+        android:shortcutLongLabel="@string/add_salary_shortcut_long_label"
+        android:shortcutShortLabel="@string/add_salary_shortcut_short_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="net.velor.rdc_utils.SalaryDayActivity"
+            android:targetPackage="net.velor.rdc_utils" />
+    </shortcut>
+</shortcuts>
