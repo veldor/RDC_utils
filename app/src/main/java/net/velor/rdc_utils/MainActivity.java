@@ -1,10 +1,15 @@
 package net.velor.rdc_utils;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +28,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import net.velor.rdc_utils.view_models.SalaryViewModel;
+import net.velor.rdc_utils.view_models.ScheduleViewModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,12 +67,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Integer> mShiftIds;
     private XMLHandler mXmlHandler;
     private DrawerLayout mDrawer;
+    private SalaryViewModel mMyViewModel;
+    private View mRootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        mRootView = findViewById(R.id.rootView);
 
         mActivityLink = this;
         // создам подключение к базе данных
@@ -95,7 +107,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         // запускаю сервис приложения
         ServiceApplication.startMe(this, ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
+
+        // зарегистрирую модель
+        mMyViewModel = ViewModelProviders.of(this).get(SalaryViewModel.class);
+
+        // проверю обновления
+        // проверю обновления
+        final LiveData<Boolean> version = mMyViewModel.startCheckUpdate();
+        version.observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean != null && aBoolean){
+                    // показываю Snackbar с уведомлением
+                    makeUpdateSnackbar();
+                }
+                version.removeObservers(MainActivity.this);
+            }
+        });
     }
+
+    private void makeUpdateSnackbar() {
+            Snackbar updateSnackbar = Snackbar.make(mRootView, getString(R.string.snackbar_found_update_message), Snackbar.LENGTH_INDEFINITE);
+            updateSnackbar.setAction(getString(R.string.snackbar_update_action_message), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mMyViewModel.initializeUpdate();
+                }
+            });
+            updateSnackbar.show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

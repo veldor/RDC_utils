@@ -133,4 +133,5 @@
     <string name="alarm_set_toast">Будильник установлен!</string>
     <string name="my_widget_name">Виджет зарплата</string>
     <string name="applogo">Лого</string>
+    <string name="update_file_name">RDC_tools</string>
 </resources>

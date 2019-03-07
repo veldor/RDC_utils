@@ -138,4 +138,7 @@
     <string name="widget_test_text" translatable="false">test</string>
     <string name="my_widget_name">Salary vidget</string>
     <string name="applogo">appLogo</string>
+    <string name="update_file_name">RDC_tools</string>
+    <string name="snackbar_found_update_message">Update found!</string>
+    <string name="snackbar_update_action_message">Get it!</string>
 </resources>
