@@ -134,4 +134,6 @@
     <string name="my_widget_name">Виджет зарплата</string>
     <string name="applogo">Лого</string>
     <string name="update_file_name">RDC_tools</string>
+    <string name="snackbar_found_update_message">Найдено обновление!</string>
+    <string name="snackbar_update_action_message">Получить</string>
 </resources>

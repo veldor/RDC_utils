@@ -21,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import net.velor.rdc_utils.view_models.SalaryViewModel;
 import net.velor.rdc_utils.view_models.ScheduleViewModel;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Integer> mShiftIds;
     private XMLHandler mXmlHandler;
     private DrawerLayout mDrawer;
-    private SalaryViewModel mMyViewModel;
+    private ScheduleViewModel mMyViewModel;
     private View mRootView;
 
     @Override
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ServiceApplication.startMe(this, ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
 
         // зарегистрирую модель
-        mMyViewModel = ViewModelProviders.of(this).get(SalaryViewModel.class);
+        mMyViewModel = ViewModelProviders.of(this).get(ScheduleViewModel.class);
 
         // проверю обновления
         // проверю обновления
@@ -117,16 +117,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         version.observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean != null && aBoolean){
+                Log.d("surprise", "MainActivity onChanged: here " + aBoolean);
+                if(aBoolean != null && !aBoolean){
                     // показываю Snackbar с уведомлением
                     makeUpdateSnackbar();
                 }
-                version.removeObservers(MainActivity.this);
             }
         });
     }
 
     private void makeUpdateSnackbar() {
+        Log.d("surprise", "MainActivity makeUpdateSnackbar: showing update snackbar");
             Snackbar updateSnackbar = Snackbar.make(mRootView, getString(R.string.snackbar_found_update_message), Snackbar.LENGTH_INDEFINITE);
             updateSnackbar.setAction(getString(R.string.snackbar_update_action_message), new View.OnClickListener() {
                 @Override

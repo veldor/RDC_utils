@@ -19,5 +19,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         mAppInstance = this;
+        // добавлю файл для автосохранения настроек
+        MyBackupAgent.requestBackup();
     }
 }

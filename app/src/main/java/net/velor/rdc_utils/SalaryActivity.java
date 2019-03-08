@@ -2,6 +2,9 @@ package net.velor.rdc_utils;
 
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,8 +15,10 @@ import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +26,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +38,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.whiteelephant.monthpicker.MonthPickerDialog;
+
+import net.velor.rdc_utils.view_models.SalaryViewModel;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -89,12 +97,27 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     private LinearLayout mDetailsLayout;
     private AlertDialog mNoSettingsDialog;
     private boolean mDetailsVisible;
+    private SalaryViewModel mMyViewModel;
+    private View mRootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.salary_activity);
+        mRootView = findViewById(R.id.rootView);
+        // зарегистрирую модель
+        mMyViewModel = ViewModelProviders.of(this).get(SalaryViewModel.class);
+        // проверю обновления
+        final LiveData<Boolean> version = mMyViewModel.startCheckUpdate();
+        version.observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean != null && aBoolean){
+                    // показываю Snackbar с уведомлением
+                    makeUpdateSnackbar();
+                }
+            }
+        });
 
         mInflater = getLayoutInflater();
 
@@ -220,6 +243,18 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                 }
             }
         });
+    }
+
+    private void makeUpdateSnackbar() {
+        Log.d("surprise", "SalaryActivity makeUpdateSnackbar: send foundUpdateSnackbar");
+        Snackbar updateSnackbar = Snackbar.make(mRootView, getString(R.string.snackbar_found_update_message), Snackbar.LENGTH_INDEFINITE);
+        updateSnackbar.setAction(getString(R.string.snackbar_update_action_message), new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMyViewModel.initializeUpdate();
+            }
+        });
+        updateSnackbar.show();
     }
 
     private String getDate() {
