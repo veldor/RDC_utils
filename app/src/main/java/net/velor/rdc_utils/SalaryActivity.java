@@ -99,6 +99,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     private boolean mDetailsVisible;
     private SalaryViewModel mMyViewModel;
     private View mRootView;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,8 +135,8 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
         // зарегистрирую пункты  меню для обработки
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView = findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
         mChooseMonthBtn = findViewById(R.id.salaryDate);
 
@@ -639,6 +640,11 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.reserve:
+                Intent startReserveIntent = new Intent(this, ReserveActivity.class);
+                startReserveIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(startReserveIntent);
                 break;
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));

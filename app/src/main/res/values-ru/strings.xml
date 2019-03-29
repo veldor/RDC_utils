@@ -136,4 +136,15 @@
     <string name="update_file_name">RDC_tools</string>
     <string name="snackbar_found_update_message">Найдено обновление!</string>
     <string name="snackbar_update_action_message">Получить</string>
+    <string name="reserve">Резервные копии</string>
+    <string name="backup">Сохранить</string>
+    <string name="restore">Восстановить</string>
+    <string name="permissions_dialog_title">Необходимо предоставить разрешения</string>
+    <string name="permissions_dialog_positive_answer">Предоставить разрешение</string>
+    <string name="permissions_dialog_negative_answer">Нет, не надо</string>
+    <string name="setting_success_restored_message">Настройки восстановлены, перезагрузка приложения</string>
+    <string name="loading_dialog_message">Ожидайте</string>
+    <string name="progress_dialog_title">Обрабатываю операцию</string>
+    <string name="backup_dialog_message">Создаю резервную копию</string>
+    <string name="restore_dialog_message">Восстанавливаю резервную копию</string>
 </resources>

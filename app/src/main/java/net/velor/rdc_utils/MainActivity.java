@@ -117,8 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         version.observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                Log.d("surprise", "MainActivity onChanged: here " + aBoolean);
-                if(aBoolean != null && !aBoolean){
+                if(aBoolean != null && aBoolean){
                     // показываю Snackbar с уведомлением
                     makeUpdateSnackbar();
                 }
@@ -327,13 +326,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+            case R.id.reserve:
+                Intent startReserveIntent = new Intent(this, ReserveActivity.class);
+                startReserveIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(startReserveIntent);
+                break;
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));
                 break;
         }
         // закрою боковое меню
         mDrawer.closeDrawer(GravityCompat.START);
-        return true;
+        return false;
     }
 
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -365,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void run() {
                         try {
-                            TimeUnit.MILLISECONDS.sleep(1000);
+                            TimeUnit.MILLISECONDS.sleep(3000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

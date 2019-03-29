@@ -141,4 +141,15 @@
     <string name="update_file_name">RDC_tools</string>
     <string name="snackbar_found_update_message">Update found!</string>
     <string name="snackbar_update_action_message">Get it!</string>
+    <string name="reserve">Reserve</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="permissions_dialog_title">Permissions required!</string>
+    <string name="permissions_dialog_positive_answer">Accept</string>
+    <string name="permissions_dialog_negative_answer">Deny</string>
+    <string name="setting_success_restored_message">Settings restored, restart App</string>
+    <string name="progress_dialog_title">Operation in progress</string>
+    <string name="loading_dialog_message">Wait</string>
+    <string name="backup_dialog_message">Creating backup</string>
+    <string name="restore_dialog_message">Restore backup</string>
 </resources>

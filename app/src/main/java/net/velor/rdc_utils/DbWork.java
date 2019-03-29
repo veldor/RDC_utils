@@ -22,7 +22,7 @@ public class DbWork {
     }
 
     private final int DB_VERSION = 1; // версия БД
-    private final String DB_NAME = "myDb";
+    public static final String DB_NAME = "myDb";
     private final static String TABLE_SHIFTS = "shifts";
     private final static String TABLE_SALARY_MONTHS = "salary_months";
     private final String TABLE_SHEDULER = "sheduler";

@@ -110,6 +110,7 @@ public class ServiceApplication extends Service {
                         remindRegisterShift(shiftStart, shiftFinish);
                     }
                 }
+                stopSelf();
             }
         });
     }

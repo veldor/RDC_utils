@@ -21,6 +21,10 @@
             android:id="@+id/settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/settings" />
+        <item
+            android:id="@+id/reserve"
+            android:icon="@drawable/ic_backup_black_24dp"
+            android:title="@string/reserve" />
 
         <item
             android:id="@+id/about"
