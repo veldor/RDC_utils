@@ -78,12 +78,6 @@ public class ScheduleViewModel extends ViewModel {
         SharedPreferencesHandler.resetPerson();
     }
 
-    public void loadSchedule() {
-        // загружу расписание
-        OneTimeWorkRequest downloadSchedule = new OneTimeWorkRequest.Builder(ScheduleDownloadWorker.class).build();
-        WorkManager.getInstance().enqueue(downloadSchedule);
-    }
-
     public LiveData<XSSFWorkbook> handleSheet() {
         return App.getInstance().handleSheet();
     }

@@ -117,7 +117,7 @@ public class Notificator {
         mNotificationManager.notify(SALARY_FILL_NOTIFICATION, notification);
     }
 
-    void sendCustomNotification(String test) {
+/*    void sendCustomNotification(String test) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, TEST_CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_monochrom)
                 .setContentTitle("Тестовое сообщение")
@@ -125,5 +125,5 @@ public class Notificator {
         Notification notification = notificationBuilder.build();
         mNotificationManager.notify(TEST_NOTIFICATION, notification);
         Log.d("surprise", "Notificator sendCustomNotification: and i work");
-    }
+    }*/
 }

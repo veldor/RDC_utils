@@ -9,12 +9,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.os.Handler;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -504,6 +503,7 @@ public class SalaryDayActivity extends AppCompatActivity {
     }
 
     // проверю готовность к сохранению записи
+    @org.jetbrains.annotations.Contract(pure = true)
     private boolean checkReady() {
         return sYearValue != null && sMonthValue != null && sDayValue != null && sCenterValue != null && sDurationValue != 0 && sRevenueValue != null;
     }
@@ -532,7 +532,7 @@ public class SalaryDayActivity extends AppCompatActivity {
         } else if (TextUtils.isEmpty(sCenterValue)) {
             activateInput(mCenterBtn, "Сначала нужно выбрать центр");
         } else if (TextUtils.isEmpty(sRevenueValue)) {
-            activateInput(mRevenueInput, "Сначала нужно ввести выручку");
+            activateInput(mRevenueInput);
         } else if (sDurationValue == 0) {
             activateInput(mDurationBtn, "Сначала нужно ввести продолжительность смены");
         } else {
@@ -545,8 +545,8 @@ public class SalaryDayActivity extends AppCompatActivity {
         Snackbar.make(mRoot, info, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void activateInput(EditText target, String info) {
-        Snackbar.make(mRoot, info, Snackbar.LENGTH_SHORT).show();
+    private void activateInput(EditText target) {
+        Snackbar.make(mRoot, "Сначала нужно ввести выручку", Snackbar.LENGTH_SHORT).show();
         target.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);

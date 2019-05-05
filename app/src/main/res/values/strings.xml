@@ -2,11 +2,7 @@
     <string name="app_name">RDC shifts</string>
     <string name="shift_settings">Shifts settings</string>
     <string name="title_activity_shift_settings">Shift settings</string>
-    <string name="shift_begin">Shift begin time</string>
-    <string name="create_shift">Create shift</string>
-    <string name="start_shift_time_hint">Start shift time</string>
     <string name="title_activity_shift_edit">edit shift</string>
-    <string name="end_shift_time_hint">End shift time</string>
     <string name="edit_shift_start_time">Edit shift start time</string>
     <string name="edit_shift_end_time">Edit shift finish time</string>
     <string name="shift_full_name_hint">Shift full name</string>
@@ -17,7 +13,6 @@
     <string name="alarm_icon">Alarm_icon</string>
     <string name="color_select">Select a badge color</string>
     <string name="test">test</string>
-    <string name="delete_btn">Delete</string>
     <string name="color">Color</string>
     <string name="dialog_shift_delete_title">Delete shift</string>
     <string name="dialog_shift_delete_message">Sure delete?  All this shifts in calendar will be make by holidays.</string>
@@ -25,7 +20,6 @@
     <string name="shift_added">Shift success added</string>
     <string name="shift_update">Shift update success</string>
     <string name="shift_delete">Shift delete success</string>
-    <string name="date_string">Year- %d month- %d</string>
     <string name="shift_image">shift image</string>
     <string name="monday_short_text">Mon</string>
     <string name="tuesday_short_text">Tue</string>
@@ -37,34 +31,12 @@
     <string name="select_day_type">Select day type</string>
     <string name="day_type_holidays">Holiday :)</string>
     <string name="shifts_total">Shifts total:</string>
-    <string name="title_activity_salary">Salary counter</string>
     <string name="name_salary">RDC salary</string>
-    <string name="month_salary_header">Month salary is</string>
-    <string name="median_gain">Median gain</string>
-    <string name="hours_total">Hours total</string>
-    <string name="shifts_in_aurora">shifts in Aurora</string>
-    <string name="shifts_in_NV">Shifts in Nizhnevolzhskaya</string>
-    <string name="hours_in_aurora">Hours in Aurora</string>
-    <string name="hours_in_NV">Hours in NV</string>
-    <string name="gain_total">Total gain</string>
-    <string name="gain_aurora">Gain Aurora</string>
-    <string name="gain_NV">Gain on Nizhnevolzhskaya</string>
-    <string name="summ_for_hours">Summ for hours</string>
-    <string name="summ_bounty">Summ bounty</string>
     <string name="contrasts_count">Contrasts count:</string>
-    <string name="on_summ">on summ</string>
     <string name="dynamic_contrasts_count">Dynamic contrasts count</string>
     <string name="oncoscreenings_count">Oncoscreenings count</string>
-    <string name="total_accrued">total_accrued</string>
-    <string name="ndfl_text">Tax from</string>
-    <string name="first_salary">To pay to first salary</string>
-    <string name="cash_summ">Cash summ</string>
-    <string name="cashless_summ">cashless summ</string>
-    <string name="second_salary">To pay to second salary</string>
     <string name="zero" translatable="false">0</string>
-    <string name="zero_cash" translatable="false">0 Р</string>
     <string name="select_month">Select month</string>
-    <string name="dialog_choose_month">Choose a month</string>
     <string name="nav_header_desc" translatable="false">header image</string>
     <string name="salary">Salary</string>
     <string name="navigation_drawer_open" translatable="false">drawer open</string>
@@ -81,8 +53,6 @@
     <string name="shift_date">Shift date</string>
     <string name="select_a_center">Select a center</string>
     <string name="select_shift_duration">Select shift duration</string>
-    <string name="save">Save</string>
-    <string name="delete">Delete</string>
     <string name="edit_salary_day">Edit day</string>
     <string name="bounty_up_limit">Bounty up limit</string>
     <string name="pay_for_hour">Pay for hour (rubles)</string>
@@ -96,7 +66,6 @@
     <string name="os_hidden">Oncoscreenings field hidden</string>
     <string name="default_selected_center">Default selected center</string>
     <string name="day_registered_message">Day registered</string>
-    <string name="no_salary">You have not salary this month</string>
     <string name="show_shifts">Show shifts</string>
     <string name="shift_notifications_channel">Shifts notifications</string>
     <string name="salary_notifications_channel">Salary notifications</string>
@@ -129,13 +98,11 @@
     <string name="contributor_name">Developer: Sergey Kirillov</string>
     <string name="app_version">App version is: %s</string>
     <string name="my_email" translatable="false">eldorianwin@gmail.com</string>
-    <string name="mail_me_tittle">Send Email</string>
     <string name="mail_subject">Review on RDC Tools</string>
     <string name="oncoscreening_settings_unlock">Oncoscreening settings unlocked!</string>
     <string name="oncoscreening_settings_already_unlock">Not needed. Unlocked yet</string>
     <string name="notification_set_alarm">set alarm</string>
     <string name="alarm_set_toast">Alarm is enabled!</string>
-    <string name="widget_test_text" translatable="false">test</string>
     <string name="my_widget_name">Salary widget</string>
     <string name="applogo">appLogo</string>
     <string name="update_file_name">RDC_tools</string>
@@ -148,7 +115,6 @@
     <string name="permissions_dialog_positive_answer">Accept</string>
     <string name="permissions_dialog_negative_answer">Deny</string>
     <string name="setting_success_restored_message">Settings restored, restart App</string>
-    <string name="progress_dialog_title">Operation in progress</string>
     <string name="loading_dialog_message">Wait</string>
     <string name="backup_dialog_message">Creating backup</string>
     <string name="restore_dialog_message">Restore backup</string>
@@ -172,7 +138,6 @@
     <string name="person_saved_message">Person saved. You may reset it in preferences.</string>
     <string name="reset_name_settings">Reset name</string>
     <string name="name_reset_message">Saved name successfully reset</string>
-    <string name="day_info_dialog_title">Day info</string>
     <string name="day_info_date">%d %s %d year</string>
     <string name="day_info_type_holiday">Holiday.</string>
     <string name="shift_begin_info">Shift begin in %s</string>

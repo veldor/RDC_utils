@@ -75,11 +75,6 @@ public class ReserveActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public boolean onSupportNavigateUp() {
         startActivity(new Intent(this, MainActivity.class));
         finish();

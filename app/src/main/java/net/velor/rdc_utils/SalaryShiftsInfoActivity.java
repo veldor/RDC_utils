@@ -1,5 +1,6 @@
 package net.velor.rdc_utils;
 
+import android.arch.persistence.room.Ignore;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -37,6 +38,7 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
     private static int sMonth;
 
     @Override
+    @Ignore
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_salary_shifts_info);

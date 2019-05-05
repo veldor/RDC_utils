@@ -3,7 +3,6 @@ package net.velor.rdc_utils.handlers;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.SalaryDayActivity;

@@ -53,8 +53,8 @@ public class TimePreference extends DialogPreference {
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (positiveResult) {
-            mLastHour = String.format(Locale.ENGLISH,"%02d", mPicker.getCurrentHour());
-            mLastMinute = String.format(Locale.ENGLISH,"%02d", mPicker.getCurrentMinute());
+            mLastHour = String.format(Locale.ENGLISH,"%02d", mPicker.getHour());
+            mLastMinute = String.format(Locale.ENGLISH,"%02d", mPicker.getMinute());
 
             String time = String.format(Locale.ENGLISH,"%s:%s", mLastHour, mLastMinute);
 

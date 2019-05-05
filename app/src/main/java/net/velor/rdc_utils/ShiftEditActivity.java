@@ -110,54 +110,36 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
         // если выбран режим обновления- загружу данные смены
 
         if (mMode.equals(MODE_UPDATE)) {
-
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    mId = i.getLongExtra(ShiftCursorAdapter.COL_ID, 0);
-                    Map<String, String> data = mDb.getShift(mId);
-                    mFullNameView.setText(data.get(ShiftCursorAdapter.COL_NAME_FULL));
-                    mShortNameView.setText(data.get(ShiftCursorAdapter.COL_NAME_SHORT));
-                    String color = data.get(ShiftCursorAdapter.COL_SHIFT_COLOR);
-                    if (color != null) {
-                        // назначен цвет
-                        mColorView.setText(color);
-                        mColorName = color;
-                    }
-                    String start = data.get(ShiftCursorAdapter.COL_SHIFT_START);
-                    if (start != null) {
-                        mShiftStartView.setText(start);
-                        mStartName = start;
-                    }
-                    String finish = data.get(ShiftCursorAdapter.COL_SHIFT_FINISH);
-                    if (finish != null) {
-                        mShiftFinishView.setText(finish);
-                        mFinishName = finish;
-                    }
-                    String alarm = data.get(ShiftCursorAdapter.COL_ALARM);
-                    assert alarm != null;
-                    if (alarm.equals(ALARM_ON)) {
-                        mAlarmSwitcher.setChecked(true);
-                        String alarmTime = data.get(ShiftCursorAdapter.COL_ALARM_TIME);
-                        if (alarmTime != null) {
-                            mAlarmView.setText(alarmTime);
-                            mAlarmName = alarmTime;
-                        }
-                    }
-                   /* // активирую кнопку удаления записи, при условии, что запись не первая
-                    if (mId != 1) {
-                        mDeleteBtn = findViewById(R.id.deleteBtn);
-                        mDeleteBtn.setVisibility(View.VISIBLE);
-                        final DeleteConfirmDialog deleteDialog = new DeleteConfirmDialog();
-                        mDeleteBtn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                deleteDialog.show(getSupportFragmentManager(), "delete");
-                            }
-                        });
-                    }*/
+            mId = i.getLongExtra(ShiftCursorAdapter.COL_ID, 0);
+            Map<String, String> data = mDb.getShift(mId);
+            mFullNameView.setText(data.get(ShiftCursorAdapter.COL_NAME_FULL));
+            mShortNameView.setText(data.get(ShiftCursorAdapter.COL_NAME_SHORT));
+            String color = data.get(ShiftCursorAdapter.COL_SHIFT_COLOR);
+            if (color != null) {
+                // назначен цвет
+                mColorView.setText(color);
+                mColorName = color;
+            }
+            String start = data.get(ShiftCursorAdapter.COL_SHIFT_START);
+            if (start != null) {
+                mShiftStartView.setText(start);
+                mStartName = start;
+            }
+            String finish = data.get(ShiftCursorAdapter.COL_SHIFT_FINISH);
+            if (finish != null) {
+                mShiftFinishView.setText(finish);
+                mFinishName = finish;
+            }
+            String alarm = data.get(ShiftCursorAdapter.COL_ALARM);
+            assert alarm != null;
+            if (alarm.equals(ALARM_ON)) {
+                mAlarmSwitcher.setChecked(true);
+                String alarmTime = data.get(ShiftCursorAdapter.COL_ALARM_TIME);
+                if (alarmTime != null) {
+                    mAlarmView.setText(alarmTime);
+                    mAlarmName = alarmTime;
                 }
-            });
+            }
         }
 
 

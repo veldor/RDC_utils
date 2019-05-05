@@ -47,10 +47,6 @@ public class PageFragment extends Fragment {
         return inflater.inflate(R.layout.month_fragment, container, false);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
 /*    public void setText(String text){
         mTvPage.setText(text);

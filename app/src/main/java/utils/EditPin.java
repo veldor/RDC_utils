@@ -106,9 +106,4 @@ public class EditPin extends AppCompatActivity {
 			}
 		});
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
 }

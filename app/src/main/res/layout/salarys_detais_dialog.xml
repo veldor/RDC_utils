@@ -50,7 +50,6 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/firstSalaryCashlessLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/firstSalarySumm"
@@ -91,7 +90,6 @@
         android:textSize="40sp" />
 
     <RelativeLayout
-        android:id="@+id/secondSalaryCashLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/secondSalarySumm">
@@ -114,7 +112,6 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/secondSalaryCashlessLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/secondSalarySumm"
