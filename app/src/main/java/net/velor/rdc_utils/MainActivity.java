@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -141,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // зарегистрирую модель
         mMyViewModel = ViewModelProviders.of(this).get(ScheduleViewModel.class);
 
-        // проверю обновления
+        /*// проверю обновления
         // проверю обновления
         final LiveData<Boolean> version = mMyViewModel.startCheckUpdate();
         version.observe(this, new Observer<Boolean>() {
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     makeUpdateSnackbar();
                 }
             }
-        });
+        });*/
     }
 
     @Override
@@ -166,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loadShifts();
     }
 
-    private void makeUpdateSnackbar() {
+/*    private void makeUpdateSnackbar() {
         Snackbar updateSnackbar = Snackbar.make(mRootView, getString(R.string.snackbar_found_update_message), Snackbar.LENGTH_INDEFINITE);
         updateSnackbar.setAction(getString(R.string.snackbar_update_action_message), new View.OnClickListener() {
             @Override
@@ -175,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         updateSnackbar.show();
-    }
+    }*/
 
     // ===================================== ЗАГРУЗКА ТИПОВ СМЕН ======================================================
 
@@ -323,8 +322,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!mMyViewModel.checkFileRead()) {
             showRightsDialog();
         } else {
-            // проверю существование файла
-            if (mMyViewModel.sheetExists()) {
                 // Покажу диалог загрузки таблицы и начну загружать
                 if (sSheet == null) {
                     showSheetLoadingDialog();
@@ -360,11 +357,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     selectMonth();
                 }
-            } else {
-                Toast.makeText(this, this.getString(R.string.no_sheet_error), Toast.LENGTH_LONG).show();
             }
         }
-    }
 
     private void selectMonth() {
         ArrayList<String> months = new ArrayList<>();

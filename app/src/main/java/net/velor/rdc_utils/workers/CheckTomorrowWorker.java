@@ -31,6 +31,7 @@ class CheckTomorrowWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.d("surprise", "CheckTomorrowWorker doWork: i work");
         // проверю, не нужно ли завтра на работу
         Calendar calendar = Calendar.getInstance();
         // получу завтрашнее число

@@ -7,7 +7,7 @@ import net.velor.rdc_utils.workers.CheckPlannerWorker;
 
 public class ForemanHandler {
     public static void startPlanner(){
-        OneTimeWorkRequest startLoadSheet = new OneTimeWorkRequest.Builder(CheckPlannerWorker.class).build();
-        WorkManager.getInstance().enqueue(startLoadSheet);
+        OneTimeWorkRequest startPlanner = new OneTimeWorkRequest.Builder(CheckPlannerWorker.class).build();
+        WorkManager.getInstance().enqueue(startPlanner);
     }
 }
