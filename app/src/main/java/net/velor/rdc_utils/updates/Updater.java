@@ -2,14 +2,12 @@ package net.velor.rdc_utils.updates;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.util.Log;
-
-
-import net.velor.rdc_utils.workers.CheckUpdateWorker;
-import net.velor.rdc_utils.workers.MakeUpdateWorker;
 
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+
+import net.velor.rdc_utils.workers.CheckUpdateWorker;
+import net.velor.rdc_utils.workers.MakeUpdateWorker;
 
 public class Updater {
 
@@ -20,7 +18,7 @@ public class Updater {
 
     public static MutableLiveData<Boolean> newVersion = new MutableLiveData<>();
     // место для хранения идентификатора загрузки обновления
-    public static MutableLiveData<Long> updateDownloadIdentificator = new MutableLiveData<>();
+    public static MutableLiveData<Long> updateDownloadIdentification = new MutableLiveData<>();
 
     public static LiveData<Boolean> checkUpdate(){
         // даю задание worker-у

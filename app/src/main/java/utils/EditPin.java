@@ -76,7 +76,7 @@ public class EditPin extends AppCompatActivity {
 		});
 	}
 
-	protected void validatePins() {
+	private void validatePins() {
 		new Handler().post(new Runnable() {
 			@Override
 			public void run() {

@@ -16,6 +16,7 @@
 
     <application
         android:name="utils.App"
+        android:largeHeap="true"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/logo"
@@ -26,13 +27,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:icon">
-        <activity android:name=".ReserveActivity"></activity>
+        <activity android:name=".ReserveActivity"/>
 
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAI9AcOK_9zBDgssRtuHyVYmEZZvtd_gsqY7jXSdA" />
 
-        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".AboutActivity"/>
         <activity
             android:name=".SalaryShiftsInfoActivity"
             android:parentActivityName=".SalaryActivity">
@@ -51,21 +52,6 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".SalaryActivity"
-            android:icon="@drawable/logo"
-            android:label="@string/name_salary"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/salary_shortcuts" />
-        </activity>
         <activity
             android:name=".ShiftEditActivity"
             android:label="@string/title_activity_shift_edit"
@@ -92,6 +78,20 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".SalaryActivity"
+            android:icon="@drawable/logo"
+            android:label="@string/name_salary"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/salary_shortcuts" />
+        </activity>
+        <activity
             android:name="utils.EditPin"
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
@@ -99,17 +99,16 @@
             android:label="@string/need_authentication"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
-        <service android:name=".ServiceApplication" />
         <service android:name=".services.UpdateWaitService" />
 
-        <receiver android:name=".BroadcastBootCompletedReceiver">
+        <receiver android:name=".broadcast_receivers.BroadcastBootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".receivers.AlarmStartReceiver"
-            android:exported="false"></receiver>
+            android:exported="false"/>
         <receiver
             android:name=".widgets.SalaryWidget"
             android:icon="@drawable/widget_preview"

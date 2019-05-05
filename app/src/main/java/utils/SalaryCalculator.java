@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import net.velor.rdc_utils.DbWork;
+import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.SalaryActivity;
 
-import java.nio.DoubleBuffer;
 import java.util.Calendar;
 
 public class SalaryCalculator {
@@ -19,8 +17,7 @@ public class SalaryCalculator {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
-        DbWork db = new DbWork(context);
-        db.getConnection();
+        DbWork db = App.getInstance().getDatabaseProvider();
         Cursor info = db.getSalaryMonth(year, month);
         if(info != null && info.moveToFirst()){
             float salary = 0;
@@ -28,8 +25,10 @@ public class SalaryCalculator {
 
             float total = info.getFloat(info.getColumnIndex(DbWork.SM_COL_TOTAL_GAIN));
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            float tariffMedian = Float.valueOf(prefs.getString(SalaryActivity.FIELD_UP_LIMIT, "0"));
-
+            String value = prefs.getString(SalaryActivity.FIELD_UP_LIMIT, "0");
+            if(value != null){
+                float tariffMedian = Float.valueOf(value);
+            }
             // посчитаю НДФЛ
 
             int hours = info.getInt(info.getColumnIndex(DbWork.SM_COL_TOTAL_HOURS));
@@ -77,7 +76,6 @@ public class SalaryCalculator {
             info.close();
             return new Float[]{salary, median, debet};
         }
-        db.closeConnection();
         return null;
     }
 }

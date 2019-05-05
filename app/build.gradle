@@ -6,8 +6,8 @@ android {
         applicationId "net.velor.rdc_utils"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 6
-        versionName "1.4.1"
+        versionCode 7
+        versionName "1.4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -32,7 +32,24 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
 
-    implementation "android.arch.work:work-runtime:1.0.0"
+    implementation 'com.android.support:cardview-v7:28.0.0'
+
+    implementation 'com.google.dagger:dagger:2.15'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.15'
+
+    implementation "android.arch.work:work-runtime:1.0.1"
 
     implementation "cz.msebera.android:httpclient:4.4.1.2"
+
+
+    implementation "com.github.SUPERCILEX.poi-android:poi:3.17"
+    implementation "com.github.SUPERCILEX.poi-android:proguard:3.17"
+    implementation "com.android.support:multidex:1.0.3"
+}
+
+allprojects {
+    repositories {
+        // ...
+        maven { url 'https://jitpack.io' }
+    }
 }

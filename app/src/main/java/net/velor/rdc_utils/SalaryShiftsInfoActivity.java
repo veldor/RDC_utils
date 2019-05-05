@@ -3,14 +3,14 @@ package net.velor.rdc_utils;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Handler;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,10 +19,13 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.velor.rdc_utils.adapters.SalaryShiftsAdapter;
+import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.widgets.SalaryWidget;
 
 import java.util.Objects;
 
+import utils.App;
 import utils.LoginActivity;
 import utils.Security;
 
@@ -41,9 +44,9 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
         sYear = intent.getIntExtra("year", 0);
         sMonth = intent.getIntExtra("month", 0);
         boolean overLimit = intent.getBooleanExtra("overLimit", false);
-        mDb = new DbWork(this);
-        mDb.getConnection();
+        mDb = App.getInstance().getDatabaseProvider();
         Cursor data = mDb.getMonthInfo(sYear, sMonth);
+        Log.d("surprise", "SalaryShiftsInfoActivity onCreate: " + data.moveToFirst());
         ListView parent = findViewById(R.id.shiftsList);
         registerForContextMenu(parent);
         parent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,22 +101,12 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
     }
     // асинхронно удалю смену
     private void deleteShift(final long id){
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
                 mDb.deleteSalaryShift(id);
                 SalaryWidget.forceUpdateWidget();
                 Toast.makeText(getApplicationContext(), "Данные удалены", Toast.LENGTH_LONG).show();
                 Objects.requireNonNull(getSupportLoaderManager().getLoader(0)).forceLoad();
-            }
-        });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mDb.closeConnection();
-    }
 
     @NonNull
     @Override

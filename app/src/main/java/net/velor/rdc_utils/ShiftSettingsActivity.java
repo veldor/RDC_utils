@@ -19,8 +19,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
+import net.velor.rdc_utils.database.DbWork;
+
 import java.util.Objects;
 
+import utils.App;
 import utils.LoginActivity;
 import utils.Security;
 
@@ -44,8 +48,7 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
             }
         });
         // подключусь к базе данных
-        mDb = new DbWork(this);
-        mDb.getConnection();
+        mDb = App.getInstance().getDatabaseProvider();
         ListView mList = findViewById(R.id.shift_list);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -124,12 +127,6 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
             }
 
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mDb.closeConnection();
     }
 
     @NonNull

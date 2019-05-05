@@ -1,4 +1,4 @@
-package net.velor.rdc_utils;
+package net.velor.rdc_utils.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +13,19 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import net.velor.rdc_utils.R;
+
 public class ShiftCursorAdapter extends CursorAdapter {
 
 
-    static final String COL_ID = "_id";
-    static final String COL_NAME_FULL = "name_full";
-    static final String COL_NAME_SHORT = "name_short";
-    static final String COL_SHIFT_START = "shift_start";
-    static final String COL_SHIFT_FINISH = "shift_end";
-    static final String COL_SHIFT_COLOR = "shift_color";
-    static final String COL_ALARM = "alarm";
-    static final String COL_ALARM_TIME = "alarm_time";
+    public static final String COL_ID = "_id";
+    public static final String COL_NAME_FULL = "name_full";
+    public static final String COL_NAME_SHORT = "name_short";
+    public static final String COL_SHIFT_START = "shift_start";
+    public static final String COL_SHIFT_FINISH = "shift_end";
+    public static final String COL_SHIFT_COLOR = "shift_color";
+    public static final String COL_ALARM = "alarm";
+    public static final String COL_ALARM_TIME = "alarm_time";
 
     private final LayoutInflater mInflater;
     private final Context mContext;

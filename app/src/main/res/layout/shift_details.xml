@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
+    android:layout_margin="3dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,8 +25,7 @@
             android:layout_marginStart="10dp"
             android:textColor="@color/colorPrimary"
             android:textSize="15sp"
-            android:textStyle="bold"
-            android:text="Вечер аврора"/>
+            android:textStyle="bold"/>
 
 
         <TextView
@@ -37,8 +36,7 @@
             android:layout_marginStart="1dp"
             android:textColor="@color/colorPrimary"
             android:textSize="15sp"
-            android:textStyle="bold"
-            android:text="@string/test"/>
+            android:textStyle="bold"/>
 
 
 
@@ -47,8 +45,7 @@
             android:layout_width="0dp"
             android:layout_weight="6"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="(с 15:00 до 23:00)"/>
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

@@ -12,20 +12,19 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import net.velor.rdc_utils.handlers.ForemanHandler;
+
 import java.util.List;
 
-import utils.App;
 import utils.EditPin;
 import utils.Fingerprint;
 import utils.FingerprintUtils;
@@ -73,7 +72,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             // проверю, если настройка изменяет время проверки смены, обновлю событие
             if(preference.getKey().equals(MainActivity.FIELD_SCHEDULE_CHECK_TIME)){
-                ServiceApplication.startMe(App.getInstance(), ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
+                ForemanHandler.startPlanner();
             }
             return true;
         }
@@ -189,18 +188,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(rootScreen);
             mCheckTime.setKey(MainActivity.FIELD_SCHEDULE_CHECK_TIME);
-            mCheckTime.setTitle(R.string.shedule_setting_title);
+            mCheckTime.setTitle(R.string.schedule_setting_title);
             setHasOptionsMenu(true);
             rootScreen.addPreference(mCheckTime);
-
-/*            checkTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    Log.d("surprise", "time changed");
-                    ServiceApplication.startMe(getActivity(), ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
-                    return true;
-                }
-            });*/
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are

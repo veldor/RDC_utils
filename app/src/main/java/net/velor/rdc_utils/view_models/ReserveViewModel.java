@@ -33,7 +33,7 @@ public class ReserveViewModel extends ViewModel {
     }
 
     public LiveData<WorkInfo> doBackup() {
-        if(checkRights().getValue()){
+        if(checkRights().getValue() != null){
             Log.d("surprise", "ReserveViewModel doBackup: start backup");
             Data inputData = new Data.Builder()
                     .putInt(OPERATION_NAME, OPERATION_START_BACKUP)
@@ -47,7 +47,7 @@ public class ReserveViewModel extends ViewModel {
     }
 
     public LiveData<WorkInfo> doRestore() {
-        if(checkRights().getValue()){
+        if(checkRights().getValue() != null){
             Log.d("surprise", "ReserveViewModel doRestore: start restore");
             Data inputData = new Data.Builder()
                     .putInt(OPERATION_NAME, OPERATION_START_RESTORE)

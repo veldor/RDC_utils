@@ -31,19 +31,19 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isFingerprintUsed = false;
     private FingerprintHelper mFingerprintHelper;
 	private EditText mEnterPin;
-	private TextView mFingerpringDialog;
+	private TextView mFingerprintDialog;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) { // инициализация вьюхи
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this); // получаю настройки приложения, где должен храниться пин приложения
-        mFingerpringDialog = findViewById(R.id.fingerprintUse);
+        mFingerprintDialog = findViewById(R.id.fingerprintUse);
         if(mPreferences.contains(Fingerprint.FIELD_USE_FINGERPRINT) && (isFingerprintUsed = mPreferences.getBoolean(Fingerprint.FIELD_USE_FINGERPRINT, false))){
-            mFingerpringDialog.setVisibility(View.VISIBLE);
+            mFingerprintDialog.setVisibility(View.VISIBLE);
         }
         else{
-            mFingerpringDialog.setVisibility(View.GONE);
+            mFingerprintDialog.setVisibility(View.GONE);
         }
         mEnterPin = findViewById(R.id.enterPin);
 		mEnterPin.addTextChangedListener(new TextWatcher() {
@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onAuthenticationError(int errMsgId, CharSequence errString) {
-			mFingerpringDialog.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_fingerprint_failure, 0, 0);
+			mFingerprintDialog.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_fingerprint_failure, 0, 0);
         }
 
         @Override
@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
         	// Успешная аутентификация
-			mFingerpringDialog.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_fingerprint_success, 0, 0);
+			mFingerprintDialog.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_fingerprint_success, 0, 0);
 
             Cipher cipher = result.getCryptoObject().getCipher();
             String encoded = mPreferences.getString(FINGERPRINT_PIN, null);
@@ -168,8 +168,8 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onAuthenticationFailed() {
-			mFingerpringDialog.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_fingerprint_failure, 0, 0);
-			Snackbar.make(findViewById(R.id.activity_login), R.string.wrong_fingreprint_action, Snackbar.LENGTH_LONG)
+			mFingerprintDialog.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_fingerprint_failure, 0, 0);
+			Snackbar.make(findViewById(R.id.activity_login), R.string.wrong_fingerprint_action, Snackbar.LENGTH_LONG)
 					.setAction("Action", null).show();
         }
     }

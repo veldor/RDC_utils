@@ -29,13 +29,13 @@ public class UpdateWaitService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // получу идентификатор загрузки
-        MutableLiveData<Long> identificator = Updater.updateDownloadIdentificator;
-        if(identificator == null){
-            Log.d("surprise", "UpdateWaitService onStartCommand: not found download identificator");
+        MutableLiveData<Long> identifier = Updater.updateDownloadIdentification;
+        if(identifier == null){
+            Log.d("surprise", "UpdateWaitService onStartCommand: not found download identifier");
             stopSelf();
         }
         else{
-            mDownloadId = identificator.getValue();
+            mDownloadId = identifier.getValue();
             // Регистрирую сервис для приёма статуса загрузки обновления
             DownloadReceiver downloadObserver = new DownloadReceiver();
             this.registerReceiver(downloadObserver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
@@ -104,7 +104,7 @@ public class UpdateWaitService extends Service {
                     }
                 }
             }
-            Toast.makeText(getApplicationContext(), "Flibusta loader update failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "update loading failed", Toast.LENGTH_LONG).show();
         }
     }
 }

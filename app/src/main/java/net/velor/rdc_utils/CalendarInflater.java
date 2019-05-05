@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.v7.widget.CardView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -14,10 +15,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Objects;
+
+import utils.App;
+import net.velor.rdc_utils.handlers.XMLHandler;
 
 class CalendarInflater {
     private static final String MODE_NEW = "new";
@@ -30,13 +37,15 @@ class CalendarInflater {
     private final int mMonth;
     private final XMLHandler mXmlHandler;
     private final HashMap<String, HashMap<String, String>> mShiftTypes;
+    private final View.OnLongClickListener mLongHandler;
     private Context mContext;
     private int mThisDay;
 
-    CalendarInflater(Context context, View.OnClickListener handler, Cursor monthInfo, LinearLayout parent, XMLHandler xmlHandler, HashMap<String, HashMap<String, String>> shiftTypes) {
+    CalendarInflater(Context context, View.OnClickListener handler, View.OnLongClickListener longHandler, Cursor monthInfo, LinearLayout parent, XMLHandler xmlHandler, HashMap<String, HashMap<String, String>> shiftTypes) {
         mContext = context;
         mMonthInfo = monthInfo;
         mHandler = handler;
+        mLongHandler = longHandler;
         mParent = parent;
         mXmlHandler = xmlHandler;
         mShiftTypes = shiftTypes;
@@ -55,14 +64,7 @@ class CalendarInflater {
         else{
             mode = MODE_NEW;
         }
-        StringBuilder xml = new StringBuilder();
-        xml.append("<?xml version=\"1.0\" encoding=\"utf-8\"?><month year='");
-        xml.append(MainActivity.sYear);
-        xml.append("' month='");
-        xml.append(MainActivity.sMonth);
-        xml.append("'>");
         Calendar mycal = new GregorianCalendar(mYear, mMonth - 1, 1);
-
         // если идёт текущий месяц- найду сегодняшнее число
         Calendar now = new GregorianCalendar();
         if(now.get(Calendar.YEAR) == mYear && (now.get(Calendar.MONTH) + 1) == mMonth ){
@@ -74,18 +76,15 @@ class CalendarInflater {
         // С какого дня недели начинается месяц
         int mStartDay = mycal.get(Calendar.DAY_OF_WEEK);
         int offset;
-        switch (mStartDay){
-            case 1:
-                offset = 6;
-                break;
-            default:
-                offset = mStartDay - 2;
+        if (mStartDay == 1) {
+            offset = 6;
+        } else {
+            offset = mStartDay - 2;
         }
         LayoutInflater li = LayoutInflater.from(mContext);
         // создам элемент вывода
         ScrollView parent = (ScrollView) li.inflate(R.layout.calendar_grid_layout, mParent, false);
         GridLayout gl = parent.findViewById(R.id.calendarGridLayout);
-        ((TextView)parent.findViewById(R.id.monthName)).setText(android.text.format.DateFormat.format("LLLL", mycal));
         int counter = 0;
         int shiftsCounter = 0;
         // добавлю отслеживание конкретных смен
@@ -103,6 +102,9 @@ class CalendarInflater {
                 }
                 else if(counter == mThisDay){
                     dayLayout.setBackground(mContext.getDrawable(R.drawable.day_now_wrapper));
+                }
+                else{
+                    dayLayout.setBackground(mContext.getDrawable(R.drawable.day_wrapper));
                 }
             }
             ((TextView)dayLayout.findViewById(R.id.dayNum)).setText(String.valueOf(counter));
@@ -135,9 +137,7 @@ class CalendarInflater {
                         dayLayout.findViewById(R.id.shiftRound).setVisibility(View.INVISIBLE);
                         String monthSchedule = mXmlHandler.setDay(String.valueOf(counter), -1);
                         Log.d("surprise", monthSchedule);
-                        DbWork db = new DbWork(mContext);
-                        db.getConnection();
-                        db.updateShedule(String.valueOf(mYear), String.valueOf(mMonth), monthSchedule);
+                        App.getInstance().getDatabaseProvider().updateSchedule(String.valueOf(mYear), String.valueOf(mMonth), monthSchedule);
                     }
                 }
             }
@@ -146,6 +146,7 @@ class CalendarInflater {
             }
             dayLayout.setId(counter);
             dayLayout.setOnClickListener(mHandler);
+            dayLayout.setOnLongClickListener(mLongHandler);
            gl.addView(dayLayout);
         }
         // добавлю строку с общим количеством смен
@@ -168,11 +169,11 @@ class CalendarInflater {
             String finish = Objects.requireNonNull(mShiftTypes.get(String.valueOf(key))).get(ShiftCursorAdapter.COL_SHIFT_FINISH);
             StringBuilder sb = new StringBuilder();
             sb.append("(");
-            if(start != null){
+            if(start != null && !TextUtils.isEmpty(start)){
                 sb.append("c ");
                 sb.append(start);
             }
-            if(finish != null){
+            if(finish != null && !TextUtils.isEmpty(finish)){
                 sb.append(" до ");
                 sb.append(finish);
             }

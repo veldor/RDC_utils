@@ -1,4 +1,4 @@
-package net.velor.rdc_utils;
+package net.velor.rdc_utils.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import net.velor.rdc_utils.SalaryActivity;
+import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -14,88 +17,96 @@ import java.util.Map;
 public class DbWork {
 
     private static final String TABLE_SALARY_DAY = "salary_day";
+    private static final String COL_SHIFT_SHORT_NAME = "name_short";
     private final DBHelper mHelper;
-    private SQLiteDatabase mConnetion;
+    private SQLiteDatabase mConnection;
 
     public DbWork(Context context) {
         mHelper = new DBHelper(context);
     }
 
-    private final int DB_VERSION = 1; // версия БД
+    private final int DB_VERSION = 2; // версия БД
     public static final String DB_NAME = "myDb";
     private final static String TABLE_SHIFTS = "shifts";
     private final static String TABLE_SALARY_MONTHS = "salary_months";
-    private final String TABLE_SHEDULER = "sheduler";
+    private final String TABLE_SCHEDULER = "scheduler";
 
     // salary_months_cols
 
-    private final static String COL_ID = "_id"; // идентификатор
-    final static String COL_YEAR = "c_year";
-    final static String COL_MONTH = "c_month";
+    public final static String COL_ID = "_id"; // идентификатор
+    public final static String COL_YEAR = "c_year";
+    public final static String COL_MONTH = "c_month";
     public final static String SM_COL_MEDIAN_GAIN = "c_median_gain"; // средняя выручка
     public final static String SM_COL_TOTAL_SHIFTS = "c_total_shifts"; // всего смен
-    final static String SM_COL_AURORA_SHIFTS = "c_aurora_shifts"; // смен в Авроре
-    final static String SM_COL_NV_SHIFTS = "c_nv_shifts"; // смен на НВ
+    public final static String SM_COL_AURORA_SHIFTS = "c_aurora_shifts"; // смен в Авроре
+    public final static String SM_COL_NV_SHIFTS = "c_nv_shifts"; // смен на НВ
     public final static String SM_COL_TOTAL_HOURS = "c_total_hours"; // Отработано часов
-    final static String SM_COL_AURORA_HOURS = "c_aurora_hours"; // Отработано часов в Авроре
-    final static String SM_COL_NV_HOURS = "c_nv_hours"; // Отработано часов на НВ
+    public final static String SM_COL_AURORA_HOURS = "c_aurora_hours"; // Отработано часов в Авроре
+    public final static String SM_COL_NV_HOURS = "c_nv_hours"; // Отработано часов на НВ
     public final static String SM_COL_TOTAL_GAIN = "c_total_gain"; // выручка
-    final static String SM_COL_AURORA_GAIN = "c_aurora_gain"; // выручка в Авроре
-    final static String SM_COL_NV_GAIN = "c_nv_gain"; // выручка на НВ
+    public final static String SM_COL_AURORA_GAIN = "c_aurora_gain"; // выручка в Авроре
+    public final static String SM_COL_NV_GAIN = "c_nv_gain"; // выручка на НВ
     public final static String SM_COL_CONTRASTS_COUNT = "c_contrasts_count"; // сделано контрастов
     public final static String SM_COL_DYNAMIC_CONTRASTS_COUNT = "c_dynamic_contrasts_count"; // сделано дин.контрастов
     public final static String SM_COL_ONCOSCREENINGS_COUNT = "c_oncoscreenings_count"; // проведено онкоскринингов
 
 
-    final static String SD_COL_DAY = "c_day";
-    final static String SD_COL_CENTER = "c_center";
-    final static String SD_COL_DURATION = "c_duration";
-    final static String SD_COL_REVENUE = "c_revenue";
-    final static String SD_COL_CONTRASTS = "c_contrasts";
-    final static String SD_COL_DCONTRASTS = "c_d_contrasts";
-    final static String SD_COL_SCREENINGS = "c_oncoscreenings";
+    public final static String SD_COL_DAY = "c_day";
+    public final static String SD_COL_CENTER = "c_center";
+    public final static String SD_COL_DURATION = "c_duration";
+    public final static String SD_COL_REVENUE = "c_revenue";
+    public final static String SD_COL_CONTRASTS = "c_contrasts";
+    public final static String SD_COL_DCONTRASTS = "c_d_contrasts";
+    public final static String SD_COL_SCREENINGS = "c_oncoscreenings";
 
 
-    static final String COL_NAME_SHIFTS = "c_shedule";
+    public static final String COL_NAME_SHIFTS = "c_schedule";
 
 
     // ==================================== ПОЛУЧЕНИЕ ИНФОРМАЦИИ О МЕСЯЦЕ
     public Cursor getSalaryMonth(int year, int month) {
         String[] selectionArgs = new String[]{String.valueOf(year), String.valueOf(month)};
-        return mConnetion.query(TABLE_SALARY_MONTHS, null, "c_year=? AND c_month=?", selectionArgs, null, null, null);
+        return mConnection.query(TABLE_SALARY_MONTHS, null, "c_year=? AND c_month=?", selectionArgs, null, null, null);
     }
 
-    Cursor getAllShifts(){
-        return mConnetion.query(TABLE_SHIFTS, null, null, null, null, null, null);
+    public Cursor getAllShifts() {
+        return mConnection.query(TABLE_SHIFTS, null, null, null, null, null, null);
     }
 
-    void updateShedule(String year, String month, String monthSchedule) {
+    public Cursor getShiftByShiftName(String shiftName){
+        String selection = String.format(Locale.ENGLISH, "%s = ?", COL_SHIFT_SHORT_NAME);
+        String[] args = {shiftName};
+        return mConnection.query(TABLE_SHIFTS, null, selection, args, null, null, null);
+    }
+
+    public void updateSchedule(String year, String month, String monthSchedule) {
         ContentValues cv = new ContentValues();
         cv.put(COL_NAME_SHIFTS, monthSchedule);
         String[] selectionArgs = new String[]{year, month};
-        int result = mConnetion.update(TABLE_SHEDULER,cv, "c_year=? AND c_month=?", selectionArgs);
-        if(result == 0){
+        int result = mConnection.update(TABLE_SCHEDULER, cv, "c_year=? AND c_month=?", selectionArgs);
+        if (result == 0) {
             Log.d("surprise", "Create absent row");
             cv.put(COL_YEAR, year);
             cv.put(COL_MONTH, month);
-            mConnetion.insert(TABLE_SHEDULER, null, cv);
+            mConnection.insert(TABLE_SCHEDULER, null, cv);
         }
     }
+
     // получу смены за выбранный месяц
-    Cursor getMonthInfo(int year, int month) {
+    public Cursor getMonthInfo(int year, int month) {
         String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ?", COL_YEAR, COL_MONTH);
         String[] args = {String.valueOf(year), String.valueOf(month)};
-        return mConnetion.query(TABLE_SALARY_DAY, null, selection, args, null, null, SD_COL_DAY);
+        return mConnection.query(TABLE_SALARY_DAY, null, selection, args, null, null, SD_COL_DAY);
     }
 
     // ===================================== ДОБАВЛЮ СМЕНУ
-    void insertShift(ContentValues cv) {
-        mConnetion.insert(TABLE_SHIFTS, null, cv);
+    public void insertShift(ContentValues cv) {
+        mConnection.insert(TABLE_SHIFTS, null, cv);
     }
 
     // ===================================== ДОБАВЛЮ ИНФОРМАЦИЮ О ВЫРУЧКЕ ЗА ДЕНЬ
-    void insertRevenue(ContentValues cv) {
-        mConnetion.beginTransaction();
+    public void insertRevenue(ContentValues cv) {
+        mConnection.beginTransaction();
         int year = cv.getAsInteger(COL_YEAR);
         int month = cv.getAsInteger(COL_MONTH);
         int day = cv.getAsInteger(SD_COL_DAY);
@@ -146,7 +157,7 @@ public class DbWork {
                 int id = monthInfo.getInt(monthInfo.getColumnIndex(COL_ID));
                 String selection = String.format(Locale.ENGLISH, "%s = ?", COL_ID);
                 String[] args = {String.valueOf(id)};
-                mConnetion.update(TABLE_SALARY_MONTHS, mcv, selection, args);
+                mConnection.update(TABLE_SALARY_MONTHS, mcv, selection, args);
             } else {
                 // данных нет, заполняю информацию
                 ContentValues mcv = new ContentValues();
@@ -174,20 +185,21 @@ public class DbWork {
                 mcv.put(SM_COL_CONTRASTS_COUNT, cv.getAsInteger(SD_COL_CONTRASTS));
                 mcv.put(SM_COL_DYNAMIC_CONTRASTS_COUNT, cv.getAsInteger(SD_COL_DCONTRASTS));
                 mcv.put(SM_COL_ONCOSCREENINGS_COUNT, cv.getAsInteger(SD_COL_SCREENINGS));
-                mConnetion.insert(TABLE_SALARY_MONTHS, null, mcv);
+                mConnection.insert(TABLE_SALARY_MONTHS, null, mcv);
             }
-            mConnetion.insert(TABLE_SALARY_DAY, null, cv);
-            mConnetion.setTransactionSuccessful();
-            mConnetion.endTransaction();
+            mConnection.insert(TABLE_SALARY_DAY, null, cv);
+            mConnection.setTransactionSuccessful();
+            mConnection.endTransaction();
         }
+        Log.d("surprise", "DbWork insertRevenue: shift already registered");
     }
 
     // ===================================== ПРОВЕРКА СВОБОДНОГО ДНЯ
-    boolean checkDay(int year, int month, int day) {
+    public boolean checkDay(int year, int month, int day) {
         String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ? AND %s = ?", COL_YEAR, COL_MONTH, SD_COL_DAY);
         String[] args = {String.valueOf(year), String.valueOf(month), String.valueOf(day)};
         String[] columns = {COL_ID};
-        Cursor c = mConnetion.query(TABLE_SALARY_DAY, columns, selection, args, null, null, null);
+        Cursor c = mConnection.query(TABLE_SALARY_DAY, columns, selection, args, null, null, null);
         if (c.getCount() > 0) {
             c.close();
             return false;
@@ -197,7 +209,7 @@ public class DbWork {
     }
 
 
-    void deleteSalaryShift(long id) {
+    public void deleteSalaryShift(long id) {
         // сперва найду смену
         Cursor shiftData = getSalaryDay(id);
         if (shiftData.moveToFirst()) {
@@ -206,15 +218,14 @@ public class DbWork {
             int month = shiftData.getInt(shiftData.getColumnIndex(COL_MONTH));
             Cursor monthInfo = getSalaryMonth(year, month);
             if (monthInfo.moveToFirst()) {
-                mConnetion.beginTransaction();
+                mConnection.beginTransaction();
                 int monthId = monthInfo.getInt(monthInfo.getColumnIndex(COL_ID));
                 // количество смен
                 int shifts = monthInfo.getInt(monthInfo.getColumnIndex(SM_COL_TOTAL_SHIFTS)) - 1;
                 // если количество смен после удаления записи будет равно нулю- удалю сведения о месяце
-                if(shifts == 0){
+                if (shifts == 0) {
                     deleteSalaryMonth(monthId);
-                }
-                else{
+                } else {
                     ContentValues mcv = new ContentValues();
                     // получу данные о центре
                     String center = shiftData.getString(shiftData.getColumnIndex(SD_COL_CENTER));
@@ -252,42 +263,48 @@ public class DbWork {
                     // Обновлю запись
                     String selection = String.format(Locale.ENGLISH, "%s = ?", COL_ID);
                     String[] args = {String.valueOf(monthId)};
-                    mConnetion.update(TABLE_SALARY_MONTHS, mcv, selection, args);
+                    mConnection.update(TABLE_SALARY_MONTHS, mcv, selection, args);
                 }
                 // удалю смену
                 deleteSalaryDay(id);
-                mConnetion.setTransactionSuccessful();
-                mConnetion.endTransaction();
+                mConnection.setTransactionSuccessful();
+                mConnection.endTransaction();
                 shiftData.close();
                 monthInfo.close();
             }
         }
     }
 
-    private void deleteSalaryMonth(long id){
+    private void deleteSalaryMonth(long id) {
         String selection = String.format(Locale.ENGLISH, "%s = ?", COL_ID);
         String[] args = {String.valueOf(id)};
-        mConnetion.delete(TABLE_SALARY_MONTHS, selection, args);
+        mConnection.delete(TABLE_SALARY_MONTHS, selection, args);
     }
-    private void deleteSalaryDay(long id){
+
+    private void deleteSalaryDay(long id) {
         String selection = String.format(Locale.ENGLISH, "%s = ?", COL_ID);
         String[] args = {String.valueOf(id)};
-        mConnetion.delete(TABLE_SALARY_DAY, selection, args);
+        mConnection.delete(TABLE_SALARY_DAY, selection, args);
     }
 
-    Cursor getSalaryDay(long id) {
-        return mConnetion.query(TABLE_SALARY_DAY, null, ShiftCursorAdapter.COL_ID + " = '" + id + "'", null, null, null, null);
+    public Cursor getSalaryDay(long id) {
+        return mConnection.query(TABLE_SALARY_DAY, null, ShiftCursorAdapter.COL_ID + " = '" + id + "'", null, null, null, null);
+    }
+    public Cursor getSalaryDayByDate(int year, int month, int day) {
+        String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ? AND %s = ?", COL_YEAR, COL_MONTH, SD_COL_DAY);
+        String[] args = {String.valueOf(year), String.valueOf(month), String.valueOf(day)};
+        return mConnection.query(TABLE_SALARY_DAY, null, selection, args, null, null, null);
     }
 
-    Cursor getShedule(int year, int month){
+    public Cursor getSchedule(int year, int month) {
         String[] selectionArgs = new String[]{String.valueOf(year), String.valueOf(month)};
-        return mConnetion.query(TABLE_SHEDULER, null, "c_year=? AND c_month=?", selectionArgs, null, null, null);
+        return mConnection.query(TABLE_SCHEDULER, null, "c_year=? AND c_month=?", selectionArgs, null, null, null);
     }
 
-    Map<String, String> getShift(long id) {
-        Cursor c = mConnetion.query(TABLE_SHIFTS, null, ShiftCursorAdapter.COL_ID + " = '" + id + "'", null, null, null, null);
-        Map <String, String> values = new HashMap<>();
-        if(c.moveToFirst()){
+    public Map<String, String> getShift(long id) {
+        Cursor c = mConnection.query(TABLE_SHIFTS, null, ShiftCursorAdapter.COL_ID + " = '" + id + "'", null, null, null, null);
+        Map<String, String> values = new HashMap<>();
+        if (c.moveToFirst()) {
             values.put(ShiftCursorAdapter.COL_NAME_FULL, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_NAME_FULL)));
             values.put(ShiftCursorAdapter.COL_NAME_SHORT, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_NAME_SHORT)));
             values.put(ShiftCursorAdapter.COL_SHIFT_START, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_START)));
@@ -299,14 +316,15 @@ public class DbWork {
         c.close();
         return values;
     }
-    void updateShift(ContentValues cv, long id) {
-        mConnetion.update(TABLE_SHIFTS,cv, ShiftCursorAdapter.COL_ID + " = " + id, null);
+
+    public void updateShift(ContentValues cv, long id) {
+        mConnection.update(TABLE_SHIFTS, cv, ShiftCursorAdapter.COL_ID + " = " + id, null);
     }
 
-    int checkName(String colName, String val){
+    public int checkName(String colName, String val) {
         // проверю, нет ли уже в базе строки с данным именем
-        Cursor c = mConnetion.query(TABLE_SHIFTS, null, colName + " = '" + val + "'", null, null, null, null);
-        if(c.moveToFirst()){
+        Cursor c = mConnection.query(TABLE_SHIFTS, null, colName + " = '" + val + "'", null, null, null, null);
+        if (c.moveToFirst()) {
             int id = c.getInt(c.getColumnIndex(ShiftCursorAdapter.COL_ID));
             c.close();
             return id;
@@ -315,18 +333,15 @@ public class DbWork {
         return 0;
     }
 
-    void deleteShift(long mId) {
+    public void deleteShift(long mId) {
         // удалю смену
-        mConnetion.delete(TABLE_SHIFTS, ShiftCursorAdapter.COL_ID + " = " + mId, null);
+        mConnection.delete(TABLE_SHIFTS, ShiftCursorAdapter.COL_ID + " = " + mId, null);
     }
 
     public void getConnection() {
-        mConnetion = mHelper.getWritableDatabase();
+        mConnection = mHelper.getWritableDatabase();
     }
 
-   public void closeConnection() {
-        mConnetion.close();
-    }
 
     private class DBHelper extends SQLiteOpenHelper {
 
@@ -373,16 +388,16 @@ public class DbWork {
 
 
             // создаю таблицу для календаря
-            db.execSQL("create table sheduler ("
+            db.execSQL("create table scheduler ("
                     + "_id integer primary key autoincrement,"
                     + "c_year CHAR(4),"
                     + "c_month CHAR(2),"
-                    + "c_shedule text" + ");");
+                    + "c_schedule text" + ");");
             // создаю таблицу для типов смен
             db.execSQL("create table " + TABLE_SHIFTS + " (" +
                     "_id integer primary key autoincrement," +
                     " name_full VARCHAR(50) NOT NULL," +
-                    " name_short CHAR(2) NOT NULL," +
+                    " name_short CHAR(50) NOT NULL," +
                     " shift_start CHAR(5), shift_end CHAR(5)," +
                     " shift_color CHAR(7)," +
                     " alarm BOOL DEFAULT '0'," +
@@ -401,7 +416,46 @@ public class DbWork {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if(oldVersion == 1 && newVersion == 2){
+                db.beginTransaction();
 
+                try {
+                    db.execSQL("create table scheduler ("
+                            + "_id integer primary key autoincrement,"
+                            + "c_year CHAR(4),"
+                            + "c_month CHAR(2),"
+                            + "c_schedule text" + ");");
+                    db.execSQL("insert into scheduler select _id, c_year, c_month, c_shedule from sheduler;");
+                    db.execSQL("drop table sheduler");
+
+                    // создам временную таблицу для данных типов смен
+
+                    db.execSQL("create temporary table temp_" + TABLE_SHIFTS + " (" +
+                            "_id integer primary key autoincrement," +
+                            " name_full VARCHAR(50) NOT NULL," +
+                            " name_short CHAR(50) NOT NULL," +
+                            " shift_start CHAR(5), shift_end CHAR(5)," +
+                            " shift_color CHAR(7)," +
+                            " alarm BOOL DEFAULT '0'," +
+                            " alarm_time CHAR(5) );");
+
+                    db.execSQL("insert into temp_" + TABLE_SHIFTS + " select _id, name_full, name_short, shift_start, shift_end, shift_color, alarm, alarm_time from " + TABLE_SHIFTS + ";");
+                    db.execSQL("drop table " + TABLE_SHIFTS);
+                    db.execSQL("create table " + TABLE_SHIFTS + " (" +
+                            "_id integer primary key autoincrement," +
+                            " name_full VARCHAR(50) NOT NULL," +
+                            " name_short CHAR(50) NOT NULL," +
+                            " shift_start CHAR(5), shift_end CHAR(5)," +
+                            " shift_color CHAR(7)," +
+                            " alarm BOOL DEFAULT '0'," +
+                            " alarm_time CHAR(5) );");
+                    db.execSQL("insert into " + TABLE_SHIFTS + " select _id, name_full, name_short, shift_start, shift_end, shift_color, alarm, alarm_time from temp_" + TABLE_SHIFTS + ";");
+                    db.execSQL("drop table temp_" + TABLE_SHIFTS + ";");
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
         }
     }
 }

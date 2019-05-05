@@ -49,13 +49,13 @@ public class AboutActivity extends AppCompatActivity {
                 ++ mCounter;
                 if(mCounter == 20){
                     SharedPreferences prefsManager = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    boolean isOSunlocked = prefsManager.getBoolean(SettingsActivity.ONCOSCREENING_UNLOCK, false);
-                    if(isOSunlocked){
-                        Toast.makeText(AboutActivity.this, getString(R.string.oncosreening_settings_already_unlock), Toast.LENGTH_LONG).show();
+                    boolean isOsUnlocked = prefsManager.getBoolean(SettingsActivity.ONCOSCREENING_UNLOCK, false);
+                    if(isOsUnlocked){
+                        Toast.makeText(AboutActivity.this, getString(R.string.oncoscreening_settings_already_unlock), Toast.LENGTH_LONG).show();
                     }
                     else{
                         prefsManager.edit().putBoolean(SettingsActivity.ONCOSCREENING_UNLOCK, true).apply();
-                        Toast.makeText(AboutActivity.this, getString(R.string.oncosreening_settings_unlock), Toast.LENGTH_LONG).show();
+                        Toast.makeText(AboutActivity.this, getString(R.string.oncoscreening_settings_unlock), Toast.LENGTH_LONG).show();
                     }
                 }
             }

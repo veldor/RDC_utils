@@ -1,8 +1,10 @@
-package net.velor.rdc_utils;
+package net.velor.rdc_utils.handlers;
 
-import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
+import android.text.TextUtils;
+
+import net.velor.rdc_utils.MainActivity;
+import net.velor.rdc_utils.database.DbWork;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,8 +14,10 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,12 +28,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-class XMLHandler {
+import utils.App;
+
+public class XMLHandler {
     private static final String ATTRIBUTE_TYPE = "type";
     private Document mShiftDom;
     private String mShifts;
 
-    XMLHandler(Cursor shifts) {
+    public XMLHandler(Cursor shifts) {
         if (shifts.moveToFirst()) {
             // смены есть
             mShifts = shifts.getString(shifts.getColumnIndex(DbWork.COL_NAME_SHIFTS));
@@ -55,7 +61,7 @@ class XMLHandler {
             mShifts = xml.toString();
         }
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = null;
+        DocumentBuilder dBuilder;
         try {
             dBuilder = dbFactory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(mShifts));
@@ -69,9 +75,56 @@ class XMLHandler {
         }
     }
 
-    static int checkShift(Cursor shedule, int day) {
-        if(shedule.moveToFirst()){
-            String shifts = shedule.getString(shedule.getColumnIndex(DbWork.COL_NAME_SHIFTS));
+    public XMLHandler(ArrayList<String> shifts) {
+        if (!shifts.isEmpty()) {
+            // смены есть
+            // получу список существующих смен
+            HashMap<String, String> existentShifts = ShiftsHandler.getShiftsWithNames();
+            int counter = 0;
+            StringBuilder xml = new StringBuilder();
+            xml.append("<?xml version=\"1.0\" encoding=\"utf-8\"?><month year='");
+            xml.append(MainActivity.sYear);
+            xml.append("' month='");
+            xml.append(MainActivity.sMonth);
+            xml.append("'>");
+            Calendar mycal = new GregorianCalendar(MainActivity.sYear, MainActivity.sMonth - 1, 1);
+            // узнаю, сколько дней нужно прорисовать
+            int daysInMonth = mycal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            while (counter < daysInMonth) {
+                ++counter;
+                xml.append("<day id='");
+                xml.append(counter);
+                xml.append("' type='");
+                String value = shifts.get(counter - 1);
+                if(TextUtils.isEmpty(value)){
+                    xml.append(-1);
+                }
+                else{
+                    xml.append(existentShifts.get(value));
+                }
+                xml.append("'/>");
+            }
+            xml.append("</month>");
+            mShifts = xml.toString();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder;
+            try {
+                dBuilder = dbFactory.newDocumentBuilder();
+                InputSource is = new InputSource(new StringReader(mShifts));
+                mShiftDom = dBuilder.parse(is);
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static int checkShift(Cursor schedule, int day) {
+        if (schedule.moveToFirst()) {
+            String shifts = schedule.getString(schedule.getColumnIndex(DbWork.COL_NAME_SHIFTS));
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             try {
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -91,7 +144,7 @@ class XMLHandler {
         return -1;
     }
 
-    String setDay(String day, int type) {
+    public String setDay(String day, int type) {
         Element dayElement = mShiftDom.getElementById(day);
         // нужно распарсить XML, найти день и изменить его тип
         dayElement.setAttribute(ATTRIBUTE_TYPE, String.valueOf(type));
@@ -119,5 +172,9 @@ class XMLHandler {
     public String getDayType(String day) {
         Element dayElement = mShiftDom.getElementById(day);
         return dayElement.getAttribute(ATTRIBUTE_TYPE);
+    }
+
+    public void save(){
+        App.getInstance().getDatabaseProvider().updateSchedule(String.valueOf(MainActivity.sYear), String.valueOf(MainActivity.sMonth), mShifts);
     }
 }

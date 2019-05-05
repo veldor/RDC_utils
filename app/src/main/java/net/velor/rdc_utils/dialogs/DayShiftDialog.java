@@ -1,4 +1,4 @@
-package net.velor.rdc_utils;
+package net.velor.rdc_utils.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,7 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
+
+import net.velor.rdc_utils.R;
 
 import java.util.ArrayList;
 
@@ -17,7 +18,7 @@ public class DayShiftDialog extends DialogFragment implements DialogInterface.On
     private AnswerDialogListener mListener;
 
     public interface AnswerDialogListener {
-        void onDialogPositiveClick(DialogFragment dialog, int choise);
+        void onDialogPositiveClick(DialogFragment dialog, int choice);
     }
 
     @NonNull

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.R;
@@ -17,14 +18,17 @@ import net.velor.rdc_utils.SalaryDayActivity;
 import net.velor.rdc_utils.receivers.AlarmStartReceiver;
 
 import java.util.Calendar;
+
 import static utils.CashHandler.timeToInt;
 
 
 public class Notificator {
     private static final String SHIFTS_CHANNEL_ID = "shifts";
     private static final String SALARY_CHANNEL_ID = "salary";
+    private static final String TEST_CHANNEL_ID = "test";
     public static final int NEXT_DAY_SHIFT_NOTIFICATION = 0;
     public static final int SALARY_FILL_NOTIFICATION = 1;
+    private static final int TEST_NOTIFICATION = 2;
     private final Context mContext;
     private final NotificationManager mNotificationManager;
 
@@ -44,6 +48,13 @@ public class Notificator {
             nc.setDescription(mContext.getString(R.string.salary_reminder));
             nc.enableLights(true);
             nc.setLightColor(Color.BLUE);
+            nc.enableVibration(true);
+            mNotificationManager.createNotificationChannel(nc);
+            // создам канал тестовых уведомлений
+            nc = new NotificationChannel(TEST_CHANNEL_ID, mContext.getString(R.string.test_notifications_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            nc.setDescription(mContext.getString(R.string.test_reminder));
+            nc.enableLights(true);
+            nc.setLightColor(Color.GREEN);
             nc.enableVibration(true);
             mNotificationManager.createNotificationChannel(nc);
         }
@@ -93,9 +104,7 @@ public class Notificator {
         // при нажатии на уведомление запушу главную активность смен
         Intent startSalaryIntent = new Intent(mContext, SalaryActivity.class);
         PendingIntent startMainPending = PendingIntent.getActivity(mContext, 0, startSalaryIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         String text = "Смена успешно закончена (судя по времени). Вы можете заполнить информацию о выручке для расчёта заработной платы";
-
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, SALARY_CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_monochrom)
                 .setContentTitle("Смена закончена")
@@ -106,5 +115,15 @@ public class Notificator {
                 .addAction(0, "Добавить сведения", registerShiftPending);
         Notification notification = notificationBuilder.build();
         mNotificationManager.notify(SALARY_FILL_NOTIFICATION, notification);
+    }
+
+    void sendCustomNotification(String test) {
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, TEST_CHANNEL_ID)
+                .setSmallIcon(R.drawable.logo_monochrom)
+                .setContentTitle("Тестовое сообщение")
+                .setContentText(test);
+        Notification notification = notificationBuilder.build();
+        mNotificationManager.notify(TEST_NOTIFICATION, notification);
+        Log.d("surprise", "Notificator sendCustomNotification: and i work");
     }
 }

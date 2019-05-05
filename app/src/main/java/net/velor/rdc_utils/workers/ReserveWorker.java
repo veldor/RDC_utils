@@ -5,7 +5,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import net.velor.rdc_utils.DbWork;
+import net.velor.rdc_utils.database.DbWork;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -65,8 +64,8 @@ public class ReserveWorker extends Worker {
                 File zip = new File(backupDir, BACKUP_FILE_NAME);
                 FileOutputStream dest = new FileOutputStream(zip);
                 ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
-                byte dataBuffer[] = new byte[BUFFER];
-                File sharedPrefsFile = null;
+                byte[] dataBuffer = new byte[BUFFER];
+                File sharedPrefsFile;
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     sharedPrefsFile = new File(context.getDataDir() + "/shared_prefs/net.velor.rdc_utils_preferences.xml");
                 } else {

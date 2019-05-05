@@ -1,4 +1,4 @@
-package net.velor.rdc_utils;
+package net.velor.rdc_utils.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import net.velor.rdc_utils.R;
+import net.velor.rdc_utils.SalaryActivity;
+import net.velor.rdc_utils.database.DbWork;
 
 import java.util.Locale;
 
@@ -24,10 +28,10 @@ public class SalaryShiftsAdapter extends CursorAdapter {
     private final String mContrastCost;
     private final String mNormalBounty;
     private final String mDContrastCost;
-    private final String mOncosreeningCost;
+    private final String mOncoscreeningCost;
     private final SharedPreferences mPrefsManager;
 
-    SalaryShiftsAdapter(Context context, Cursor c, boolean overLimit, int flags) {
+    public SalaryShiftsAdapter(Context context, Cursor c, boolean overLimit, int flags) {
         super(context, c, flags);
         mOverLimit = overLimit;
         mInflater = (LayoutInflater) context
@@ -41,7 +45,7 @@ public class SalaryShiftsAdapter extends CursorAdapter {
         mUpBounty = mPrefsManager.getString(SalaryActivity.FIELD_HIGH_BOUNTY_PERCENT, "0");
         mContrastCost = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_CONTRAST, "0");
         mDContrastCost = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST, "0");
-        mOncosreeningCost = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, "0");
+        mOncoscreeningCost = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, "0");
     }
 
     @Override
@@ -76,7 +80,7 @@ public class SalaryShiftsAdapter extends CursorAdapter {
         float summForHours = hours * Float.valueOf(mForHour);
         float summForContrasts = Integer.valueOf(contrastsSumm) * Float.valueOf(mContrastCost);
         float summForDContrasts = Integer.valueOf(dContrastsSumm) * Float.valueOf(mDContrastCost);
-        float summForScreenings = Integer.valueOf(screeningsSumm) * Float.valueOf(mOncosreeningCost);
+        float summForScreenings = Integer.valueOf(screeningsSumm) * Float.valueOf(mOncoscreeningCost);
         float ndfl = countPercent(summForHours, "13.");
         float totalSumm;
         if(mOverLimit){

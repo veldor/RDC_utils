@@ -55,12 +55,12 @@ public class Fingerprint {
     private static KeyStore sKeyStore; // Защищенное хранилище для ключей.
     private static KeyPairGenerator sKeyPairGenerator; // Генератор публичных и закрытых ключей
 
-    static boolean checkFingerprintCompatibility(@NonNull Context context) { // проверка доступности сканера отпечатков
+    private static boolean checkFingerprintCompatibility(@NonNull Context context) { // проверка доступности сканера отпечатков
         return FingerprintManagerCompat.from(context).isHardwareDetected(); //FingerprintManagerCompat — это удобная обертка для обычного FingerprintManager’а, которая упрощает проверку устройства на совместимость, инкапсулируя в себе проверку версии API. В данном случае, isHardwareDetected() вернет false, если API ниже 23.
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-    static SensorState checkSensorState(@NonNull Context context) { // нужно понять, готов ли сенсор к использованию
+    public static SensorState checkSensorState(@NonNull Context context) { // нужно понять, готов ли сенсор к использованию
         if (checkFingerprintCompatibility(context)) {
             KeyguardManager keyguardManager =
                     (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
@@ -93,7 +93,7 @@ public class Fingerprint {
         try {
             // При инициализации мы указываем, в какой кейстор пойдут сгенерированные ключи и для какого алгоритма предназначен этот ключ.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // для данной проверки требуется версия андроида M или больше
-                sKeyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore"); // RSA (аббревиатура от фамилий Rivest, Shamir и Adleman) — криптографический алгоритм с открытым ключом, основывающийся на вычислительной сложности задачи факторизации больших целых чисел.
+                sKeyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore"); // RSA  — криптографический алгоритм с открытым ключом, основывающийся на вычислительной сложности задачи факторизации больших целых чисел.
             }
             return true;
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -179,7 +179,7 @@ public class Fingerprint {
         sCipher.init(mode, unrestricted, spec);
     }
 
-    public static void deleteInvalidKey() { // Удаление ключа
+    private static void deleteInvalidKey() { // Удаление ключа
         // Момент с KeyPermanentlyInvalidatedException — если по какой-то причине ключ нельзя использовать, выстреливает это исключение. Возможные причины — добавление нового отпечатка к существующему, смена или полное удаление блокировки. Тогда ключ более не имеет смысла хранить, и мы его удаляем.
         if (getKeyStore()) {
             try {
@@ -195,7 +195,7 @@ public class Fingerprint {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public static String encode(String inputString) { // Опишем метод, который зашифровывает строку аргумент:
+    private static String encode(String inputString) { // Опишем метод, который зашифровывает строку аргумент:
         try {
             if (prepare() && initCipher(Cipher.ENCRYPT_MODE)) { // подготовка к шифровке
                 byte[] bytes = sCipher.doFinal(inputString.getBytes()); // получаю массив байтов зашифрованной строки
@@ -236,7 +236,7 @@ public class Fingerprint {
 
         //Строго говоря, мы создаем криптообъект и отправляем его на вход в authenticate() как раз для получения этого самого подтверждения.
 
-        //Если getCryptoObject() вернул null, то это значит, что при инициализации Chiper'а произошел KeyPermanentlyInvalidatedException. Тут уже ничего не поделаешь, кроме как дать пользователю знать, что вход по отпечатку недоступен и ему придется заново ввести пин-код.
+        //Если getCryptoObject() вернул null, то это значит, что при инициализации Cipher произошел KeyPermanentlyInvalidatedException. Тут уже ничего не поделаешь, кроме как дать пользователю знать, что вход по отпечатку недоступен и ему придется заново ввести пин-код.
 
         if (prepare() && initCipher(Cipher.DECRYPT_MODE)) {
             return new FingerprintManagerCompat.CryptoObject(sCipher);

@@ -27,9 +27,9 @@ public class TimePreference extends DialogPreference {
         return(String.format(Locale.ENGLISH,"%02d",Integer.parseInt(pieces[1])));
     }
 
-    TimePreference(Context ctxt, AttributeSet attrs) {
+    TimePreference(Context context, AttributeSet attrs) {
 
-        super(ctxt, attrs);
+        super(context, attrs);
 
         setPositiveButtonText(android.R.string.ok);
         setNegativeButtonText(android.R.string.cancel);
@@ -44,8 +44,8 @@ public class TimePreference extends DialogPreference {
     @Override
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
-        mPicker.setCurrentHour(Integer.valueOf(mLastHour));
-        mPicker.setCurrentMinute(Integer.valueOf(mLastMinute));
+        mPicker.setHour(Integer.valueOf(mLastHour));
+        mPicker.setMinute(Integer.valueOf(mLastMinute));
         mPicker.setIs24HourView(true);
     }
 

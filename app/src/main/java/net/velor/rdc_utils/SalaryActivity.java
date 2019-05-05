@@ -11,11 +11,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
+import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -23,7 +24,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -39,13 +39,14 @@ import android.widget.TextView;
 
 import com.whiteelephant.monthpicker.MonthPickerDialog;
 
+import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.view_models.SalaryViewModel;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
+import utils.App;
 import utils.LoginActivity;
 import utils.Security;
 
@@ -90,7 +91,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     private String mNormalBounty;
     private String mContrastCost = "0";
     private String mDContrastCost = "0";
-    private String mOncosreeningCost = "0";
+    private String mOncoscreeningCost = "0";
     private Button mChooseMonthBtn;
     private TextView mMedianGainSumm, mBalanceSumm, mTotalGainSumm;
     private LayoutInflater mInflater;
@@ -98,8 +99,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     private AlertDialog mNoSettingsDialog;
     private boolean mDetailsVisible;
     private SalaryViewModel mMyViewModel;
-    private View mRootView;
-    private NavigationView mNavigationView;
+    private ConstraintLayout mRootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,8 +135,8 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
         // зарегистрирую пункты  меню для обработки
-        mNavigationView = findViewById(R.id.nav_view);
-        mNavigationView.setNavigationItemSelectedListener(this);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         mChooseMonthBtn = findViewById(R.id.salaryDate);
 
@@ -149,8 +149,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             mChooseMonthBtn.setText(getDate());
         }
         // получу класс для работы с базой данных
-        mDb = new DbWork(this);
-        mDb.getConnection();
+        mDb = App.getInstance().getDatabaseProvider();
 
         // кнопка выбора месяца
         mChooseMonthBtn.setOnClickListener(new View.OnClickListener() {
@@ -187,10 +186,6 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
 
         // Добавлю менеджер настроек
         mPrefsManager = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        // запускаю сервис приложения
-        ServiceApplication.startMe(this, ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
-
-
         // статичные поля
 
         mMedianGainSumm = findViewById(R.id.firstSalaryCashSumm);
@@ -199,14 +194,14 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         mTotalGainSumm = findViewById(R.id.firstSalarySumm);
 
         // кнопка отображения\скрытия деталей
-        final Button showDetais = findViewById(R.id.btnDetails);
-        showDetais.setOnClickListener(new View.OnClickListener() {
+        final Button showDetail = findViewById(R.id.btnDetails);
+        showDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mDetailsVisible) {
                     mDetailsVisible = false;
                     Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.spoiler_close);
-                    Drawable[] myTextViewCompoundDrawables = showDetais.getCompoundDrawables();
+                    Drawable[] myTextViewCompoundDrawables = showDetail.getCompoundDrawables();
                     for (Drawable drawable : myTextViewCompoundDrawables) {
                         if (drawable == null)
                             continue;
@@ -231,7 +226,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                     });
                 } else {
                     Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.spoiler_open);
-                    Drawable[] myTextViewCompoundDrawables = showDetais.getCompoundDrawables();
+                    Drawable[] myTextViewCompoundDrawables = showDetail.getCompoundDrawables();
                     for (Drawable drawable : myTextViewCompoundDrawables) {
                         if (drawable == null)
                             continue;
@@ -288,7 +283,6 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, MENU_ITEM_COUNT_SALARYS, 0, getString(R.string.count_salarys));
         menu.add(0, MENU_ITEM_SHOW_SHIFTS, 0, getString(R.string.show_shifts));
-        menu.add(0, 4, 0, "emulate shift");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -296,7 +290,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_ITEM_COUNT_SALARYS:
-                countSalarys(this);
+                countSalary(this);
                 break;
             case MENU_ITEM_SHOW_SHIFTS:
                 showShifts();
@@ -305,15 +299,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     }
 
 
-    private void countSalarys(final Context context) {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.SECONDS.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    private void countSalary(final Context context) {
                 AlertDialog.Builder ad = new AlertDialog.Builder(context);
                 ad.setTitle("Расчёт заработной платы");
                 // проведу расчёты
@@ -321,14 +307,32 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                 Cursor monthInfo = mDb.getMonthInfo(sYear, sMonth);
                 if (monthInfo.moveToFirst()) {
                     HashMap<String, Float> salaryData;
-                    salaryData = calculateSalays(monthInfo);
-                    CardView view = (CardView) mInflater.inflate(R.layout.salarys_detais_dialog, null, false);
-                    ((TextView)view.findViewById(R.id.firstSalarySumm)).setText(addRuble(salaryData.get(FIRST_SALARY_TOTAL)));
-                    ((TextView)view.findViewById(R.id.firstSalaryCashSumm)).setText(addRuble(salaryData.get(FIRST_SALARY_CASH)));
-                    ((TextView)view.findViewById(R.id.firstSalaryCashlessSumm)).setText(addRuble(salaryData.get(FIRST_SALARY_CASHLESS)));
-                    ((TextView)view.findViewById(R.id.secondSalarySumm)).setText(addRuble(salaryData.get(SECOND_SALARY_TOTAL)));
-                    ((TextView)view.findViewById(R.id.secondSalaryCashSumm)).setText(addRuble(salaryData.get(SECOND_SALARY_CASH)));
-                    ((TextView)view.findViewById(R.id.secondSalaryCashlessSumm)).setText(addRuble(salaryData.get(SECOND_SALARY_CASHLESS)));
+                    salaryData = calculateSalary(monthInfo);
+                    CardView view = (CardView) mInflater.inflate(R.layout.salarys_detais_dialog, mRootView, false);
+                    Float firstSalaryTotal = salaryData.get(FIRST_SALARY_TOTAL);
+                    if(firstSalaryTotal != null){
+                        ((TextView)view.findViewById(R.id.firstSalarySumm)).setText(addRuble(firstSalaryTotal));
+                    }
+                    Float firstSalaryCashSumm = salaryData.get(FIRST_SALARY_CASH);
+                    if(firstSalaryCashSumm != null){
+                        ((TextView)view.findViewById(R.id.firstSalaryCashSumm)).setText(addRuble(firstSalaryCashSumm));
+                    }
+                    Float firstSalaryCashlessSumm = salaryData.get(FIRST_SALARY_CASHLESS);
+                    if(firstSalaryCashlessSumm != null){
+                        ((TextView)view.findViewById(R.id.firstSalaryCashlessSumm)).setText(addRuble(firstSalaryCashlessSumm));
+                    }
+                    Float secondSalarySumm = salaryData.get(SECOND_SALARY_TOTAL);
+                    if(secondSalarySumm != null){
+                        ((TextView)view.findViewById(R.id.secondSalarySumm)).setText(addRuble(secondSalarySumm));
+                    }
+                    Float secondSalaryCashSumm = salaryData.get(SECOND_SALARY_CASH);
+                    if(secondSalaryCashSumm != null){
+                        ((TextView)view.findViewById(R.id.secondSalaryCashSumm)).setText(addRuble(secondSalaryCashSumm));
+                    }
+                    Float secondSalaryCashlessSumm = salaryData.get(SECOND_SALARY_CASHLESS);
+                    if(secondSalaryCashlessSumm != null){
+                        ((TextView)view.findViewById(R.id.secondSalaryCashlessSumm)).setText(addRuble(secondSalaryCashlessSumm));
+                    }
                     ad.setView(view);
                 } else {
                     String salaryData = "Кто не работает- тот не ест. Смены не расчитаны";
@@ -337,11 +341,9 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                 }
                 // создам AlertDialog с данными
                 ad.show();
-            }
-        });
     }
 
-    private HashMap<String, Float> calculateSalays(Cursor monthInfo) {
+    private HashMap<String, Float> calculateSalary(Cursor monthInfo) {
         monthInfo.moveToFirst();
         HashMap<String, Float> result = new HashMap<>();
         float firstSalaryCash = 0;
@@ -361,12 +363,12 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             float summForHours = hours * Float.valueOf(mForHour);
             float summForContrasts = ct * Float.valueOf(mContrastCost);
             float summForDContrasts = dct * Float.valueOf(mDContrastCost);
-            float summForScreenings = os * Float.valueOf(mOncosreeningCost);
-            double ndlf = countPercent(summForHours, NDFL_RATE);
+            float summForScreenings = os * Float.valueOf(mOncoscreeningCost);
+            double ndfl = countPercent(summForHours, NDFL_RATE);
             if (date < 16) {
                 // считаю сумму за день по обычной ставке, потом проверяю, если процен повышен- считаю по повышенной
                 float summBounty = countPercent(revenue, mNormalBounty);
-                firstSalaryCash += summForHours - ndlf;
+                firstSalaryCash += summForHours - ndfl;
                 firstSalaryCashless += summBounty + summForContrasts + summForDContrasts + summForScreenings;
                 secondSalaryCash = firstSalaryCash;
                 if (mLimitOver) {
@@ -377,7 +379,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                     secondSalaryCashless += summBounty + summForContrasts + summForDContrasts + summForScreenings;
                 }
             } else {
-                secondSalaryCash += summForHours - ndlf;
+                secondSalaryCash += summForHours - ndfl;
                 // считаю сумму за день по обычной ставке, потом проверяю, если процен повышен- считаю по повышенной
                 float summBounty;
                 if (mLimitOver) {
@@ -433,18 +435,18 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             if (medianGain < fLimit) {
                 // обычная премия
                 mLimitOver = false;
-                mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorAccent));
+                mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
                 // посчитаю недостаток
                 mBalanceSumm.setText(addRuble(debet));
-                mBalanceSumm.setTextColor(getResources().getColor(R.color.colorAccent));
-                mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorAccent));
+                mBalanceSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
+                mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
             } else {
                 // повышенная премия
                 mLimitOver = true;
-                mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary));
+                mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
                 mBalanceSumm.setText(addRuble(debet));
-                mBalanceSumm.setTextColor(getResources().getColor(R.color.colorPrimary));
-                mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary));
+                mBalanceSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+                mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
             }
             // Общее количество смен
 
@@ -537,12 +539,12 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                 // Сделано онкоскринингов
                 oncoscreeningsCount = revenues.getInt(revenues.getColumnIndex(DbWork.SM_COL_ONCOSCREENINGS_COUNT));
                 if (oncoscreeningsCount > 0) {
-                    mOncosreeningCost = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, null);
-                    if (mOncosreeningCost == null || mOncosreeningCost.equals("")) {
+                    mOncoscreeningCost = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, null);
+                    if (mOncoscreeningCost == null || mOncoscreeningCost.equals("")) {
                         noSettingDialog(this, "Оплата за онкоскрининг");
                         return;
                     }
-                    osSumm = Float.valueOf(mOncosreeningCost) * oncoscreeningsCount;
+                    osSumm = Float.valueOf(mOncoscreeningCost) * oncoscreeningsCount;
                     totalAmount += osSumm;
                 }
             }
@@ -622,12 +624,6 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         ((TextView) view.findViewById(R.id.detailText)).setText(key);
         ((TextView) view.findViewById(R.id.detailValue)).setText(value);
         mDetailsLayout.addView(view);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mDb.closeConnection();
     }
 
     @Override

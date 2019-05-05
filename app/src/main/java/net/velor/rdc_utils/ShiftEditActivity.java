@@ -38,12 +38,15 @@ import com.skydoves.colorpickerpreference.ColorListener;
 import com.skydoves.colorpickerpreference.ColorPickerDialog;
 import com.skydoves.colorpickerpreference.FlagView;
 
-import org.w3c.dom.Text;
+import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
+import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.dialogs.DeleteConfirmDialog;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import utils.App;
 import utils.LoginActivity;
 import utils.Security;
 
@@ -94,8 +97,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
         mMode = i.getStringExtra(MODE_TYPE);
 
         // создам подключение к базе данных
-        mDb = new DbWork(this);
-        mDb.getConnection();
+        mDb = App.getInstance().getDatabaseProvider();
 
         // назначу переменные
         mFullNameView = findViewById(R.id.shift_full_name);
@@ -242,7 +244,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
 
         // Диалог выбора цвета значка
 
-        final ColorPickerDialog.Builder builder = new ColorPickerDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+        final ColorPickerDialog.Builder builder = new ColorPickerDialog.Builder(this);
         builder.setTitle(getString(R.string.color_select));
         builder.setPreferenceName("MyColorPickerDialog");
         builder.setFlagView(new CustomFlag(this, R.layout.color_flag));
@@ -286,30 +288,19 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
     }
 
 
-
     @Override
     protected void onResume() {
         super.onResume();
 
-        if(!Security.isLogged(getApplicationContext())){
+        if (!Security.isLogged(getApplicationContext())) {
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mDb.closeConnection();
-    }
-
     private boolean setReady() {
         invalidateOptionsMenu();
-        if (mReady && mFullName != null && mShortName != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return mReady && mFullName != null && mShortName != null;
     }
 
     private void timePicker(final View callerView) {
@@ -354,13 +345,11 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
 
     public void confirmSave(View view) {
         // поочерёдно проверю все необходимые данные, если всё заполнено- сохраню тип смены
-        if(TextUtils.isEmpty(mFullName)){
+        if (TextUtils.isEmpty(mFullName)) {
             activateInput(mFullNameView, "Необходимо заполнить название");
-        }
-        else if(TextUtils.isEmpty(mShortName)){
+        } else if (TextUtils.isEmpty(mShortName)) {
             activateInput(mShortNameView, "Необходимо заполнить короткое название");
-        }
-        else{
+        } else {
             save();
         }
     }
@@ -368,7 +357,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
     private void activateInput(EditText target, String info) {
         target.requestFocus();
 
-        InputMethodManager imm = (InputMethodManager)   getSystemService(INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         Snackbar.make(mRoot, info, Snackbar.LENGTH_SHORT).show();
     }
@@ -422,29 +411,30 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(setReady()){
+        if (setReady()) {
             menu.add(0, MENU_SAVE_ID, 3, R.string.menu_save)
                     .setIcon(R.drawable.ic_check_black_24dp)
                     .setTitle(R.string.menu_save)
                     .setShowAsAction(
-                            MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                            MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         }
         menu.add(0, MENU_CANCEL_ID, 2, getString(R.string.close_action))
                 .setIcon(R.drawable.ic_close_black_24dp)
                 .setTitle(R.string.close_action)
                 .setShowAsAction(
-                        MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        if(mId > 0 && mId != 1)
+                        MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        if (mId > 0 && mId != 1)
             menu.add(0, MENU_DELETE_ID, 1, getString(R.string.delete_action))
                     .setIcon(R.drawable.ic_delete_black_24dp)
                     .setTitle(R.string.delete_action)
                     .setShowAsAction(
-                            MenuItem.SHOW_AS_ACTION_ALWAYS|MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+                            MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case MENU_CANCEL_ID:
                 finish();
                 break;
@@ -459,39 +449,27 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
     }
 
     private void delete() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                mDb.deleteShift(mId);
-                Toast.makeText(getApplicationContext(), getString(R.string.shift_delete), Toast.LENGTH_SHORT).show();
-                finish();
-            }
-
-        });
+        mDb.deleteShift(mId);
+        Toast.makeText(getApplicationContext(), getString(R.string.shift_delete), Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void save() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                final ContentValues cv = new ContentValues();
-                cv.put(ShiftCursorAdapter.COL_NAME_FULL, mFullName);
-                cv.put(ShiftCursorAdapter.COL_NAME_SHORT, mShortName);
-                cv.put(ShiftCursorAdapter.COL_SHIFT_START, mStartName);
-                cv.put(ShiftCursorAdapter.COL_SHIFT_FINISH, mFinishName);
-                cv.put(ShiftCursorAdapter.COL_SHIFT_COLOR, mColorName);
-                cv.put(ShiftCursorAdapter.COL_ALARM, mAlarm);
-                cv.put(ShiftCursorAdapter.COL_ALARM_TIME, mAlarmName);
-                if (mMode.equals(MODE_CREATE)) {
-                    mDb.insertShift(cv);
-                    Toast.makeText(getApplicationContext(), getString(R.string.shift_added), Toast.LENGTH_SHORT).show();
-                } else if (mMode.equals(MODE_UPDATE)) {
-                    mDb.updateShift(cv, mId);
-                    Toast.makeText(getApplicationContext(), getString(R.string.shift_update), Toast.LENGTH_SHORT).show();
-                }
-                finish();
-            }
-
-        });
+        final ContentValues cv = new ContentValues();
+        cv.put(ShiftCursorAdapter.COL_NAME_FULL, mFullName);
+        cv.put(ShiftCursorAdapter.COL_NAME_SHORT, mShortName);
+        cv.put(ShiftCursorAdapter.COL_SHIFT_START, mStartName);
+        cv.put(ShiftCursorAdapter.COL_SHIFT_FINISH, mFinishName);
+        cv.put(ShiftCursorAdapter.COL_SHIFT_COLOR, mColorName);
+        cv.put(ShiftCursorAdapter.COL_ALARM, mAlarm);
+        cv.put(ShiftCursorAdapter.COL_ALARM_TIME, mAlarmName);
+        if (mMode.equals(MODE_CREATE)) {
+            mDb.insertShift(cv);
+            Toast.makeText(getApplicationContext(), getString(R.string.shift_added), Toast.LENGTH_SHORT).show();
+        } else if (mMode.equals(MODE_UPDATE)) {
+            mDb.updateShift(cv, mId);
+            Toast.makeText(getApplicationContext(), getString(R.string.shift_update), Toast.LENGTH_SHORT).show();
+        }
+        finish();
     }
 }
