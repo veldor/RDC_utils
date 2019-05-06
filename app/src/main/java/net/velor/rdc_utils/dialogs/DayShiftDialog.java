@@ -4,14 +4,20 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 
 import net.velor.rdc_utils.R;
+import net.velor.rdc_utils.ShiftEditActivity;
+import net.velor.rdc_utils.ShiftSettingsActivity;
 
 import java.util.ArrayList;
+import java.util.Objects;
+
+import utils.App;
 
 public class DayShiftDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
@@ -32,7 +38,22 @@ public class DayShiftDialog extends DialogFragment implements DialogInterface.On
         assert getArguments() != null;
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.select_day_type))
-                .setItems(stringArray, this);
+                .setItems(stringArray, this)
+                .setNegativeButton(App.getInstance().getString(R.string.edit_shfits_variant_message), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i = new Intent(App.getInstance(), ShiftSettingsActivity.class);
+                        startActivity(i);
+                    }
+                })
+                .setPositiveButton(App.getInstance().getString(R.string.add_shfit_variant_message), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i = new Intent(App.getInstance(), ShiftEditActivity.class);
+                        i.putExtra(ShiftEditActivity.MODE_TYPE, ShiftEditActivity.MODE_CREATE);
+                        startActivity(i);
+                    }
+                });
         return adb.create();
     }
 

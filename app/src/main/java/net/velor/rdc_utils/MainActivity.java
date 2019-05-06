@@ -187,37 +187,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // добавлю строку выходного
         mShiftValues.add(getString(R.string.day_type_holidays));
         mShiftIds.add(-1);
-        shifts.moveToFirst();
-        do {
-            HashMap<String, String> arr = new HashMap<>();
-            // получу идентификатор и название смены
-            String id = String.valueOf(shifts.getInt(shifts.getColumnIndex(ShiftCursorAdapter.COL_ID)));
-            String name = shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_NAME_FULL));
-            arr.put(ShiftCursorAdapter.COL_NAME_FULL, name);
-            arr.put(ShiftCursorAdapter.COL_NAME_SHORT, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_NAME_SHORT)));
-            String start = shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_START));
-            arr.put(ShiftCursorAdapter.COL_SHIFT_START, start);
-            String finish = shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_FINISH));
-            arr.put(ShiftCursorAdapter.COL_SHIFT_FINISH, finish);
-            arr.put(ShiftCursorAdapter.COL_SHIFT_COLOR, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_COLOR)));
-            arr.put(ShiftCursorAdapter.COL_ALARM, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_ALARM)));
-            arr.put(ShiftCursorAdapter.COL_ALARM_TIME, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_ALARM_TIME)));
-            mShifts.put(id, arr);
-            StringBuilder sb = new StringBuilder();
-            sb.append(name);
-            if (start != null) {
-                sb.append(" с ");
-                sb.append(start);
+        if (shifts.moveToFirst()) {
+            do {
+                HashMap<String, String> arr = new HashMap<>();
+                // получу идентификатор и название смены
+                String id = String.valueOf(shifts.getInt(shifts.getColumnIndex(ShiftCursorAdapter.COL_ID)));
+                String name = shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_NAME_FULL));
+                arr.put(ShiftCursorAdapter.COL_NAME_FULL, name);
+                arr.put(ShiftCursorAdapter.COL_NAME_SHORT, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_NAME_SHORT)));
+                String start = shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_START));
+                arr.put(ShiftCursorAdapter.COL_SHIFT_START, start);
+                String finish = shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_FINISH));
+                arr.put(ShiftCursorAdapter.COL_SHIFT_FINISH, finish);
+                arr.put(ShiftCursorAdapter.COL_SHIFT_COLOR, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_COLOR)));
+                arr.put(ShiftCursorAdapter.COL_ALARM, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_ALARM)));
+                arr.put(ShiftCursorAdapter.COL_ALARM_TIME, shifts.getString(shifts.getColumnIndex(ShiftCursorAdapter.COL_ALARM_TIME)));
+                mShifts.put(id, arr);
+                StringBuilder sb = new StringBuilder();
+                sb.append(name);
+                if (start != null) {
+                    sb.append(" с ");
+                    sb.append(start);
+                }
+                if (finish != null) {
+                    sb.append(" до ");
+                    sb.append(finish);
+                }
+                mShiftValues.add(sb.toString());
+                mShiftIds.add(Integer.valueOf(id));
             }
-            if (finish != null) {
-                sb.append(" до ");
-                sb.append(finish);
-            }
-            mShiftValues.add(sb.toString());
-            mShiftIds.add(Integer.valueOf(id));
+            while (shifts.moveToNext());
+            shifts.close();
         }
-        while (shifts.moveToNext());
-        shifts.close();
         prepareDayTypeDialog();
     }
 
@@ -322,43 +323,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!mMyViewModel.checkFileRead()) {
             showRightsDialog();
         } else {
-                // Покажу диалог загрузки таблицы и начну загружать
-                if (sSheet == null) {
-                    showSheetLoadingDialog();
-                    final LiveData<Integer> loading = mMyViewModel.downloadSheet();
-                    loading.observe(this, new Observer<Integer>() {
-                        @Override
-                        public void onChanged(@Nullable Integer result) {
-                            if (result != null) {
-                                if (result == App.DOWNLOAD_STATUS_ERROR_DOWNLOAD) {
-                                    hideSheetLoadingDialog();
-                                    Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.sheet_download_error_message), Toast.LENGTH_LONG).show();
-                                } else {
-                                    final LiveData<XSSFWorkbook> handle = mMyViewModel.handleSheet();
-                                    // отслежу состояние обработки таблицы
-                                    handle.observe(MainActivity.this, new Observer<XSSFWorkbook>() {
-                                        @Override
-                                        public void onChanged(@Nullable XSSFWorkbook sheets) {
-                                            if (sheets != null) {
-                                                sSheet = sheets;
-                                                handle.removeObservers(MainActivity.this);
-                                                hideSheetLoadingDialog();
-                                                selectMonth();
-                                            }
+            // Покажу диалог загрузки таблицы и начну загружать
+            if (sSheet == null) {
+                showSheetLoadingDialog();
+                final LiveData<Integer> loading = mMyViewModel.downloadSheet();
+                loading.observe(this, new Observer<Integer>() {
+                    @Override
+                    public void onChanged(@Nullable Integer result) {
+                        if (result != null) {
+                            if (result == App.DOWNLOAD_STATUS_ERROR_DOWNLOAD) {
+                                hideSheetLoadingDialog();
+                                Toast.makeText(MainActivity.this, MainActivity.this.getString(R.string.sheet_download_error_message), Toast.LENGTH_LONG).show();
+                            } else {
+                                final LiveData<XSSFWorkbook> handle = mMyViewModel.handleSheet();
+                                // отслежу состояние обработки таблицы
+                                handle.observe(MainActivity.this, new Observer<XSSFWorkbook>() {
+                                    @Override
+                                    public void onChanged(@Nullable XSSFWorkbook sheets) {
+                                        if (sheets != null) {
+                                            sSheet = sheets;
+                                            handle.removeObservers(MainActivity.this);
+                                            hideSheetLoadingDialog();
+                                            selectMonth();
                                         }
-                                    });
+                                    }
+                                });
 
-                                }
-                                loading.removeObservers(MainActivity.this);
                             }
+                            loading.removeObservers(MainActivity.this);
                         }
-                    });
-                    showSheetLoadingDialog();
-                } else {
-                    selectMonth();
-                }
+                    }
+                });
+                showSheetLoadingDialog();
+            } else {
+                selectMonth();
             }
         }
+    }
 
     private void selectMonth() {
         ArrayList<String> months = new ArrayList<>();
@@ -645,7 +646,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onClick(DialogInterface dialog, int which) {
                         ShiftsHandler.registerSalary(dayId);
                     }
+                })
+                .setNegativeButton(getString(R.string.change_type_message), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mDayTypeDialog.show(getSupportFragmentManager(), String.valueOf(dayId));
+                    }
                 });
+
         dialogBuilder.create().show();
 
     }

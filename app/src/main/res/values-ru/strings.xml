@@ -141,5 +141,8 @@
     <string name="test_reminder">Сервисные сообщения, ничего важного.</string>
     <string name="download_schedule_message">Загрузка расписания РДЦ</string>
     <string name="sheet_download_error_message">Не удалось загрузить таблицу. Проверьте подключение к интернету и попробуйте снова.</string>
-    <string name="register_salary_message">Добавить выручку</string>
+    <string name="register_salary_message">Выручка</string>
+    <string name="change_type_message">Изменить</string>
+    <string name="add_shfit_variant_message">Добавить вариант</string>
+    <string name="edit_shfits_variant_message">Изменить</string>
 </resources>

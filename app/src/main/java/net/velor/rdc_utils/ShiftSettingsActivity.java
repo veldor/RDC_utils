@@ -66,14 +66,14 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
         Cursor shifts = mDb.getAllShifts();
         mMyAdapter = new ShiftCursorAdapter(ShiftSettingsActivity.this, shifts, 0);
         mList.setAdapter(mMyAdapter);
-        getSupportLoaderManager().initLoader(0,null, this);
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if(!Security.isLogged(getApplicationContext())){
+        if (!Security.isLogged(getApplicationContext())) {
             // перенаправляю на страницу входа
             startActivity(new Intent(this, LoginActivity.class));
         }
@@ -91,7 +91,7 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case 1: //удаляю раздел, на котором вызвано меню
                 AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                 deleteShift(acmi.id);
@@ -113,20 +113,9 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
     }
 
     private void deleteShift(final long id) {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                if(id != 1){
-                    mDb.deleteShift(id);
-                    Objects.requireNonNull(getSupportLoaderManager().getLoader(0)).forceLoad();
-                    Toast.makeText(getApplicationContext(), getString(R.string.shift_delete), Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Этот пункт удалить нельзя", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-        });
+        mDb.deleteShift(id);
+        Objects.requireNonNull(getSupportLoaderManager().getLoader(0)).forceLoad();
+        Toast.makeText(getApplicationContext(), getString(R.string.shift_delete), Toast.LENGTH_SHORT).show();
     }
 
     @NonNull
@@ -144,6 +133,7 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
+
     static class MyCursorLoader extends CursorLoader {
 
         private DbWork mInnerDb;

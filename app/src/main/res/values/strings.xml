@@ -147,4 +147,7 @@
     <string name="download_schedule_message">Downloading RDC schedule</string>
     <string name="sheet_download_error_message">Error download sheet file, maybe not Internet connection, try later</string>
     <string name="register_salary_message">Register salary</string>
+    <string name="change_type_message">Change</string>
+    <string name="add_shfit_variant_message">Add variant</string>
+    <string name="edit_shfits_variant_message">Edit list</string>
 </resources>

@@ -402,16 +402,6 @@ public class DbWork {
                     " shift_color CHAR(7)," +
                     " alarm BOOL DEFAULT '0'," +
                     " alarm_time CHAR(5) );");
-            // добавляю первую запись типа смены- стандартную, без возможности удаления
-            ContentValues cv = new ContentValues();
-            cv.put("name_full", "Утро");
-            cv.put("name_short", "У");
-            cv.put("shift_start", "8:00");
-            cv.put("shift_end", "15:00");
-            cv.put("shift_color", "#FF0000");
-            cv.put("alarm", 1);
-            cv.put("alarm_time", "5:30");
-            db.insert(TABLE_SHIFTS, null, cv);
         }
 
         @Override

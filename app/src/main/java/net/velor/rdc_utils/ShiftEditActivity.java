@@ -53,8 +53,8 @@ import utils.Security;
 public class ShiftEditActivity extends AppCompatActivity implements DeleteConfirmDialog.AnswerDialogListener {
 
 
-    final static String MODE_TYPE = "type";
-    final static String MODE_CREATE = "create";
+    public final static String MODE_TYPE = "type";
+    public final static String MODE_CREATE = "create";
     final static String MODE_UPDATE = "update";
     private static final String ALARM_ON = "1";
     private static final int MENU_SAVE_ID = 1;
@@ -112,8 +112,12 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
         if (mMode.equals(MODE_UPDATE)) {
             mId = i.getLongExtra(ShiftCursorAdapter.COL_ID, 0);
             Map<String, String> data = mDb.getShift(mId);
-            mFullNameView.setText(data.get(ShiftCursorAdapter.COL_NAME_FULL));
-            mShortNameView.setText(data.get(ShiftCursorAdapter.COL_NAME_SHORT));
+            String fullNameValue = data.get(ShiftCursorAdapter.COL_NAME_FULL);
+            mFullNameView.setText(fullNameValue);
+            mFullName = fullNameValue;
+            String shortNameValue = data.get(ShiftCursorAdapter.COL_NAME_SHORT);
+            mShortNameView.setText(shortNameValue);
+            mShortName = shortNameValue;
             String color = data.get(ShiftCursorAdapter.COL_SHIFT_COLOR);
             if (color != null) {
                 // назначен цвет
@@ -372,9 +376,6 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
     }
 
     private void checkDuplicates(final String value, final String col, final TextInputLayout ll) {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
                 int id = mDb.checkName(col, value);
                 // если нашёлся повтор
                 if (id != 0 && !(mMode.equals(MODE_UPDATE) && id == mId)) {
@@ -387,8 +388,6 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
                     mReady = true;
                 }
                 setReady();
-            }
-        });
     }
 
     @Override
@@ -405,7 +404,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
                 .setTitle(R.string.close_action)
                 .setShowAsAction(
                         MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        if (mId > 0 && mId != 1)
+        if (mId > 0)
             menu.add(0, MENU_DELETE_ID, 1, getString(R.string.delete_action))
                     .setIcon(R.drawable.ic_delete_black_24dp)
                     .setTitle(R.string.delete_action)
