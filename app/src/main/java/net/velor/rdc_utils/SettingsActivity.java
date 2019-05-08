@@ -72,7 +72,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             // проверю, если настройка изменяет время проверки смены, обновлю событие
             if(preference.getKey().equals(MainActivity.FIELD_SCHEDULE_CHECK_TIME)){
-                ForemanHandler.startPlanner();
+                ForemanHandler.startPlanner(true);
             }
             return true;
         }

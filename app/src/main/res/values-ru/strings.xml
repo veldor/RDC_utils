@@ -145,4 +145,5 @@
     <string name="change_type_message">Изменить</string>
     <string name="add_shfit_variant_message">Добавить вариант</string>
     <string name="edit_shfits_variant_message">Изменить</string>
+    <string name="autofill_schedule_message">Заполнить автоматически</string>
 </resources>

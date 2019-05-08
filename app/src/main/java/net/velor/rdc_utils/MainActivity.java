@@ -230,11 +230,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Bundle args = new Bundle();
         args.putStringArrayList("values", mShiftValues);
         mDayTypeDialog.setArguments(args);
-        if (mPager == null) {
+       /* if (mPager == null) {*/
             loadPager();
-        } else {
+        /*} else {
             drawCalendar();
-        }
+        }*/
     }
 
     // ===================================== ПОДКЛЮЧЕНИЕ МЕНЕДЖЕРА СТРАНИЦ =============================================
@@ -296,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menu.add(0, MENU_ITEM_SHIFT_SETTINGS, 0, getString(R.string.shift_settings));
         menu.add(0, MENU_ITEM_LOAD_SHIFTS, 0, getString(R.string.load_shift_settings));
         menu.add(0, MENU_ITEM_RESET_NAME, 0, getString(R.string.reset_name_settings));
+        menu.add(0, 8, 0, "Проверить статус планировщиков");
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -314,6 +315,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mMyViewModel.resetName();
                 Toast.makeText(this, this.getString(R.string.name_reset_message), Toast.LENGTH_LONG).show();
                 break;
+            case 8:
+                Toast.makeText(this, App.getInstance().mWorkerStatus.getValue(), Toast.LENGTH_LONG).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -610,7 +613,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // ===================================== ВЫБОР ТИПА ДНЯ ===================================================
     @Override
     public void onClick(View v) {
-        showDayInfoDialog(v);
+        // если нажата кнопка автозаполнения смен- автозаполню смены, иначе покажу информацию о сутках
+        if(v.getId() == R.id.autoloadShiftsButton){
+            loadShiftsFromExcel();
+        }
+        else{
+            showDayInfoDialog(v);
+        }
     }
 
     private void showDayInfoDialog(View v) {

@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
+    android:theme="@style/AppTheme"
     android:layout_width="match_parent"
     >
 <LinearLayout
@@ -73,5 +74,12 @@
     android:columnCount="7"
     >
 </GridLayout>
+    <Button
+        android:id="@+id/autoloadShiftsButton"
+        android:layout_width="match_parent"
+        android:theme="@style/AppTheme"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:text="@string/autofill_schedule_message"
+        android:layout_height="wrap_content" />
     </LinearLayout>
     </ScrollView>

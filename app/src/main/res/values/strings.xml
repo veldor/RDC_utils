@@ -150,4 +150,5 @@
     <string name="change_type_message">Change</string>
     <string name="add_shfit_variant_message">Add variant</string>
     <string name="edit_shfits_variant_message">Edit list</string>
+    <string name="autofill_schedule_message">Autofill schedule</string>
 </resources>

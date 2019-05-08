@@ -13,7 +13,7 @@ public class BroadcastBootCompletedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Objects.equals(intent.getAction(), "android.intent.action.BOOT_COMPLETED")) {
             // установлю проверку смены на следующий день
-            ForemanHandler.startPlanner();
+            ForemanHandler.startPlanner(false);
         }
     }
 }

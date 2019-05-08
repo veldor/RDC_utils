@@ -51,8 +51,6 @@ import utils.LoginActivity;
 import utils.Security;
 
 public class ShiftEditActivity extends AppCompatActivity implements DeleteConfirmDialog.AnswerDialogListener {
-
-
     public final static String MODE_TYPE = "type";
     public final static String MODE_CREATE = "create";
     final static String MODE_UPDATE = "update";
@@ -137,7 +135,10 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
             String alarm = data.get(ShiftCursorAdapter.COL_ALARM);
             assert alarm != null;
             if (alarm.equals(ALARM_ON)) {
+                mAlarmSwitcher = findViewById(R.id.alarmSwitcher);
+                mAlarmBtn = findViewById(R.id.set_alarm_time_btn);
                 mAlarmSwitcher.setChecked(true);
+                mAlarmBtn.setEnabled(true);
                 String alarmTime = data.get(ShiftCursorAdapter.COL_ALARM_TIME);
                 if (alarmTime != null) {
                     mAlarmView.setText(alarmTime);

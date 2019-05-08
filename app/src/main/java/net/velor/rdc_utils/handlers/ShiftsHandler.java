@@ -105,7 +105,6 @@ public class ShiftsHandler {
                 // смена зарегистрирована
                 newShift.putExtra(SalaryDayActivity.ID, registered.getLong(registered.getColumnIndex(DbWork.COL_ID)));
             }
-            newShift.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             App.getInstance().startActivity(newShift);
         }
     }

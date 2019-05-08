@@ -149,6 +149,14 @@ class CalendarInflater {
             dayLayout.setOnLongClickListener(mLongHandler);
            gl.addView(dayLayout);
         }
+        // проверю, если расписание заполнено, скрою кнопку автоматического заполнения
+        View autofillButton = parent.findViewById(R.id.autoloadShiftsButton);
+        if(shiftsCounter > 0){
+            autofillButton.setVisibility(View.GONE);
+        }
+        else{
+            autofillButton.setOnClickListener(mHandler);
+        }
         // добавлю строку с общим количеством смен
         LinearLayout monthParent = parent.findViewById(R.id.monthParent);
         li.inflate(R.layout.total_shifts_value, monthParent);

@@ -11,6 +11,7 @@ import androidx.work.WorkManager;
 
 import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.handlers.ForemanHandler;
+import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.workers.LoadSheetWorker;
 import net.velor.rdc_utils.workers.ScheduleDownloadWorker;
 
@@ -31,10 +32,15 @@ public class App extends Application {
     public final MutableLiveData<Integer> mSheetLoad = new MutableLiveData<>();
     public boolean mIsSheetLoading = false;
 
+    // хранилище данных статуса рабочих
+    public final MutableLiveData<String> mWorkerStatus = new MutableLiveData<>();
+
     // статусы загрузки таблицы
     public static final int DOWNLOAD_STATUS_YET_DOWNLOADED = 1;
     public static final int DOWNLOAD_STATUS_SUCCESSFUL_DOWNLOADED = 2;
     public static final int DOWNLOAD_STATUS_ERROR_DOWNLOAD = 1;
+    private SharedPreferencesHandler mSharedPreferenceshandler;
+    private Notificator mNotificator;
 
     public static App getInstance(){
         return mAppInstance;
@@ -50,12 +56,21 @@ public class App extends Application {
         mDatabaseProvider = new DbWork(getApplicationContext());
         mDatabaseProvider.getConnection();
 
+        // подключу провайдер настроек
+         mSharedPreferenceshandler = new SharedPreferencesHandler(this);
+         // подключу провайдер уведомлений
+        mNotificator = new Notificator(this);
+
+        if(!mSharedPreferenceshandler.getNotificationChannelsCreated()){
+            // создам каналы
+            mNotificator.createNotificationChannels();
+        }
+
         // запускаю сервис приложения
         //ServiceApplication.startMe(this, ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
 
         // взамен обработки событий в сервисе запущу рабочего, который проверит актуальность данных
-        ForemanHandler.startPlanner();
-
+        ForemanHandler.startPlanner(false);
 
         // поправлю взаимодействие с Экселем, будь он неладен
         System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl");
@@ -65,6 +80,10 @@ public class App extends Application {
 
     public DbWork getDatabaseProvider(){
         return mDatabaseProvider;
+    }
+
+    public SharedPreferencesHandler getSharedPreferenceshandler(){
+        return mSharedPreferenceshandler;
     }
 
     public LiveData<Integer> downloadSheet(){

@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 import utils.App;
 import utils.Notificator;
 
-class CheckTomorrowWorker extends Worker {
-    CheckTomorrowWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+public class CheckTomorrowWorker extends Worker {
+    public CheckTomorrowWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
@@ -101,7 +101,7 @@ class CheckTomorrowWorker extends Worker {
             }
         }
         // установлю проверку расписания на следующий день
-        ForemanHandler.startPlanner();
+        ForemanHandler.startPlanner(true);
         return Worker.Result.success();
     }
 }
