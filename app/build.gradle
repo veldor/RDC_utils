@@ -6,8 +6,8 @@ android {
         applicationId "net.velor.rdc_utils"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 13
-        versionName "1.5.5"
+        versionCode 14
+        versionName "1.5.51"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
