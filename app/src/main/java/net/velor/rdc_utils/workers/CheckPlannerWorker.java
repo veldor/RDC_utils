@@ -12,6 +12,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import net.velor.rdc_utils.handlers.ForemanHandler;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import utils.App;
 public class CheckPlannerWorker extends Worker {
     public static final String RELOAD_MARK = "reload";
     private static final String MY_TAG = "tomorrow_check_planner";
+    public static final String SALARY_REGISTER_TAG = "salary_register";
     public CheckPlannerWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -34,7 +36,6 @@ public class CheckPlannerWorker extends Worker {
         boolean reloadParam = params.getBoolean(RELOAD_MARK, false);
         if(!reloadParam && ForemanHandler.isMyWorkerRunning(MY_TAG)){
             App.getInstance().mWorkerStatus.postValue("Проверка уже запланирована");
-            Log.d("surprise", "CheckPlannerWorker doWork: Проверка уже запланирована");
         }
         else{
             Calendar cal = Calendar.getInstance();
@@ -64,7 +65,16 @@ public class CheckPlannerWorker extends Worker {
             //OneTimeWorkRequest checkTomorrow = new OneTimeWorkRequest.Builder(CheckTomorrowWorker.class).addTag(MY_TAG).setInitialDelay(5, TimeUnit.SECONDS).build();
             WorkManager.getInstance().enqueueUniqueWork(MY_TAG, ExistingWorkPolicy.REPLACE, checkTomorrow);
             App.getInstance().mWorkerStatus.postValue("Запланировал проверку");
-            Log.d("surprise", "CheckPlannerWorker doWork: Запланировал проверку");
+        }
+        // проверю, запланировано ли напоминание о регистрации выручки
+        if(!ForemanHandler.isMyWorkerRunning(SALARY_REGISTER_TAG)){
+            // todo надо проверить, есть ли сегодня смена, не закончена ли она. Если есть и не закончена- назначаю проверку на время окончания смены. Если закончена: проверю завтрашний день
+            if(SalaryHandler.planeRegistration()){
+                Log.d("surprise", "doWork: регистрация смены запланирована");
+            }
+        }
+        else{
+            Log.d("surprise", "doWork: регистрация зарплаты уже запланирована");
         }
         return Worker.Result.success();
     }

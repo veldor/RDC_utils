@@ -13,6 +13,7 @@ import androidx.work.WorkerParameters;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.handlers.ForemanHandler;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
 
 import java.util.Calendar;
@@ -72,15 +73,11 @@ public class CheckTomorrowWorker extends Worker {
                     cal.set(Calendar.HOUR, hour);
                     cal.set(Calendar.MINUTE, minutes);
 
-                    // определю, через какое время назначить проверку
-                    long currentTime = Calendar.getInstance().getTimeInMillis();
-                    long plannedTime = cal.getTimeInMillis();
-                    long difference = plannedTime - currentTime;
+                    // запланирую регистрацию данных о смене
+                    if(!ForemanHandler.isMyWorkerRunning(CheckPlannerWorker.SALARY_REGISTER_TAG)){
+                        SalaryHandler.planeRegistration();
+                    }
 
-                    // назначу запуск рабочего, который предложит сохранить сведения о смене
-                    OneTimeWorkRequest registerShift = new OneTimeWorkRequest.Builder(RegisterShiftWorker.class).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
-                    //OneTimeWorkRequest registerShift = new OneTimeWorkRequest.Builder(RegisterShiftWorker.class).setInitialDelay(5, TimeUnit.SECONDS).build();
-                    WorkManager.getInstance().enqueue(registerShift);
                 }
                 String alarm = shiftInfo.get(ShiftCursorAdapter.COL_ALARM);
                 if (alarm != null && alarm.equals("1")) {

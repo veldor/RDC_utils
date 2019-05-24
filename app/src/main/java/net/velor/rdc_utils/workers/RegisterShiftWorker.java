@@ -9,6 +9,7 @@ import androidx.work.WorkerParameters;
 
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
 
 import java.util.Calendar;
@@ -45,6 +46,8 @@ public class RegisterShiftWorker extends Worker {
                 String finish = shiftInfo.get(ShiftCursorAdapter.COL_SHIFT_FINISH);
                 Notificator notificator = new Notificator(App.getInstance());
                 notificator.sendSalaryNotification(start, finish);
+                // запланирую проверку на завтрашний день
+                SalaryHandler.checkTomorrow();
             }
         }
         return Worker.Result.success();

@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Bundle args = new Bundle();
         args.putStringArrayList("values", mShiftValues);
         mDayTypeDialog.setArguments(args);
-       if (mPager == null) {
+        if (mPager == null) {
             loadPager();
         } else {
             drawCalendar();
