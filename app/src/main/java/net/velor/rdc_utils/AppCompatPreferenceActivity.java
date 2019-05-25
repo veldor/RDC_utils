@@ -10,6 +10,10 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.velor.rdc_utils.handlers.SalaryHandler;
+
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A {@link android.preference.PreferenceActivity} which implements and proxies the necessary calls
  * to be used with AppCompat.
@@ -26,6 +30,14 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         getDelegate().onPostCreate(savedInstanceState);
@@ -35,6 +47,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
         return getDelegate().getSupportActionBar();
     }
 
+    @NotNull
     @Override
     public MenuInflater getMenuInflater() {
         return getDelegate().getMenuInflater();

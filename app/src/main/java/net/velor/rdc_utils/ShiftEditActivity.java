@@ -41,6 +41,7 @@ import com.skydoves.colorpickerpreference.FlagView;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.dialogs.DeleteConfirmDialog;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.Locale;
 import java.util.Map;
@@ -283,6 +284,9 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     private boolean setReady() {

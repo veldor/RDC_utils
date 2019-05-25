@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import net.velor.rdc_utils.adapters.SalaryShiftsAdapter;
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.widgets.SalaryWidget;
 
 import java.util.Objects;
@@ -70,6 +71,9 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     @Override

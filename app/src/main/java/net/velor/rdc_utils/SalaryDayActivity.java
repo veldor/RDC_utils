@@ -29,6 +29,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.widgets.SalaryWidget;
 
 import java.util.Calendar;
@@ -149,6 +150,9 @@ public class SalaryDayActivity extends AppCompatActivity {
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     private void loadInfo(final long currentId) {

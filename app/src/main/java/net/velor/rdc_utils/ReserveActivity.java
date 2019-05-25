@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.view_models.ReserveViewModel;
 import net.velor.rdc_utils.workers.ReserveWorker;
 
@@ -72,6 +73,14 @@ public class ReserveActivity extends AppCompatActivity {
             showProgressDialog(getString(R.string.restore_dialog_message));
             sRestoreResult.observe(this, new RestoreBackupObserver());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     @Override

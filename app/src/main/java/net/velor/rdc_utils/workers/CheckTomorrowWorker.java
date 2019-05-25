@@ -32,7 +32,6 @@ public class CheckTomorrowWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.d("surprise", "CheckTomorrowWorker doWork: i work");
         // проверю, не нужно ли завтра на работу
         Calendar calendar = Calendar.getInstance();
         // получу завтрашнее число
@@ -70,7 +69,7 @@ public class CheckTomorrowWorker extends Worker {
                     int minutes = Integer.valueOf(time_array[1]);
                     Calendar cal = Calendar.getInstance();
                     cal.add(Calendar.DATE, 1);
-                    cal.set(Calendar.HOUR, hour);
+                    cal.set(Calendar.HOUR_OF_DAY, hour);
                     cal.set(Calendar.MINUTE, minutes);
 
                     // запланирую регистрацию данных о смене
@@ -93,12 +92,11 @@ public class CheckTomorrowWorker extends Worker {
                 notif.sendShiftNotification(name, "На работку!", sb.toString(), alarmEnabled,alarmTimeArray);
                 // если сведения о смене найдены- верну их
             }
-            else{
-                Log.d("surprise", "CheckTomorrowWorker doWork: tomorrow is holiday");
-            }
         }
         // установлю проверку расписания на следующий день
         ForemanHandler.startPlanner(true);
+        // проверю регистрацию смены
+        SalaryHandler.planeRegistration();
         return Worker.Result.success();
     }
 }

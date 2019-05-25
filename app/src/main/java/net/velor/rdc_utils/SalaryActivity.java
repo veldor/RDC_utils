@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.whiteelephant.monthpicker.MonthPickerDialog;
 
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -269,6 +270,9 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         }
         recountData();
         mChooseMonthBtn.setText(getDate());
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     @Override

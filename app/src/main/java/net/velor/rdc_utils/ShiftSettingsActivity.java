@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.Objects;
 
@@ -79,6 +80,9 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
         }
 
         Objects.requireNonNull(getSupportLoaderManager().getLoader(0)).forceLoad();
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
 

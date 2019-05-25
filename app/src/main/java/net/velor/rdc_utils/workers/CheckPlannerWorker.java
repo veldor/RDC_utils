@@ -24,6 +24,7 @@ public class CheckPlannerWorker extends Worker {
     public static final String RELOAD_MARK = "reload";
     private static final String MY_TAG = "tomorrow_check_planner";
     public static final String SALARY_REGISTER_TAG = "salary_register";
+
     public CheckPlannerWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -34,10 +35,9 @@ public class CheckPlannerWorker extends Worker {
         // если задание уже запланировано- ничего не делаю
         Data params = getInputData();
         boolean reloadParam = params.getBoolean(RELOAD_MARK, false);
-        if(!reloadParam && ForemanHandler.isMyWorkerRunning(MY_TAG)){
+        if (!reloadParam && ForemanHandler.isMyWorkerRunning(MY_TAG)) {
             App.getInstance().mWorkerStatus.postValue("Проверка уже запланирована");
-        }
-        else{
+        } else {
             Calendar cal = Calendar.getInstance();
             // установлю время проверки завтрашней смены
             String time = SharedPreferencesHandler.getScheduleCheckTime();
@@ -62,19 +62,11 @@ public class CheckPlannerWorker extends Worker {
             long difference = plannedTime - currentTime;
             // назначу запуск рабочего, который проверит расписание на завтра
             OneTimeWorkRequest checkTomorrow = new OneTimeWorkRequest.Builder(CheckTomorrowWorker.class).addTag(MY_TAG).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
-            //OneTimeWorkRequest checkTomorrow = new OneTimeWorkRequest.Builder(CheckTomorrowWorker.class).addTag(MY_TAG).setInitialDelay(5, TimeUnit.SECONDS).build();
             WorkManager.getInstance().enqueueUniqueWork(MY_TAG, ExistingWorkPolicy.REPLACE, checkTomorrow);
             App.getInstance().mWorkerStatus.postValue("Запланировал проверку");
         }
-        // проверю, запланировано ли напоминание о регистрации выручки
-        if(!ForemanHandler.isMyWorkerRunning(SALARY_REGISTER_TAG)){
-            // todo надо проверить, есть ли сегодня смена, не закончена ли она. Если есть и не закончена- назначаю проверку на время окончания смены. Если закончена: проверю завтрашний день
-            if(SalaryHandler.planeRegistration()){
-                Log.d("surprise", "doWork: регистрация смены запланирована");
-            }
-        }
-        else{
-            Log.d("surprise", "doWork: регистрация зарплаты уже запланирована");
+        if (SalaryHandler.planeRegistration()) {
+            Log.d("surprise", "doWork: регистрация зарплаты запланирована");
         }
         return Worker.Result.success();
     }

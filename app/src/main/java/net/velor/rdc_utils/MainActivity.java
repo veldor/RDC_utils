@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.dialogs.DayShiftDialog;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
@@ -69,8 +70,6 @@ import utils.LoginActivity;
 import utils.Security;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, DayShiftDialog.AnswerDialogListener, NavigationView.OnNavigationItemSelectedListener {
-
-
     private int REQUEST_WRITE_READ = 3;
 
     // константы имён
@@ -163,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         // загружу данные о сменах, создам диалог выбора типа смены, подключу менеджер страниц
         loadShifts();
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
 /*    private void makeUpdateSnackbar() {
@@ -296,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menu.add(0, MENU_ITEM_SHIFT_SETTINGS, 0, getString(R.string.shift_settings));
         menu.add(0, MENU_ITEM_LOAD_SHIFTS, 0, getString(R.string.load_shift_settings));
         menu.add(0, MENU_ITEM_RESET_NAME, 0, getString(R.string.reset_name_settings));
-        menu.add(0, 8, 0, "Проверить статус планировщиков");
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -315,8 +315,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mMyViewModel.resetName();
                 Toast.makeText(this, this.getString(R.string.name_reset_message), Toast.LENGTH_LONG).show();
                 break;
-            case 8:
-                Toast.makeText(this, App.getInstance().mWorkerStatus.getValue(), Toast.LENGTH_LONG).show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -614,10 +612,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         // если нажата кнопка автозаполнения смен- автозаполню смены, иначе покажу информацию о сутках
-        if(v.getId() == R.id.autoloadShiftsButton){
+        if (v.getId() == R.id.autoloadShiftsButton) {
             loadShiftsFromExcel();
-        }
-        else{
+        } else {
             showDayInfoDialog(v);
         }
     }

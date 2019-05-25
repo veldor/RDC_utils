@@ -3,6 +3,7 @@ package net.velor.rdc_utils.workers;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -26,9 +27,8 @@ public class RegisterShiftWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        Log.d("surprise", "RegisterShiftWorker doWork: tick");
         Calendar calendar = Calendar.getInstance();
-        //todo удалить после теста- получаю данные о завтрашней смене вместо сегодняшней
-        calendar.add(Calendar.DATE, 1);
         // получу сведения о сегодняшней смене
         DbWork databaseProvider = App.getInstance().getDatabaseProvider();
         int year = calendar.get(Calendar.YEAR);

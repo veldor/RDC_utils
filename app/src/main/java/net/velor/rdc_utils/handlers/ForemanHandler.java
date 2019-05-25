@@ -20,10 +20,12 @@ public class ForemanHandler {
             startPlanner.setInputData(myData);
         }
         WorkManager.getInstance().enqueue(startPlanner.build());
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     public static boolean isMyWorkerRunning(String tag) {
-        List<WorkInfo> status = null;
+        List<WorkInfo> status;
         try {
             status = WorkManager.getInstance().getWorkInfosByTag(tag).get();
             for (WorkInfo workStatus : status) {

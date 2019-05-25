@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import net.velor.rdc_utils.handlers.ForemanHandler;
+import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.List;
 
@@ -121,6 +122,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // перенаправляю на страницу входа
             startActivity(new Intent(this, LoginActivity.class));
         }
+
+        // перепроверю регистрацию смены
+        SalaryHandler.planeRegistration();
     }
 
     /**
