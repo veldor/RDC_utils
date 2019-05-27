@@ -26,6 +26,12 @@
             android:src="@drawable/shift_square"
             android:contentDescription="@string/shift_image"
             android:paddingBottom="3dp"/>
+        <ImageView
+            android:id="@+id/shiftFilled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/shift_filled_circle"
+            android:contentDescription="@string/shift_image"/>
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

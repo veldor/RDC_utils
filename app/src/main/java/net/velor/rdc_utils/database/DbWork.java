@@ -62,6 +62,25 @@ public class DbWork {
 
     public static final String COL_NAME_SHIFTS = "c_schedule";
 
+    // ==================================== ПОЛУЧЕНИЕ ИНФОРМАЦИИ О СМЕНАХ С ВЫРУЧКОЙ ЗА МЕСЯЦ
+
+    public HashMap<Integer, Boolean> getFilledDays(int year, int month) {
+        Log.d("surprise", "getFilledDays: start find for " + month);
+        HashMap<Integer, Boolean> days = new HashMap<>();
+        String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ?", COL_YEAR, COL_MONTH);
+        String[] args = {String.valueOf(year), String.valueOf(month - 1)};
+        Cursor collection = mConnection.query(TABLE_SALARY_DAY, null, selection, args, null, null, SD_COL_DAY);
+        Log.d("surprise", "getFilledDays: found " + collection.getCount());
+        if(collection.moveToFirst()){
+            do {
+                days.put(collection.getInt(collection.getColumnIndex(SD_COL_DAY)), true);
+            }
+            while (collection.moveToNext());
+        }
+        collection.close();
+        return days;
+    }
+
 
     // ==================================== ПОЛУЧЕНИЕ ИНФОРМАЦИИ О МЕСЯЦЕ
     public Cursor getSalaryMonth(int year, int month) {
@@ -73,7 +92,7 @@ public class DbWork {
         return mConnection.query(TABLE_SHIFTS, null, null, null, null, null, null);
     }
 
-    public Cursor getShiftByShiftName(String shiftName){
+    public Cursor getShiftByShiftName(String shiftName) {
         String selection = String.format(Locale.ENGLISH, "%s = ?", COL_SHIFT_SHORT_NAME);
         String[] args = {shiftName};
         return mConnection.query(TABLE_SHIFTS, null, selection, args, null, null, null);
@@ -290,6 +309,7 @@ public class DbWork {
     public Cursor getSalaryDay(long id) {
         return mConnection.query(TABLE_SALARY_DAY, null, ShiftCursorAdapter.COL_ID + " = '" + id + "'", null, null, null, null);
     }
+
     public Cursor getSalaryDayByDate(int year, int month, int day) {
         String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ? AND %s = ?", COL_YEAR, COL_MONTH, SD_COL_DAY);
         String[] args = {String.valueOf(year), String.valueOf(month), String.valueOf(day)};
@@ -406,7 +426,7 @@ public class DbWork {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if(oldVersion == 1 && newVersion == 2){
+            if (oldVersion == 1 && newVersion == 2) {
                 db.beginTransaction();
 
                 try {

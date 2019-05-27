@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import utils.App;
+
+import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.handlers.XMLHandler;
 
 class CalendarInflater {
@@ -56,6 +58,11 @@ class CalendarInflater {
     }
 
     ScrollView getLayout() {
+        // получу информацию о зарегистрированной выручке за месяц
+        DbWork db = App.getInstance().getDatabaseProvider();
+        HashMap<Integer, Boolean> days = db.getFilledDays(mYear, mMonth);
+        Log.d("surprise", "getLayout: registred " + days.size());
+
         // если есть информация о месяце- разбираю её, если нет- месяц не заполнен, все дни- выходные
         String mode;
         if(mMonthInfo.moveToFirst()){
@@ -96,6 +103,12 @@ class CalendarInflater {
             }
             ++counter;
             View dayLayout = li.inflate(R.layout.calendar_day_layout, gl, false);
+
+            // если данные о выручке за этот день не внесены- скрою маркер
+            if(!days.containsKey(counter)){
+                dayLayout.findViewById(R.id.shiftFilled).setVisibility(View.GONE);
+            }
+
             if(mThisDay != 0){
                 if(counter < mThisDay){
                     dayLayout.setBackground(mContext.getDrawable(R.drawable.day_before_now_wrapper));

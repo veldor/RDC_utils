@@ -100,6 +100,7 @@ public class ShiftsHandler {
             newShift.putExtra(SalaryDayActivity.MONTH_FIELD, calendar.get(Calendar.MONTH) - 1);
             newShift.putExtra(SalaryDayActivity.YEAR_FIELD, calendar.get(Calendar.YEAR));
             newShift.putExtra(SalaryDayActivity.DURATION, duration);
+            newShift.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             Cursor registered = App.getInstance().getDatabaseProvider().getSalaryDayByDate(MainActivity.sYear, MainActivity.sMonth - 1, dayId);
             if(registered.moveToFirst()){
                 // смена зарегистрирована
