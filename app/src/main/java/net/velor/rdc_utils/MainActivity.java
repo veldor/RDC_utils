@@ -29,7 +29,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -801,7 +800,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void delayCalendarDraw() {
-        Log.d("surprise", "MainActivity drawCalendar: delay");
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

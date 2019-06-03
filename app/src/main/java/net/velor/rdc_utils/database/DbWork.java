@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import net.velor.rdc_utils.SalaryActivity;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
@@ -65,12 +64,10 @@ public class DbWork {
     // ==================================== ПОЛУЧЕНИЕ ИНФОРМАЦИИ О СМЕНАХ С ВЫРУЧКОЙ ЗА МЕСЯЦ
 
     public HashMap<Integer, Boolean> getFilledDays(int year, int month) {
-        Log.d("surprise", "getFilledDays: start find for " + month);
         HashMap<Integer, Boolean> days = new HashMap<>();
         String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ?", COL_YEAR, COL_MONTH);
         String[] args = {String.valueOf(year), String.valueOf(month - 1)};
         Cursor collection = mConnection.query(TABLE_SALARY_DAY, null, selection, args, null, null, SD_COL_DAY);
-        Log.d("surprise", "getFilledDays: found " + collection.getCount());
         if(collection.moveToFirst()){
             do {
                 days.put(collection.getInt(collection.getColumnIndex(SD_COL_DAY)), true);
@@ -104,7 +101,6 @@ public class DbWork {
         String[] selectionArgs = new String[]{year, month};
         int result = mConnection.update(TABLE_SCHEDULER, cv, "c_year=? AND c_month=?", selectionArgs);
         if (result == 0) {
-            Log.d("surprise", "Create absent row");
             cv.put(COL_YEAR, year);
             cv.put(COL_MONTH, month);
             mConnection.insert(TABLE_SCHEDULER, null, cv);
@@ -210,7 +206,6 @@ public class DbWork {
             mConnection.setTransactionSuccessful();
             mConnection.endTransaction();
         }
-        Log.d("surprise", "DbWork insertRevenue: shift already registered");
     }
 
     // ===================================== ПРОВЕРКА СВОБОДНОГО ДНЯ
@@ -372,7 +367,6 @@ public class DbWork {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            Log.d("surprise", "create table");
             // создаю таблицу зарплаты
             db.execSQL("create table " + TABLE_SALARY_MONTHS + " (" +
                     "_id integer primary key autoincrement," +

@@ -93,6 +93,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     private AlertDialog mNoSettingsDialog;
     private boolean mDetailsVisible;
     private ConstraintLayout mRootView;
+    private boolean mIsCc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +158,13 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                         mCal.set(Calendar.YEAR, sYear);
                         mCal.set(Calendar.MONTH, sMonth);
                         mChooseMonthBtn.setText(getDate());
-                        recountData();
+                        if (!mIsCc) {
+                            recountData();
+                        }
+                        else{
+                            recountDataForCc();
+                        }
+
                     }
                 }, sYear, sMonth);
                 builder.setActivatedMonth(sMonth)
@@ -232,6 +239,13 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                 }
             }
         });
+
+        // определю, не нужно ли считать зарплату колл-центру
+        mIsCc = mPrefsManager.getBoolean(MainActivity.FIELD_WORK_IN_CC, false);
+    }
+
+    private void recountDataForCc() {
+
     }
 
 /*    private void makeUpdateSnackbar() {
@@ -268,7 +282,12 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         if (mNoSettingsDialog != null) {
             mNoSettingsDialog.cancel();
         }
-        recountData();
+        if(!mIsCc){
+            recountData();
+        }
+        else{
+            recountDataForCc();
+        }
         mChooseMonthBtn.setText(getDate());
 
         // перепроверю регистрацию смены
@@ -599,7 +618,6 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     private void noSettingDialog(Context context, String value) {
         AlertDialog.Builder ad = new AlertDialog.Builder(context);
         ad.setTitle("Необходима настройка");
-        ad.setCancelable(false);
         ad.setMessage(String.format(Locale.ENGLISH, "Отстутствует значение %s.\n Необходимо перейти в настройки приложения и назначить его.\n", value));
         ad.setPositiveButton("Перейти в настройки", new DialogInterface.OnClickListener() {
             @Override
