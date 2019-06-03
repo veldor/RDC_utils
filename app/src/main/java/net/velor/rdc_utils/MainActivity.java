@@ -70,6 +70,9 @@ import utils.LoginActivity;
 import utils.Security;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, DayShiftDialog.AnswerDialogListener, NavigationView.OnNavigationItemSelectedListener {
+    public static final String FIELD_REMIND_TOMORROW = "remind_tomorrow";
+    public static final String FIELD_REMIND_SALARY = "remind_salary";
+    public static final String FIELD_WORK_IN_CC = "callcenter";
     private int REQUEST_WRITE_READ = 3;
 
     // константы имён

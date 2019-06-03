@@ -6,7 +6,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +60,6 @@ class CalendarInflater {
         // получу информацию о зарегистрированной выручке за месяц
         DbWork db = App.getInstance().getDatabaseProvider();
         HashMap<Integer, Boolean> days = db.getFilledDays(mYear, mMonth);
-        Log.d("surprise", "getLayout: registred " + days.size());
 
         // если есть информация о месяце- разбираю её, если нет- месяц не заполнен, все дни- выходные
         String mode;
@@ -146,10 +144,8 @@ class CalendarInflater {
                         }
                     }
                     else{
-                        Log.d("surprise", "Неизвестный тип смены, меняю на выходной");
                         dayLayout.findViewById(R.id.shiftRound).setVisibility(View.INVISIBLE);
                         String monthSchedule = mXmlHandler.setDay(String.valueOf(counter), -1);
-                        Log.d("surprise", monthSchedule);
                         App.getInstance().getDatabaseProvider().updateSchedule(String.valueOf(mYear), String.valueOf(mMonth), monthSchedule);
                     }
                 }

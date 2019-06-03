@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import utils.App;
+import utils.MakeLog;
 
 public class SalaryHandler {
     public static boolean planeRegistration() {
@@ -40,14 +41,12 @@ public class SalaryHandler {
                     if (hour < time[0]) {
                         // планирую смену
                         planeRemind(setTime(calendar, time));
-                        Log.d("surprise", "SalaryHandler planeRegistration: registration on today planned");
                     } else if (hour == time[0]) {
                         // проверю минуты
                         int minutes = calendar.get(Calendar.MINUTE);
                         if (minutes < time[1]) {
                             // планирую проверку
                             planeRemind(setTime(calendar, time));
-                            Log.d("surprise", "SalaryHandler planeRegistration: registration on today planned");
                         } else {
                             // проверю следующий день
                             checkTomorrow();
@@ -66,7 +65,6 @@ public class SalaryHandler {
     }
 
     public static void checkTomorrow() {
-        Log.d("surprise", "SalaryHandler checkTomorrow: checking tomorrow");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 1);
         DbWork databaseProvider = App.getInstance().getDatabaseProvider();
@@ -77,18 +75,14 @@ public class SalaryHandler {
             int day = calendar.get(Calendar.DATE);
             int dayType = XMLHandler.checkShift(schedule, day);
             if (dayType != -1) {
-                Log.d("surprise", "planeRegistration:  today is working");
                 // получу информацию об окончании смены
                 Map<String, String> shiftInfo = databaseProvider.getShift(dayType);
                 String finish = shiftInfo.get(ShiftCursorAdapter.COL_SHIFT_FINISH);
                 if (finish != null && !finish.isEmpty()) {
-                    Log.d("surprise", "SalaryHandler checkTomorrow: registration on tomorrow planned");
                     // разложу время на часы и минуты
                     Integer[] time = TimeHandler.getTime(finish);
                     // если смена сегодня: проверю, что время ещё не прошло
                     planeRemind(setTime(calendar, time));
-                } else {
-                    Log.d("surprise", "planeRegistration: finish no found");
                 }
             }
         }
@@ -107,7 +101,7 @@ public class SalaryHandler {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         long plannedTime = calendar.getTimeInMillis();
         long difference = plannedTime - currentTime;
-        Log.d("surprise", "SalaryHandler planeRemind: difference is " + difference);
+        MakeLog.writeToLog("Запланирована регистрация через " + TimeUnit.MILLISECONDS.toHours(difference) + " часов");
         // планирую проверку
         OneTimeWorkRequest registerSalary = new OneTimeWorkRequest.Builder(RegisterShiftWorker.class).addTag(CheckPlannerWorker.SALARY_REGISTER_TAG).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
         WorkManager.getInstance().enqueueUniqueWork(CheckPlannerWorker.SALARY_REGISTER_TAG, ExistingWorkPolicy.REPLACE, registerSalary);

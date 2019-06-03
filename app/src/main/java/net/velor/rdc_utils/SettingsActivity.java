@@ -16,6 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -182,10 +183,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static class SchedulePreferenceFragment extends PreferenceFragment {
 
         private TimePreference mCheckTime;
+        private SwitchPreference mCheckTomorrow;
+        private SwitchPreference mCheckSalary;
+        private SharedPreferences mPreferences;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             // тут добавлю настройку
             mCheckTime = new TimePreference(getActivity(), null);
             PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
@@ -195,11 +200,28 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             setHasOptionsMenu(true);
             rootScreen.addPreference(mCheckTime);
 
+            mCheckTomorrow = new SwitchPreference(getActivity());
+            mCheckTomorrow.setKey(MainActivity.FIELD_REMIND_TOMORROW);
+            mCheckTomorrow.setTitle(R.string.check_tomorrow_message);
+            rootScreen.addPreference(mCheckTomorrow);
+
+            mCheckSalary = new SwitchPreference(getActivity());
+            mCheckSalary.setKey(MainActivity.FIELD_REMIND_SALARY);
+            mCheckSalary.setTitle(R.string.check_salary_message);
+            rootScreen.addPreference(mCheckSalary);
+
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(MainActivity.FIELD_SCHEDULE_CHECK_TIME));
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            mCheckTomorrow.setChecked(mPreferences.getBoolean(MainActivity.FIELD_REMIND_TOMORROW, true));
+            mCheckSalary.setChecked(mPreferences.getBoolean(MainActivity.FIELD_REMIND_SALARY, true));
         }
 
         @Override
@@ -221,6 +243,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     // ========================================== Настройки зарплаты ===========================================
     public static class SalaryPreferenceFragment extends PreferenceFragment {
         private SharedPreferences mPreferences;
+        private SwitchPreference mWorkInCC;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -231,6 +254,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(rootScreen);
+
+            mWorkInCC = new SwitchPreference(getActivity());
+            mWorkInCC.setKey(MainActivity.FIELD_WORK_IN_CC);
+            mWorkInCC.setTitle(R.string.cc_message);
+            rootScreen.addPreference(mWorkInCC);
+
+            mWorkInCC.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    if(mWorkInCC.isChecked()){
+                        // я не работаю в КЦ
+                        showAll();
+                    }
+                    else{
+                        // я работаю в КЦ
+                        // скрою ненужные поля
+                        hideUnused();
+                    }
+                    return true;
+                }
+            });
 
             EditTextPreference upLimit = new EditTextPreference(getActivity());
             upLimit.setKey(SalaryActivity.FIELD_UP_LIMIT);
@@ -330,6 +374,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
         }
 
+        private void showAll() {
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_UP_LIMIT).setEnabled(true);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_DEFAULT_CENTER).setEnabled(true);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_HIGH_BOUNTY_PERCENT).setEnabled(true);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_PAY_FOR_CONTRAST).setEnabled(true);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST).setEnabled(true);
+        }
+
+        private void hideUnused() {
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_UP_LIMIT).setEnabled(false);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_DEFAULT_CENTER).setEnabled(false);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_HIGH_BOUNTY_PERCENT).setEnabled(false);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_PAY_FOR_CONTRAST).setEnabled(false);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST).setEnabled(false);
+        }
+
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
@@ -338,6 +398,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            mWorkInCC.setChecked(mPreferences.getBoolean(MainActivity.FIELD_WORK_IN_CC, false));
+            boolean checked = !mWorkInCC.isChecked();
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_UP_LIMIT).setEnabled(checked);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_DEFAULT_CENTER).setEnabled(checked);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_HIGH_BOUNTY_PERCENT).setEnabled(checked);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_PAY_FOR_CONTRAST).setEnabled(checked);
+            getPreferenceScreen().findPreference(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST).setEnabled(checked);
         }
     }
 

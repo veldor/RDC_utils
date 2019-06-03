@@ -146,4 +146,6 @@
     <string name="add_shfit_variant_message">Добавить вариант</string>
     <string name="edit_shfits_variant_message">Изменить</string>
     <string name="autofill_schedule_message">Заполнить автоматически</string>
+    <string name="check_salary_message">Напоминать о регистрации выручки</string>
+    <string name="cc_message">Я работаю в колл-центре</string>
 </resources>
