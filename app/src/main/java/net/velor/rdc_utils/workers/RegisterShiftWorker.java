@@ -27,7 +27,6 @@ public class RegisterShiftWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.d("surprise", "RegisterShiftWorker doWork: tick");
         Calendar calendar = Calendar.getInstance();
         // получу сведения о сегодняшней смене
         DbWork databaseProvider = App.getInstance().getDatabaseProvider();

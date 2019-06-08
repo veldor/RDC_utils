@@ -21,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +47,7 @@ import utils.Security;
 
 import static utils.CashHandler.addRuble;
 import static utils.CashHandler.countPercent;
+import static utils.CashHandler.countPercentForCc;
 
 public class SalaryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -160,8 +162,7 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
                         mChooseMonthBtn.setText(getDate());
                         if (!mIsCc) {
                             recountData();
-                        }
-                        else{
+                        } else {
                             recountDataForCc();
                         }
 
@@ -244,10 +245,6 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         mIsCc = mPrefsManager.getBoolean(MainActivity.FIELD_WORK_IN_CC, false);
     }
 
-    private void recountDataForCc() {
-
-    }
-
 /*    private void makeUpdateSnackbar() {
         Log.d("surprise", "SalaryActivity makeUpdateSnackbar: send foundUpdateSnackbar");
         Snackbar updateSnackbar = Snackbar.make(mRootView, getString(R.string.snackbar_found_update_message), Snackbar.LENGTH_INDEFINITE);
@@ -282,10 +279,9 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
         if (mNoSettingsDialog != null) {
             mNoSettingsDialog.cancel();
         }
-        if(!mIsCc){
+        if (!mIsCc) {
             recountData();
-        }
-        else{
+        } else {
             recountDataForCc();
         }
         mChooseMonthBtn.setText(getDate());
@@ -315,47 +311,47 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
 
 
     private void countSalary(final Context context) {
-                AlertDialog.Builder ad = new AlertDialog.Builder(context);
-                ad.setTitle("Расчёт заработной платы");
-                // проведу расчёты
-                // для начала, получу все смены. Потом расчитаю первую зарплату- все смены до 16 числа посчитаю по нормальным расценкам, с вычетом НДФЛ. Это будет сумма первой зарплаты. Потом расчитаю полную стоимость месяца и вычту из него первую часть. Это будет сумма второй зарплаты
-                Cursor monthInfo = mDb.getMonthInfo(sYear, sMonth);
-                if (monthInfo.moveToFirst()) {
-                    HashMap<String, Float> salaryData;
-                    salaryData = calculateSalary(monthInfo);
-                    CardView view = (CardView) mInflater.inflate(R.layout.salarys_detais_dialog, mRootView, false);
-                    Float firstSalaryTotal = salaryData.get(FIRST_SALARY_TOTAL);
-                    if(firstSalaryTotal != null){
-                        ((TextView)view.findViewById(R.id.firstSalarySumm)).setText(addRuble(firstSalaryTotal));
-                    }
-                    Float firstSalaryCashSumm = salaryData.get(FIRST_SALARY_CASH);
-                    if(firstSalaryCashSumm != null){
-                        ((TextView)view.findViewById(R.id.firstSalaryCashSumm)).setText(addRuble(firstSalaryCashSumm));
-                    }
-                    Float firstSalaryCashlessSumm = salaryData.get(FIRST_SALARY_CASHLESS);
-                    if(firstSalaryCashlessSumm != null){
-                        ((TextView)view.findViewById(R.id.firstSalaryCashlessSumm)).setText(addRuble(firstSalaryCashlessSumm));
-                    }
-                    Float secondSalarySumm = salaryData.get(SECOND_SALARY_TOTAL);
-                    if(secondSalarySumm != null){
-                        ((TextView)view.findViewById(R.id.secondSalarySumm)).setText(addRuble(secondSalarySumm));
-                    }
-                    Float secondSalaryCashSumm = salaryData.get(SECOND_SALARY_CASH);
-                    if(secondSalaryCashSumm != null){
-                        ((TextView)view.findViewById(R.id.secondSalaryCashSumm)).setText(addRuble(secondSalaryCashSumm));
-                    }
-                    Float secondSalaryCashlessSumm = salaryData.get(SECOND_SALARY_CASHLESS);
-                    if(secondSalaryCashlessSumm != null){
-                        ((TextView)view.findViewById(R.id.secondSalaryCashlessSumm)).setText(addRuble(secondSalaryCashlessSumm));
-                    }
-                    ad.setView(view);
-                } else {
-                    String salaryData = "Кто не работает- тот не ест. Смены не расчитаны";
-                    ad.setMessage(salaryData);
+        AlertDialog.Builder ad = new AlertDialog.Builder(context);
+        ad.setTitle("Расчёт заработной платы");
+        // проведу расчёты
+        // для начала, получу все смены. Потом расчитаю первую зарплату- все смены до 16 числа посчитаю по нормальным расценкам, с вычетом НДФЛ. Это будет сумма первой зарплаты. Потом расчитаю полную стоимость месяца и вычту из него первую часть. Это будет сумма второй зарплаты
+        Cursor monthInfo = mDb.getMonthInfo(sYear, sMonth);
+        if (monthInfo.moveToFirst()) {
+            HashMap<String, Float> salaryData;
+            salaryData = calculateSalary(monthInfo);
+            CardView view = (CardView) mInflater.inflate(R.layout.salarys_detais_dialog, mRootView, false);
+            Float firstSalaryTotal = salaryData.get(FIRST_SALARY_TOTAL);
+            if (firstSalaryTotal != null) {
+                ((TextView) view.findViewById(R.id.firstSalarySumm)).setText(addRuble(firstSalaryTotal));
+            }
+            Float firstSalaryCashSumm = salaryData.get(FIRST_SALARY_CASH);
+            if (firstSalaryCashSumm != null) {
+                ((TextView) view.findViewById(R.id.firstSalaryCashSumm)).setText(addRuble(firstSalaryCashSumm));
+            }
+            Float firstSalaryCashlessSumm = salaryData.get(FIRST_SALARY_CASHLESS);
+            if (firstSalaryCashlessSumm != null) {
+                ((TextView) view.findViewById(R.id.firstSalaryCashlessSumm)).setText(addRuble(firstSalaryCashlessSumm));
+            }
+            Float secondSalarySumm = salaryData.get(SECOND_SALARY_TOTAL);
+            if (secondSalarySumm != null) {
+                ((TextView) view.findViewById(R.id.secondSalarySumm)).setText(addRuble(secondSalarySumm));
+            }
+            Float secondSalaryCashSumm = salaryData.get(SECOND_SALARY_CASH);
+            if (secondSalaryCashSumm != null) {
+                ((TextView) view.findViewById(R.id.secondSalaryCashSumm)).setText(addRuble(secondSalaryCashSumm));
+            }
+            Float secondSalaryCashlessSumm = salaryData.get(SECOND_SALARY_CASHLESS);
+            if (secondSalaryCashlessSumm != null) {
+                ((TextView) view.findViewById(R.id.secondSalaryCashlessSumm)).setText(addRuble(secondSalaryCashlessSumm));
+            }
+            ad.setView(view);
+        } else {
+            String salaryData = "Кто не работает- тот не ест. Смены не расчитаны";
+            ad.setMessage(salaryData);
 
-                }
-                // создам AlertDialog с данными
-                ad.show();
+        }
+        // создам AlertDialog с данными
+        ad.show();
     }
 
     private HashMap<String, Float> calculateSalary(Cursor monthInfo) {
@@ -424,6 +420,71 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
     }
 
     // ================================================ ПРОИЗВОЖУ РАСЧЁТЫ
+
+
+    private void recountDataForCc() {
+        // очищу родительский элемент
+        mDetailsLayout.removeAllViews();
+        Cursor revenues = mDb.getSalaryMonth(sYear, sMonth);
+        if (revenues.moveToFirst()) {
+            // заработанная сумма
+            float totalAmount = 0;
+            // пока заполню статичные данные
+            // средняя выручка
+            int shiftsCount = revenues.getInt(revenues.getColumnIndex(DbWork.SM_COL_TOTAL_SHIFTS));
+            float gainTotal = revenues.getFloat(revenues.getColumnIndex(DbWork.SM_COL_TOTAL_GAIN));
+
+            // обычная премия
+            mLimitOver = false;
+            mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+            mBalanceSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
+            mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
+
+            // Общее количество смен
+
+            // количество смен в Авроре
+            int shiftsInAurora = revenues.getInt(revenues.getColumnIndex(DbWork.SM_COL_AURORA_SHIFTS));
+
+            // Общее количество часов
+            int hours = revenues.getInt(revenues.getColumnIndex(DbWork.SM_COL_TOTAL_HOURS));
+
+            // оплата за часы
+            mForHour = mPrefsManager.getString(SalaryActivity.FIELD_PAY_FOR_HOUR, null);
+            if (mForHour == null || mForHour.equals("")) {
+                noSettingDialog(this, "Оплата за час работы");
+                return;
+            }
+            float salaryForHours = Float.valueOf(mForHour) * hours;
+
+            double ndfl = countPercent(salaryForHours, NDFL_RATE);
+            // Общая выручка
+            mNormalBounty = mPrefsManager.getString(SalaryActivity.FIELD_NORMAL_BOUNTY_PERCENT, null);
+            if (mNormalBounty == null || mNormalBounty.equals("")) {
+                noSettingDialog(this, "Ставка премии");
+                return;
+            }
+            double bounty;
+            // расчёт премии
+            bounty = countPercentForCc(hours, gainTotal, Double.valueOf(mNormalBounty));
+            totalAmount += bounty + salaryForHours;
+            appendDetail("Оплата за часы", addRuble(salaryForHours));
+            appendDetail("Премия", addRuble(bounty));
+            appendDetail("Итого начислено", addRuble(totalAmount));
+            appendDetail("НДФЛ", addRuble(ndfl));
+
+            appendDetail("Отработано смен", String.valueOf(shiftsCount));
+            appendDetail("Отработано часов", String.valueOf(hours));
+            appendDetail("Общая выручка", addRuble(gainTotal));
+            totalAmount -= ndfl;
+            mTotalGainSumm.setText(addRuble(totalAmount));
+        } else {
+            mTotalGainSumm.setText(R.string.zero);
+            mMedianGainSumm.setText(R.string.zero);
+            mBalanceSumm.setText(R.string.zero);
+        }
+        revenues.close();
+    }
+
     private void recountData() {
         // очищу родительский элемент
         mDetailsLayout.removeAllViews();
@@ -566,13 +627,13 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
 
             appendDetail("Оплата за часы", addRuble(salaryForHours));
             appendDetail("Премия", addRuble(bounty));
-            if(contrastsSumm > 0){
+            if (contrastsSumm > 0) {
                 appendDetail("Стоимость контрастов", addRuble(contrastsSumm));
             }
-            if(dContrastsSumm > 0){
+            if (dContrastsSumm > 0) {
                 appendDetail("Стоимость динамических контрастов", addRuble(dContrastsSumm));
             }
-            if(osSumm > 0){
+            if (osSumm > 0) {
                 appendDetail("Стоимость онкоскринингов", addRuble(osSumm));
             }
             appendDetail("Итого начислено", addRuble(totalAmount));
@@ -601,13 +662,12 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             }
             appendDetail("Проведено контрастов", String.valueOf(contrastsCount));
             appendDetail("Проведено динамических контрастов", String.valueOf(dContrastsCount));
-            if(osSumm > 0){
+            if (osSumm > 0) {
                 appendDetail("Проведено онкоскринингов", String.valueOf(oncoscreeningsCount));
             }
             totalAmount -= ndfl;
             mTotalGainSumm.setText(addRuble(totalAmount));
-        }
-        else{
+        } else {
             mTotalGainSumm.setText(R.string.zero);
             mMedianGainSumm.setText(R.string.zero);
             mBalanceSumm.setText(R.string.zero);

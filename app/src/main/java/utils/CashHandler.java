@@ -41,6 +41,11 @@ public class CashHandler {
         return full / 100 * percent;
     }
 
+
+    public static double countPercentForCc(int hours, float gainTotal, Double percent) {
+        return (double) hours / 164.17 * gainTotal * percent;
+    }
+
     public static int timeToInt(String time){
         String[] arr = time.split(":");
         return Integer.parseInt(arr[0]);

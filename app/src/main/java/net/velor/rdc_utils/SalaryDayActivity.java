@@ -73,6 +73,7 @@ public class SalaryDayActivity extends AppCompatActivity {
     private View mRoot;
     private String mMonthName;
     private Calendar mCalendar;
+    private boolean mIsCc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +129,17 @@ public class SalaryDayActivity extends AppCompatActivity {
         boolean showOs = mPrefsManager.getBoolean(SalaryActivity.FIELD_SHOW_ONCOSCREENINGS, false);
         if (!showOs) {
             mOncoscreeningsBtn.setVisibility(View.GONE);
+        }
+
+        // определю, не нужно ли считать зарплату колл-центру
+        mIsCc = mPrefsManager.getBoolean(MainActivity.FIELD_WORK_IN_CC, false);
+
+        if(mIsCc){
+            mContrastsBtn.setVisibility(View.GONE);
+            mDynamicContrastsBtn.setVisibility(View.GONE);
+            mCenterBtn.setVisibility(View.GONE);
+            sCenterValue = CENTERS_LIST[0];
+            sRevenueValue = "0";
         }
 
         loadInfo(mCurrentId);

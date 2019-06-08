@@ -27,7 +27,6 @@ public class SalaryHandler {
         int month = calendar.get(Calendar.MONTH);
         Cursor schedule = databaseProvider.getSchedule(year, month + 1);
         if (schedule != null && schedule.moveToFirst()) {
-            Log.d("surprise", "SalaryHandler planeRegistration: here");
             int day = calendar.get(Calendar.DATE);
             int dayType = XMLHandler.checkShift(schedule, day);
             if (dayType != -1) {

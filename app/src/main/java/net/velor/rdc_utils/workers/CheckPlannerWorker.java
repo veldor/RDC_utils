@@ -19,6 +19,9 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import utils.App;
+import utils.MakeLog;
+
+import static java.util.Calendar.HOUR_OF_DAY;
 
 public class CheckPlannerWorker extends Worker {
     public static final String RELOAD_MARK = "reload";
@@ -47,12 +50,12 @@ public class CheckPlannerWorker extends Worker {
             int minutes = Integer.valueOf(time_array[1]);
 
             // Проверю, если позже времени установки проверяльщика- установлю его на следующий день
-            int now_hour = cal.get(Calendar.HOUR_OF_DAY);
+            int now_hour = cal.get(HOUR_OF_DAY);
             if (now_hour > hour || (now_hour == hour && cal.get(Calendar.MINUTE) >= minutes)) {
                 cal.add(Calendar.DATE, 1);
             }
 
-            cal.set(Calendar.HOUR_OF_DAY, hour);
+            cal.set(HOUR_OF_DAY, hour);
             cal.set(Calendar.MINUTE, minutes);
             cal.set(Calendar.SECOND, 0);
 
@@ -64,6 +67,7 @@ public class CheckPlannerWorker extends Worker {
             OneTimeWorkRequest checkTomorrow = new OneTimeWorkRequest.Builder(CheckTomorrowWorker.class).addTag(MY_TAG).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
             WorkManager.getInstance().enqueueUniqueWork(MY_TAG, ExistingWorkPolicy.REPLACE, checkTomorrow);
             App.getInstance().mWorkerStatus.postValue("Запланировал проверку");
+            MakeLog.writeToLog("Запланирована проверка через " + TimeUnit.MILLISECONDS.toHours(difference) + " часов");
         }
         if (SalaryHandler.planeRegistration()) {
             Log.d("surprise", "doWork: регистрация зарплаты запланирована");
