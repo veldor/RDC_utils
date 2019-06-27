@@ -162,9 +162,6 @@ public class SalaryDayActivity extends AppCompatActivity {
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     private void loadInfo(final long currentId) {

@@ -32,9 +32,6 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     @Override

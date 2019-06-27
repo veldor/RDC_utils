@@ -148,4 +148,5 @@
     <string name="autofill_schedule_message">Заполнить автоматически</string>
     <string name="check_salary_message">Напоминать о регистрации выручки</string>
     <string name="cc_message">Я работаю в колл-центре</string>
+    <string name="who_works_message">Кто работает</string>
 </resources>

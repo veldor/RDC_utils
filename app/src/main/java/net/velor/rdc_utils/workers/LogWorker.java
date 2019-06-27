@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Calendar;
 
 import utils.MakeLog;
 
@@ -29,6 +30,9 @@ public class LogWorker extends Worker {
     public Result doWork() {
         Data data = getInputData();
         String text = data.getString(MakeLog.LOG_MESSAGE);
+        Calendar cal = Calendar.getInstance();
+        String time = cal.get(Calendar.HOUR_OF_DAY) + "-" + cal.get(Calendar.MINUTE) + "-" + cal.get(Calendar.SECOND);
+        text = time + " " + text;
         File backupDir = new File(Environment.getExternalStorageDirectory(), BACKUP_DIR_NAME);
         if (!backupDir.exists()) {
             boolean result = backupDir.mkdirs();

@@ -6,14 +6,11 @@ import android.arch.lifecycle.ViewModel;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-
+import net.velor.rdc_utils.handlers.ScheduleHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
-import net.velor.rdc_utils.updates.Updater;
-import net.velor.rdc_utils.workers.ScheduleDownloadWorker;
+import net.velor.rdc_utils.subclasses.WorkingPerson;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -24,14 +21,6 @@ import java.util.HashSet;
 import utils.App;
 
 public class ScheduleViewModel extends ViewModel {
-
-    public LiveData<Boolean> startCheckUpdate() {
-        return Updater.checkUpdate();
-    }
-
-    public void initializeUpdate() {
-        Updater.update();
-    }
 
     public Cursor getAllShifts() {
         return App.getInstance().getDatabaseProvider().getAllShifts();
@@ -80,5 +69,9 @@ public class ScheduleViewModel extends ViewModel {
 
     public LiveData<XSSFWorkbook> handleSheet() {
         return App.getInstance().handleSheet();
+    }
+
+    public LiveData<ArrayList<WorkingPerson>> showWorkers(int day) {
+        return ScheduleHandler.showWorkers(day);
     }
 }

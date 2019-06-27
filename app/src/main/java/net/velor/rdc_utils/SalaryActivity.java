@@ -285,9 +285,6 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             recountDataForCc();
         }
         mChooseMonthBtn.setText(getDate());
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     @Override

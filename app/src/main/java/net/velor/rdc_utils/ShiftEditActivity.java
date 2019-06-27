@@ -284,9 +284,6 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     private boolean setReady() {

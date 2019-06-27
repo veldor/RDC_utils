@@ -122,9 +122,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // перенаправляю на страницу входа
             startActivity(new Intent(this, LoginActivity.class));
         }
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     /**

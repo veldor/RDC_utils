@@ -86,9 +86,6 @@ public class AboutActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     @Override

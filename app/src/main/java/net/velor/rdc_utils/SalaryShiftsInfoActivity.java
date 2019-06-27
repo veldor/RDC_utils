@@ -71,9 +71,6 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
             // перенаправляю на страницу входа
             startActivityForResult(new Intent(this, LoginActivity.class), Security.LOGIN_REQUIRED);
         }
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
     @Override

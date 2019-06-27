@@ -40,7 +40,6 @@ public class App extends Application {
     public static final int DOWNLOAD_STATUS_SUCCESSFUL_DOWNLOADED = 2;
     public static final int DOWNLOAD_STATUS_ERROR_DOWNLOAD = 1;
     private SharedPreferencesHandler mSharedPreferenceshandler;
-    private Notificator mNotificator;
 
     public static App getInstance(){
         return mAppInstance;
@@ -59,18 +58,18 @@ public class App extends Application {
         // подключу провайдер настроек
          mSharedPreferenceshandler = new SharedPreferencesHandler(this);
          // подключу провайдер уведомлений
-        mNotificator = new Notificator(this);
+        Notificator notificator = new Notificator(this);
 
         if(!mSharedPreferenceshandler.getNotificationChannelsCreated()){
             // создам каналы
-            mNotificator.createNotificationChannels();
+            notificator.createNotificationChannels();
         }
 
         // запускаю сервис приложения
         //ServiceApplication.startMe(this, ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
 
         // взамен обработки событий в сервисе запущу рабочего, который проверит актуальность данных
-        ForemanHandler.startPlanner(false);
+        ForemanHandler.startPlanner(true);
 
         // поправлю взаимодействие с Экселем, будь он неладен
         System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl");

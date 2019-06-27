@@ -80,9 +80,6 @@ public class ShiftSettingsActivity extends AppCompatActivity implements LoaderMa
         }
 
         Objects.requireNonNull(getSupportLoaderManager().getLoader(0)).forceLoad();
-
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
 

@@ -26,9 +26,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,11 +45,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
+import net.velor.rdc_utils.adapters.WorkersAdapter;
 import net.velor.rdc_utils.dialogs.DayShiftDialog;
-import net.velor.rdc_utils.handlers.SalaryHandler;
+import net.velor.rdc_utils.handlers.ScheduleHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
+import net.velor.rdc_utils.subclasses.WorkingPerson;
 import net.velor.rdc_utils.view_models.ScheduleViewModel;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -83,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int PAGE_COUNT = 5;
 
-    private static Calendar sCalendar = Calendar.getInstance();
+    public static Calendar sCalendar = Calendar.getInstance();
 
     //текущие месяц и год
     public static int sYear, sMonth;
@@ -107,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static XSSFWorkbook sSheet;
     private XSSFSheet mTable;
     private ArrayList<String> mPersonList;
+    public static AlertDialog.Builder sShowWorkersDialogBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,8 +170,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         // загружу данные о сменах, создам диалог выбора типа смены, подключу менеджер страниц
         loadShifts();
-        // перепроверю регистрацию смены
-        SalaryHandler.planeRegistration();
     }
 
 /*    private void makeUpdateSnackbar() {
@@ -395,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void selectPerson(String rowName) {
         selectPerson(sSheet.getSheetIndex(rowName));
+        ScheduleHandler.handlePersons(sSheet.getSheetAt(sSheet.getSheetIndex(rowName)));
     }
 
     private void selectPerson(int which) {
@@ -648,7 +653,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialogBuilder
                 .setTitle(String.format(Locale.ENGLISH, this.getString(R.string.day_info_date), v.getId(), month_s, sYear))
                 .setView(view)
-                .setNeutralButton(android.R.string.ok, null)
+                .setNeutralButton(R.string.who_works_message, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ScheduleHandler.discardWorkers();
+                        showWorkersDialog(dayId);
+                    }
+                })
                 .setPositiveButton(getString(R.string.register_salary_message), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -664,6 +675,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         dialogBuilder.create().show();
 
+    }
+
+    private void showWorkersDialog(int day) {
+        // покажу диалоговое окно со списком работающих в этот день
+        sShowWorkersDialogBuilder = new AlertDialog.Builder(this);
+        sShowWorkersDialogBuilder
+                .setTitle(day + " " + sMonth + " " + sYear);
+        // загружу и покажу список работающих в этот день
+        final LiveData<ArrayList<WorkingPerson>> data = mMyViewModel.showWorkers(day);
+        data.observe(MainActivity.this, new Observer<ArrayList<net.velor.rdc_utils.subclasses.WorkingPerson>>() {
+            @Override
+            public void onChanged(@Nullable ArrayList<WorkingPerson> workingPeople) {
+                if(workingPeople != null && workingPeople.size() > 0){
+                    // создам представление
+                    LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_show_workers, null, false);
+                    RecyclerView recycler = view.findViewById(R.id.workersList);
+                    WorkersAdapter adapter = new WorkersAdapter(workingPeople);
+                    adapter.notifyDataSetChanged();
+                    recycler.setAdapter(adapter);
+                    recycler.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                    sShowWorkersDialogBuilder.setView(view).setPositiveButton(getString(android.R.string.ok), null).create().show();
+                    data.removeObservers(MainActivity.this);
+                }
+            }
+
+        });
     }
 
     @Override

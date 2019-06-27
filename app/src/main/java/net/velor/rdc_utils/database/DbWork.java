@@ -6,9 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.SalaryActivity;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -17,6 +19,10 @@ public class DbWork {
 
     private static final String TABLE_SALARY_DAY = "salary_day";
     private static final String COL_SHIFT_SHORT_NAME = "name_short";
+    public static final String COL_PERSON_NAME = "person_name";
+    public static final String COL_PERSON_POST = "person_post";
+    public static final String COL_DAY = "day";
+    public static final String COL_SCHEDULE_TYPE = "schedule_type";
     private final DBHelper mHelper;
     private SQLiteDatabase mConnection;
 
@@ -24,9 +30,11 @@ public class DbWork {
         mHelper = new DBHelper(context);
     }
 
-    private final int DB_VERSION = 2; // версия БД
+    private final int DB_VERSION = 3; // версия БД
     public static final String DB_NAME = "myDb";
     private final static String TABLE_SHIFTS = "shifts";
+    private final static String TABLE_PERSONS = "persons";
+    private final static String TABLE_WORKING_PERSONS = "working_persons";
     private final static String TABLE_SALARY_MONTHS = "salary_months";
     private final String TABLE_SCHEDULER = "scheduler";
 
@@ -357,6 +365,49 @@ public class DbWork {
         mConnection = mHelper.getWritableDatabase();
     }
 
+    public void insertPerson(String post, String person) {
+        // проверю, нет ли уже в базе строки с данным именем
+        String[] selectionArgs = new String[]{String.valueOf(post), String.valueOf(person)};
+        Cursor c = mConnection.query(TABLE_PERSONS, null, COL_PERSON_POST + "=? AND " + COL_PERSON_NAME + "=?", selectionArgs, null, null, null, null);
+        if (c.getCount() == 0) {
+            // добавлю нового работника
+            ContentValues mcv = new ContentValues();
+            mcv.put(COL_PERSON_NAME, person);
+            mcv.put(COL_PERSON_POST, post);
+            mConnection.insert(TABLE_PERSONS, null, mcv);
+        }
+        c.close();
+    }
+
+    public void insertDayToSchedule(String post, String person, int day, String value) {
+        Calendar calendar = MainActivity.sCalendar;
+        String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
+        // проверю, нет ли в базе этой записи
+        String[] selectionArgs = new String[]{date, post, person};
+        Cursor c = mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=? AND " + COL_PERSON_POST + "=? AND " + COL_PERSON_NAME + "=?", selectionArgs, null, null, null, null);
+        if (c.getCount() == 0) {
+            // добавлю нового работника в смену
+            ContentValues mcv = new ContentValues();
+            mcv.put(COL_PERSON_NAME, person);
+            mcv.put(COL_PERSON_POST, post);
+            mcv.put(COL_DAY, date);
+            mcv.put(COL_SCHEDULE_TYPE, value);
+            mConnection.insert(TABLE_WORKING_PERSONS, null, mcv);
+        }
+        c.close();
+    }
+
+    public Cursor getWorkers(int day) {
+        Calendar calendar = MainActivity.sCalendar;
+        String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
+        String[] selectionArgs = new String[]{date};
+        return mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=?", selectionArgs, null, null, null, null);
+    }
+
+    public Cursor getAllWorkers(){
+        return mConnection.query(TABLE_WORKING_PERSONS, null, null, null, null, null, null, null);
+    }
+
 
     private class DBHelper extends SQLiteOpenHelper {
 
@@ -416,13 +467,25 @@ public class DbWork {
                     " shift_color CHAR(7)," +
                     " alarm BOOL DEFAULT '0'," +
                     " alarm_time CHAR(5) );");
+
+            // создаю таблицу для хранения имён персонала
+            db.execSQL("create table " + TABLE_PERSONS + " (" +
+                    COL_ID + " integer primary key autoincrement," +
+                    COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                    COL_PERSON_POST + " VARCHAR(50) );");
+            // создаю таблицу данных работающих в определённый день
+            db.execSQL("create table " + TABLE_WORKING_PERSONS + " (" +
+                    COL_ID + " integer primary key autoincrement," +
+                    COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                    COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                    COL_DAY + " CHAR(10)," +
+                    COL_SCHEDULE_TYPE + " VARCHAR(10) );");
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion == 1 && newVersion == 2) {
+            if (oldVersion == 1) {
                 db.beginTransaction();
-
                 try {
                     db.execSQL("create table scheduler ("
                             + "_id integer primary key autoincrement,"
@@ -455,6 +518,39 @@ public class DbWork {
                             " alarm_time CHAR(5) );");
                     db.execSQL("insert into " + TABLE_SHIFTS + " select _id, name_full, name_short, shift_start, shift_end, shift_color, alarm, alarm_time from temp_" + TABLE_SHIFTS + ";");
                     db.execSQL("drop table temp_" + TABLE_SHIFTS + ";");
+
+                    // создаю таблицу для хранения имён персонала
+                    db.execSQL("create table " + TABLE_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " VARCHAR(50) );");
+                    // создаю таблицу данных работающих в определённый день
+                    db.execSQL("create table " + TABLE_WORKING_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                            COL_DAY + " CHAR(10)," +
+                            COL_SCHEDULE_TYPE + " VARCHAR(10) );");
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+            if(oldVersion == 2){
+                db.beginTransaction();
+                try {
+                    // создаю таблицу для хранения имён персонала
+                    db.execSQL("create table " + TABLE_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " VARCHAR(50) );");
+                    // создаю таблицу данных работающих в определённый день
+                    db.execSQL("create table " + TABLE_WORKING_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                            COL_DAY + " CHAR(10)," +
+                            COL_SCHEDULE_TYPE + " VARCHAR(10) );");
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
