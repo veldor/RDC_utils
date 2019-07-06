@@ -9,10 +9,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -134,7 +136,7 @@ public class SalaryDayActivity extends AppCompatActivity {
         // определю, не нужно ли считать зарплату колл-центру
         mIsCc = mPrefsManager.getBoolean(MainActivity.FIELD_WORK_IN_CC, false);
 
-        if(mIsCc){
+        if (mIsCc) {
             mContrastsBtn.setVisibility(View.GONE);
             mDynamicContrastsBtn.setVisibility(View.GONE);
             mCenterBtn.setVisibility(View.GONE);
@@ -357,7 +359,11 @@ public class SalaryDayActivity extends AppCompatActivity {
             mDb.deleteSalaryShift(mCurrentId);
         }
         mDb.insertRevenue(cv);
-        Toast.makeText(getApplicationContext(), R.string.day_registered_message, Toast.LENGTH_LONG).show();
+        // проверю, выполнена ли средняя выручка
+        boolean isUp = SalaryHandler.checkUpSalary(Integer.valueOf(sYearValue), Integer.valueOf(sMonthValue));
+        // рассчитаю заработанную сумму
+        String salary = SalaryHandler.countSalary(App.getInstance().getDatabaseProvider().getSalaryDayByDate(Integer.valueOf(sYearValue), Integer.valueOf(sMonthValue), Integer.valueOf(sDayValue)), isUp);
+        Toast.makeText(getApplicationContext(), String.format(Locale.ENGLISH, "Смена зарегистрирована, заработано %s", salary), Toast.LENGTH_LONG).show();
         // очищаю данные
         clearData();
         // обновлю данные виджета
@@ -430,7 +436,11 @@ public class SalaryDayActivity extends AppCompatActivity {
             }
         };
         ad.setPositiveButton(android.R.string.ok, dialogConfirm);
-        ad.setView(R.layout.number_picker);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ad.setView(R.layout.number_picker);
+        } else {
+            ad.setView(getLayoutInflater().inflate(R.layout.number_picker, null));
+        }
         AlertDialog dialog = ad.create();
         // задаю название диалога
         int id = view.getId();
@@ -510,7 +520,7 @@ public class SalaryDayActivity extends AppCompatActivity {
     // =========================================== ПОМЕЧАЮ КНОПКУ КАК АКТИВНУЮ ===============================================
     private void makeButtonReady(Button btn) {
         //btn.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.day_layout_clicked));
-        btn.setBackgroundColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+        btn.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
         checkReady();
         invalidateOptionsMenu();
     }

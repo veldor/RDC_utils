@@ -31,7 +31,7 @@ public class LogWorker extends Worker {
         Data data = getInputData();
         String text = data.getString(MakeLog.LOG_MESSAGE);
         Calendar cal = Calendar.getInstance();
-        String time = cal.get(Calendar.HOUR_OF_DAY) + "-" + cal.get(Calendar.MINUTE) + "-" + cal.get(Calendar.SECOND);
+        String time = cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DATE) + " " + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
         text = time + " " + text;
         File backupDir = new File(Environment.getExternalStorageDirectory(), BACKUP_DIR_NAME);
         if (!backupDir.exists()) {

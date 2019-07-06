@@ -125,7 +125,8 @@
                         android:textColor="@color/colorPrimary"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        tools:ignore="Autofill" />
+                        tools:ignore="Autofill"
+                        android:drawableLeft="@drawable/shift_circle" />
                 </TableRow>
 
                 <TableRow>
@@ -184,6 +185,7 @@
         android:onClick="confirmSave"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_check_white_24dp" />
+        app:srcCompat="@drawable/ic_check_white_24dp"
+        android:layout_marginRight="36dp" />
 
 </android.support.constraint.ConstraintLayout>

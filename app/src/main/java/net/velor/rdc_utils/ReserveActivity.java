@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,17 +15,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import net.velor.rdc_utils.handlers.SalaryHandler;
-import net.velor.rdc_utils.view_models.ReserveViewModel;
-import net.velor.rdc_utils.workers.ReserveWorker;
-
 import androidx.work.Data;
 import androidx.work.WorkInfo;
+
+import net.velor.rdc_utils.view_models.ReserveViewModel;
+import net.velor.rdc_utils.workers.ReserveWorker;
 
 public class ReserveActivity extends AppCompatActivity {
 

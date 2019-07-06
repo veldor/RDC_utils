@@ -133,5 +133,6 @@
         android:onClick="confirmSave"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_check_white_24dp" />
+        app:srcCompat="@drawable/ic_check_white_24dp"
+        android:layout_marginRight="8dp" />
 </android.support.constraint.ConstraintLayout>

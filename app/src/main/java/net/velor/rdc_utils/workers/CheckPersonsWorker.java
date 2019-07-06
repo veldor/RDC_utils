@@ -3,7 +3,6 @@ package net.velor.rdc_utils.workers;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -29,7 +28,7 @@ public class CheckPersonsWorker extends Worker {
     @Override
     public Result doWork() {
         XSSFSheet sheet = ScheduleHandler.sSheet;
-        if(sheet != null){
+        if (sheet != null) {
             // получу список всех работников
             int length = sheet.getLastRowNum();
             String post = "";
@@ -41,7 +40,7 @@ public class CheckPersonsWorker extends Worker {
                     cell = row.getCell(0);
                     if (cell != null) {
                         String person = cell.getStringCellValue();
-                        if(person != null && !person.isEmpty()){
+                        if (person != null && !person.isEmpty()) {
                             switch (person.trim()) {
                                 case "Врачи МРТ":
                                     post = "Врач";

@@ -3,10 +3,7 @@ package net.velor.rdc_utils.workers;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -19,7 +16,6 @@ import net.velor.rdc_utils.handlers.XMLHandler;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import utils.App;
 import utils.Notificator;

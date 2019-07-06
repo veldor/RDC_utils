@@ -10,8 +10,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.velor.rdc_utils.handlers.SalaryHandler;
-
 import org.jetbrains.annotations.NotNull;
 
 /**

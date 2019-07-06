@@ -2,6 +2,7 @@ package net.velor.rdc_utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
@@ -14,14 +15,14 @@ public class TimePreference extends DialogPreference {
     private String mLastMinute ="00";
     private TimePicker mPicker =null;
 
-    static String getHour(String time) {
+    private static String getHour(String time) {
 
         String[] pieces = time.split(":");
 
         return(String.format(Locale.ENGLISH,"%02d", Integer.parseInt(pieces[0])));
     }
 
-    static String getMinute(String time) {
+    private static String getMinute(String time) {
         String[] pieces=time.split(":");
 
         return(String.format(Locale.ENGLISH,"%02d",Integer.parseInt(pieces[1])));
@@ -44,8 +45,18 @@ public class TimePreference extends DialogPreference {
     @Override
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
-        mPicker.setHour(Integer.valueOf(mLastHour));
-        mPicker.setMinute(Integer.valueOf(mLastMinute));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mPicker.setHour(Integer.valueOf(mLastHour));
+        }
+        else{
+            mPicker.setCurrentHour(Integer.valueOf(mLastHour));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mPicker.setMinute(Integer.valueOf(mLastMinute));
+        }
+        else{
+            mPicker.setCurrentMinute(Integer.valueOf(mLastMinute));
+        }
         mPicker.setIs24HourView(true);
     }
 
@@ -53,8 +64,18 @@ public class TimePreference extends DialogPreference {
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
         if (positiveResult) {
-            mLastHour = String.format(Locale.ENGLISH,"%02d", mPicker.getHour());
-            mLastMinute = String.format(Locale.ENGLISH,"%02d", mPicker.getMinute());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mLastHour = String.format(Locale.ENGLISH,"%02d", mPicker.getHour());
+            }
+            else{
+                mLastHour = String.format(Locale.ENGLISH,"%02d", mPicker.getCurrentHour());
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mLastMinute = String.format(Locale.ENGLISH,"%02d", mPicker.getMinute());
+            }
+            else{
+                mLastMinute = String.format(Locale.ENGLISH,"%02d", mPicker.getCurrentMinute());
+            }
 
             String time = String.format(Locale.ENGLISH,"%s:%s", mLastHour, mLastMinute);
 

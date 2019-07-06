@@ -21,7 +21,7 @@ public class DbWork {
     private static final String COL_SHIFT_SHORT_NAME = "name_short";
     public static final String COL_PERSON_NAME = "person_name";
     public static final String COL_PERSON_POST = "person_post";
-    public static final String COL_DAY = "day";
+    private static final String COL_DAY = "day";
     public static final String COL_SCHEDULE_TYPE = "schedule_type";
     private final DBHelper mHelper;
     private SQLiteDatabase mConnection;
@@ -403,11 +403,6 @@ public class DbWork {
         String[] selectionArgs = new String[]{date};
         return mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=?", selectionArgs, null, null, null, null);
     }
-
-    public Cursor getAllWorkers(){
-        return mConnection.query(TABLE_WORKING_PERSONS, null, null, null, null, null, null, null);
-    }
-
 
     private class DBHelper extends SQLiteOpenHelper {
 

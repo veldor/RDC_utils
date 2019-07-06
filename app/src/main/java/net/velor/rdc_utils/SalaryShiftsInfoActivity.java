@@ -107,7 +107,7 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
                 mDb.deleteSalaryShift(id);
                 SalaryWidget.forceUpdateWidget();
                 Toast.makeText(getApplicationContext(), "Данные удалены", Toast.LENGTH_LONG).show();
-                Objects.requireNonNull(getSupportLoaderManager().getLoader(0)).forceLoad();
+                getSupportLoaderManager().getLoader(0).forceLoad();
     }
 
 

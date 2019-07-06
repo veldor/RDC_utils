@@ -26,9 +26,12 @@ public class ReserveViewModel extends ViewModel {
     public LiveData<Boolean> checkRights() {
         // проверю права доступа
         App context = App.getInstance();
-        int writeResult = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int writeResult;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            writeResult = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int readResult = context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
         haveRights.setValue(writeResult == PackageManager.PERMISSION_GRANTED && readResult == PackageManager.PERMISSION_GRANTED);
+    }
         return haveRights;
     }
 

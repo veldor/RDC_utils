@@ -15,7 +15,6 @@ import net.velor.rdc_utils.ShiftEditActivity;
 import net.velor.rdc_utils.ShiftSettingsActivity;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import utils.App;
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -31,7 +30,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@{person.role}"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="8dp" />
 
             <TextView
                 android:id="@+id/personName"
@@ -41,7 +41,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@{person.name}"
                 app:layout_constraintStart_toEndOf="@+id/personRole"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="8dp" />
 
             <TextView
                 android:id="@+id/shiftType"

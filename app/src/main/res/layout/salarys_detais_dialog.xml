@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:text="Первая зарплата"
         android:textAlignment="center"
         android:textSize="20sp" />
 
@@ -22,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/firstSalaryTitle"
         android:layout_centerHorizontal="true"
-        android:text="60 000"
         android:textAlignment="center"
         android:textSize="40sp" />
 
@@ -36,8 +34,7 @@
             android:id="@+id/firstSalaryCashTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Наличные" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/firstSalaryCashSumm"
@@ -45,7 +42,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/firstSalaryCashTitle"
             android:layout_centerHorizontal="true"
-            android:text="60000"
             android:textSize="20sp" />
     </RelativeLayout>
 
@@ -53,21 +49,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/firstSalarySumm"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true">
 
         <TextView
             android:id="@+id/firstSalaryCashlessTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Безнал" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/firstSalaryCashlessSumm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/firstSalaryCashlessTitle"
-            android:text="60000"
             android:textSize="20sp" />
     </RelativeLayout>
     <TextView
@@ -75,7 +70,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/firstSalaryCashLayout"
-        android:text="Вторая зарплата"
         android:textAlignment="center"
         android:textSize="20sp" />
 
@@ -85,7 +79,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/secondSalaryTitle"
         android:layout_centerHorizontal="true"
-        android:text="60 000"
         android:textAlignment="center"
         android:textSize="40sp" />
 
@@ -98,8 +91,7 @@
             android:id="@+id/secondSalaryCashTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Наличные" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/secondSalaryCashSumm"
@@ -107,7 +99,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/secondSalaryCashTitle"
             android:layout_centerHorizontal="true"
-            android:text="60000"
             android:textSize="20sp" />
     </RelativeLayout>
 
@@ -115,21 +106,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/secondSalarySumm"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true">
 
         <TextView
             android:id="@+id/secondSalaryCashlessTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Безнал" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/secondSalaryCashlessSumm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/secondSalaryCashlessTitle"
-            android:text="60000"
             android:textSize="20sp" />
     </RelativeLayout>
 </RelativeLayout>

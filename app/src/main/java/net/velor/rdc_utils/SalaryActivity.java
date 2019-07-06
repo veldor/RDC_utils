@@ -15,13 +15,13 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +35,6 @@ import android.widget.TextView;
 import com.whiteelephant.monthpicker.MonthPickerDialog;
 
 import net.velor.rdc_utils.database.DbWork;
-import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -433,14 +432,9 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
 
             // обычная премия
             mLimitOver = false;
-            mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
-            mBalanceSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
-            mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
-
-            // Общее количество смен
-
-            // количество смен в Авроре
-            int shiftsInAurora = revenues.getInt(revenues.getColumnIndex(DbWork.SM_COL_AURORA_SHIFTS));
+                mMedianGainSumm.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            mBalanceSumm.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+            mTotalGainSumm.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
 
             // Общее количество часов
             int hours = revenues.getInt(revenues.getColumnIndex(DbWork.SM_COL_TOTAL_HOURS));
@@ -508,18 +502,18 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             if (medianGain < fLimit) {
                 // обычная премия
                 mLimitOver = false;
-                mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
+                mMedianGainSumm.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
                 // посчитаю недостаток
                 mBalanceSumm.setText(addRuble(debet));
-                mBalanceSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
-                mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorAccent, getTheme()));
+                mBalanceSumm.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+                mTotalGainSumm.setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
             } else {
                 // повышенная премия
                 mLimitOver = true;
-                mMedianGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+                mMedianGainSumm.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
                 mBalanceSumm.setText(addRuble(debet));
-                mBalanceSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
-                mTotalGainSumm.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+                mBalanceSumm.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                mTotalGainSumm.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary));
             }
             // Общее количество смен
 

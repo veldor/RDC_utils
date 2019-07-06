@@ -16,7 +16,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:contentDescription="@string/shift_image"
-            android:src="@drawable/shift_circle" />
+            android:src="@drawable/shift_circle"
+            android:layout_marginLeft="10dp" />
 
         <TextView
             android:id="@+id/shiftName"
@@ -26,7 +27,8 @@
             android:layout_marginStart="10dp"
             android:textColor="@color/colorPrimary"
             android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp" />
 
 
         <TextView
@@ -37,7 +39,8 @@
             android:layout_marginStart="1dp"
             android:textColor="@color/colorPrimary"
             android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:layout_marginLeft="1dp" />
 
 
 
@@ -46,7 +49,8 @@
             android:layout_width="0dp"
             android:layout_weight="6"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"/>
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

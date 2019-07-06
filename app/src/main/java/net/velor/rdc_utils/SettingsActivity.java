@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import net.velor.rdc_utils.handlers.ForemanHandler;
-import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.List;
 

@@ -36,9 +36,14 @@ public class ScheduleViewModel extends ViewModel {
 
     public boolean checkFileRead() {
         App context = App.getInstance();
-        int writeResult = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int readResult = context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-        return (writeResult == PackageManager.PERMISSION_GRANTED && readResult == PackageManager.PERMISSION_GRANTED);
+        int writeResult;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            writeResult = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int readResult = context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+            return (writeResult == PackageManager.PERMISSION_GRANTED && readResult == PackageManager.PERMISSION_GRANTED);
+        } else {
+            return true;
+        }
     }
 
     public LiveData<Integer> downloadSheet() {

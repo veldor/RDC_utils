@@ -1,9 +1,11 @@
 package net.velor.rdc_utils;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.SparseIntArray;
@@ -16,16 +18,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
+import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.handlers.XMLHandler;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Objects;
 
 import utils.App;
-
-import net.velor.rdc_utils.database.DbWork;
-import net.velor.rdc_utils.handlers.XMLHandler;
 
 class CalendarInflater {
     private static final String MODE_NEW = "new";
@@ -109,13 +109,28 @@ class CalendarInflater {
 
             if(mThisDay != 0){
                 if(counter < mThisDay){
-                    dayLayout.setBackground(mContext.getDrawable(R.drawable.day_before_now_wrapper));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        dayLayout.setBackground(mContext.getDrawable(R.drawable.day_before_now_wrapper));
+                    }
+                    else{
+                        dayLayout.setBackground(mContext.getResources().getDrawable(R.drawable.day_before_now_wrapper));
+                    }
                 }
                 else if(counter == mThisDay){
-                    dayLayout.setBackground(mContext.getDrawable(R.drawable.day_now_wrapper));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        dayLayout.setBackground(mContext.getDrawable(R.drawable.day_now_wrapper));
+                    }
+                    else{
+                        dayLayout.setBackground(mContext.getResources().getDrawable(R.drawable.day_now_wrapper));
+                    }
                 }
                 else{
-                    dayLayout.setBackground(mContext.getDrawable(R.drawable.day_wrapper));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        dayLayout.setBackground(mContext.getDrawable(R.drawable.day_wrapper));
+                    }
+                    else{
+                        dayLayout.setBackground(mContext.getResources().getDrawable(R.drawable.day_wrapper));
+                    }
                 }
             }
             ((TextView)dayLayout.findViewById(R.id.dayNum)).setText(String.valueOf(counter));
@@ -174,16 +189,16 @@ class CalendarInflater {
             int key = countedShifts.keyAt(ctr);
             CardView detail = (CardView) li.inflate(R.layout.shift_details, monthParent, false);
             // получу название смены
-            String shName = Objects.requireNonNull(mShiftTypes.get(String.valueOf(key))).get(ShiftCursorAdapter.COL_NAME_FULL);
+            String shName = mShiftTypes.get(String.valueOf(key)).get(ShiftCursorAdapter.COL_NAME_FULL);
             ((TextView)detail.findViewById(R.id.shiftName)).setText(shName);
             ((TextView)detail.findViewById(R.id.shift_count)).setText(String.valueOf(countedShifts.get(key)));
             monthParent.addView(detail);
-            String color = Objects.requireNonNull(mShiftTypes.get(String.valueOf(key))).get(ShiftCursorAdapter.COL_SHIFT_COLOR);
+            String color = mShiftTypes.get(String.valueOf(key)).get(ShiftCursorAdapter.COL_SHIFT_COLOR);
             if(color != null){
                 ((ImageView) detail.findViewById(R.id.shiftRound)).getDrawable().setColorFilter(new PorterDuffColorFilter(Color.parseColor(color), PorterDuff.Mode.SRC_IN));
             }
-            String start = Objects.requireNonNull(mShiftTypes.get(String.valueOf(key))).get(ShiftCursorAdapter.COL_SHIFT_START);
-            String finish = Objects.requireNonNull(mShiftTypes.get(String.valueOf(key))).get(ShiftCursorAdapter.COL_SHIFT_FINISH);
+            String start = mShiftTypes.get(String.valueOf(key)).get(ShiftCursorAdapter.COL_SHIFT_START);
+            String finish = mShiftTypes.get(String.valueOf(key)).get(ShiftCursorAdapter.COL_SHIFT_FINISH);
             StringBuilder sb = new StringBuilder();
             sb.append("(");
             if(start != null && !TextUtils.isEmpty(start)){

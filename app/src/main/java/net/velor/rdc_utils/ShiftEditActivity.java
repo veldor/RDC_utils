@@ -10,13 +10,12 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -41,7 +40,6 @@ import com.skydoves.colorpickerpreference.FlagView;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.dialogs.DeleteConfirmDialog;
-import net.velor.rdc_utils.handlers.SalaryHandler;
 
 import java.util.Locale;
 import java.util.Map;
@@ -64,7 +62,6 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
     // хранилища текстовых данных
     private TextView mShiftStartView, mShiftFinishView, mAlarmView;
     private EditText mColorView;
-    private Switch mAlarmSwitcher;
     private DbWork mDb;
     private boolean mReady = false;
 
@@ -108,6 +105,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
 
         // если выбран режим обновления- загружу данные смены
 
+        Switch alarmSwitcher;
         if (mMode.equals(MODE_UPDATE)) {
             mId = i.getLongExtra(ShiftCursorAdapter.COL_ID, 0);
             Map<String, String> data = mDb.getShift(mId);
@@ -136,9 +134,9 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
             String alarm = data.get(ShiftCursorAdapter.COL_ALARM);
             assert alarm != null;
             if (alarm.equals(ALARM_ON)) {
-                mAlarmSwitcher = findViewById(R.id.alarmSwitcher);
+                alarmSwitcher = findViewById(R.id.alarmSwitcher);
                 mAlarmBtn = findViewById(R.id.set_alarm_time_btn);
-                mAlarmSwitcher.setChecked(true);
+                alarmSwitcher.setChecked(true);
                 mAlarmBtn.setEnabled(true);
                 String alarmTime = data.get(ShiftCursorAdapter.COL_ALARM_TIME);
                 if (alarmTime != null) {
@@ -265,8 +263,8 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
         mAlarmBtn = findViewById(R.id.set_alarm_time_btn);
 
         // переключатель будильника
-        mAlarmSwitcher = findViewById(R.id.alarmSwitcher);
-        mAlarmSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        alarmSwitcher = findViewById(R.id.alarmSwitcher);
+        alarmSwitcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mAlarmBtn.setEnabled(isChecked);
