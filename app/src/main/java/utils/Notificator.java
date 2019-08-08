@@ -132,7 +132,7 @@ public class Notificator {
         sendCustomNotification("Привет", "Я- приложение РДЦ. Буду считать вашу зарплату и отправлять вам напоминания о рабочих днях. И ещё много полезных вещей в перспективе. Надеюсь, мы сработаемся :)");
     }
 
-    void sendCustomNotification(String title, String test) {
+    private void sendCustomNotification(String title, String test) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, TEST_CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo_monochrom)
                 .setContentTitle(title)

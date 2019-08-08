@@ -688,7 +688,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onChanged(@Nullable ArrayList<WorkingPerson> workingPeople) {
                 if(workingPeople != null && workingPeople.size() > 0){
                     // создам представление
-                    LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_show_workers, null, false);
+                    LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_show_workers, mRootView, false);
                     RecyclerView recycler = view.findViewById(R.id.workersList);
                     WorkersAdapter adapter = new WorkersAdapter(workingPeople);
                     adapter.notifyDataSetChanged();

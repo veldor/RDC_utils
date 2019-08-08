@@ -25,7 +25,7 @@ import utils.MakeLog;
 import static utils.CashHandler.countPercent;
 
 public class SalaryHandler {
-    public static boolean planeRegistration() {
+    public static void planeRegistration() {
         Calendar calendar = Calendar.getInstance();
         DbWork databaseProvider = App.getInstance().getDatabaseProvider();
         int year = calendar.get(Calendar.YEAR);
@@ -69,7 +69,6 @@ public class SalaryHandler {
                 checkTomorrow();
             }
         }
-        return true;
     }
 
     public static void checkTomorrow() {
@@ -107,8 +106,7 @@ public class SalaryHandler {
     private static void planeRemind(Calendar calendar) {
         // получу значения текущего времени
         long currentTime = Calendar.getInstance().getTimeInMillis();
-        // запланирую проверку выручки на час раньше завершения смены
-        calendar.add(Calendar.HOUR, -1);
+        // запланирую проверку выручки
         long plannedTime = calendar.getTimeInMillis();
         long difference = plannedTime - currentTime;
         MakeLog.writeToLog("Запланирована регистрация зарплаты через " + TimeUnit.MILLISECONDS.toHours(difference) + " часов");
@@ -118,64 +116,62 @@ public class SalaryHandler {
     }
 
     public static String countSalary(Cursor salaryDay, boolean isUpRevenue) {
-        SharedPreferences prefsManager = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String forHour = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_HOUR, "0");
-        String normalBounty = prefsManager.getString(SalaryActivity.FIELD_NORMAL_BOUNTY_PERCENT, "0");
-        String upBounty = prefsManager.getString(SalaryActivity.FIELD_HIGH_BOUNTY_PERCENT, "0");
-        String contrastCost = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_CONTRAST, "0");
-        String dContrastCost = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST, "0");
-        String oncoscreeningCost = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, "0");
-        float hours = salaryDay.getFloat(salaryDay.getColumnIndex(DbWork.SD_COL_DURATION));
-        String revenueSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_REVENUE));
-        String contrastsSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_CONTRASTS));
-        String dContrastsSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_DCONTRASTS));
-        String screeningsSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_SCREENINGS));
+        if(salaryDay.moveToFirst()){
+            float hours = salaryDay.getFloat(salaryDay.getColumnIndex(DbWork.SD_COL_DURATION));
+            String revenueSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_REVENUE));
+            String contrastsSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_CONTRASTS));
+            String dContrastsSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_DCONTRASTS));
+            String screeningsSumm = salaryDay.getString(salaryDay.getColumnIndex(DbWork.SD_COL_SCREENINGS));
+            SharedPreferences prefsManager = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+            String forHour = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_HOUR, "0");
+            String normalBounty = prefsManager.getString(SalaryActivity.FIELD_NORMAL_BOUNTY_PERCENT, "0");
+            String upBounty = prefsManager.getString(SalaryActivity.FIELD_HIGH_BOUNTY_PERCENT, "0");
+            String contrastCost = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_CONTRAST, "0");
+            String dContrastCost = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST, "0");
+            String oncoscreeningCost = prefsManager.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, "0");
 
-        // получу сумму, заработанную за день
-        assert forHour != null;
-        float summForHours = hours * Float.valueOf(forHour);
-        assert contrastCost != null;
-        float summForContrasts = Integer.valueOf(contrastsSumm) * Float.valueOf(contrastCost);
-        assert dContrastCost != null;
-        float summForDContrasts = Integer.valueOf(dContrastsSumm) * Float.valueOf(dContrastCost);
-        assert oncoscreeningCost != null;
-        float summForScreenings = Integer.valueOf(screeningsSumm) * Float.valueOf(oncoscreeningCost);
-        float ndfl = countPercent(summForHours, "13.");
-        float totalSumm;
-        if(isUpRevenue){
-            float summBounty = countPercent(Float.valueOf(revenueSumm), upBounty);
-            totalSumm = summBounty + summForContrasts + summForDContrasts + summForScreenings - ndfl;
+            // получу сумму, заработанную за день
+            assert forHour != null;
+            float summForHours = hours * Float.valueOf(forHour);
+            assert contrastCost != null;
+            float summForContrasts = Integer.valueOf(contrastsSumm) * Float.valueOf(contrastCost);
+            assert dContrastCost != null;
+            float summForDContrasts = Integer.valueOf(dContrastsSumm) * Float.valueOf(dContrastCost);
+            assert oncoscreeningCost != null;
+            float summForScreenings = Integer.valueOf(screeningsSumm) * Float.valueOf(oncoscreeningCost);
+            float ndfl = countPercent(summForHours, "13.");
+            float totalSumm;
+            if(isUpRevenue){
+                float summBounty = countPercent(Float.valueOf(revenueSumm), upBounty);
+                totalSumm = summBounty + summForContrasts + summForDContrasts + summForScreenings - ndfl;
+            }
+            else{
+                float summBounty = countPercent(Float.valueOf(revenueSumm), normalBounty);
+                totalSumm = summBounty + summForContrasts + summForDContrasts + summForScreenings + summForHours - ndfl;
+            }
+            salaryDay.close();
+            return CashHandler.addRuble(totalSumm);
         }
-        else{
-            float summBounty = countPercent(Float.valueOf(revenueSumm), normalBounty);
-            totalSumm = summBounty + summForContrasts + summForDContrasts + summForScreenings + summForHours - ndfl;
-        }
-        return CashHandler.addRuble(totalSumm);
+        return "0";
     }
 
     public static boolean checkUpSalary(Integer year, Integer month) {
         Cursor days = App.getInstance().getDatabaseProvider().getSalaryMonth(year, month);
-        float revenue = 0;
-        int shifts = 0;
+        float medianGain = 0;
         if(days.moveToFirst()){
             do{
-                // получу сумму, заработанную за день
-                String revenueSumm = days.getString(days.getColumnIndex(DbWork.SD_COL_REVENUE));
-                if(revenueSumm != null && !revenueSumm.isEmpty()){
-                    revenue += Float.valueOf(revenueSumm);
-                    ++shifts;
-                }
+                // получу сумму, заработанную за месяц
+                medianGain = Float.valueOf(days.getString(days.getColumnIndex(DbWork.SM_COL_MEDIAN_GAIN)));
             }
             while (days.moveToNext());
-            days.close();
         }
-        float median = revenue / shifts;
+        days.close();
         SharedPreferences prefsManager = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         String limit = prefsManager.getString(SalaryActivity.FIELD_UP_LIMIT, null);
         float neededMedian = 0;
         if(limit != null && !limit.isEmpty()){
             neededMedian = Float.valueOf(limit);
         }
-        return median >= neededMedian;
+        return medianGain >= neededMedian;
     }
 }

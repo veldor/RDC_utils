@@ -35,7 +35,6 @@ public class ForemanHandler {
         wm.enqueue(startPeriodicalPlanner.build());
         // перепроверю регистрацию смены
         SalaryHandler.planeRegistration();
-        Log.d("surprise", "ForemanHandler startPlanner: checked");
     }
 
     public static boolean isMyWorkerRunning(String tag) {

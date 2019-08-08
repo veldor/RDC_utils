@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import utils.App;
+import utils.MakeLog;
 import utils.Notificator;
 
 public class CheckTomorrowWorker extends Worker {
@@ -28,6 +29,7 @@ public class CheckTomorrowWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        MakeLog.writeToLog("Проведена проверка завтрашней смены");
         // проверю, не нужно ли завтра на работу
         Calendar calendar = Calendar.getInstance();
         // получу завтрашнее число
@@ -86,7 +88,7 @@ public class CheckTomorrowWorker extends Worker {
                 sb.append(" Удачной вам смены!");
                 Notificator notif = new Notificator(getApplicationContext());
                 notif.sendShiftNotification(name, "На работку!", sb.toString(), alarmEnabled,alarmTimeArray);
-                // если сведения о смене найдены- верну их
+
             }
         }
         // установлю проверку расписания на следующий день

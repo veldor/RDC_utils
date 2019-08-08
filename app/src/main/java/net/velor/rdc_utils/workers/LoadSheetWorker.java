@@ -2,6 +2,7 @@ package net.velor.rdc_utils.workers;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -27,11 +28,14 @@ public class LoadSheetWorker extends Worker {
         // теперь- чтение
         File file = new File(App.DOWNLOAD_FOLDER_LOCATION, App.SHEET_FILE_NAME);
         if(file.exists()){
+            Log.d("surprise", "LoadSheetWorker doWork: file downloaded, start parse");
             try {
                 XSSFWorkbook excelBook;
                 try{
                     OPCPackage opcPackage = OPCPackage.open(file);
+                    Log.d("surprise", "LoadSheetWorker doWork: file opened");
                     excelBook = new XSSFWorkbook(opcPackage);
+                    Log.d("surprise", "LoadSheetWorker doWork: excel loaded");
                 }
                 catch (Exception e){
                     excelBook = new XSSFWorkbook(new FileInputStream(file));

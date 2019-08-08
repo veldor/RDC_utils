@@ -6,15 +6,23 @@ android {
         applicationId "net.velor.rdc_utils"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 20
-        versionName "1.5.8"
+        versionCode 21
+        versionName "1.5.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
             minifyEnabled false
+            multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            // getting error: Cannot fit requested classes in a single dex file.  # methods: 65537 > 65536
+            // https://developer.android.com/studio/build/multidex
+            // minifyEnabled true (used with release) will fix this by getting rid of unused method calls, but this will hide debugging info on crash
+            multiDexEnabled true
+            minifyEnabled true
         }
     }
 
@@ -53,6 +61,8 @@ dependencies {
 
 
     implementation 'com.android.support:recyclerview-v7:28.0.0'
+
+    implementation 'com.android.support:multidex:1.0.3'
 }
 
 allprojects {

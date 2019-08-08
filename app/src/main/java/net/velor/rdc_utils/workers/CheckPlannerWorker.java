@@ -2,7 +2,6 @@ package net.velor.rdc_utils.workers;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
@@ -35,7 +34,6 @@ public class CheckPlannerWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        MakeLog.writeToLog("Проверка");
         // если задание уже запланировано- ничего не делаю
         Data params = getInputData();
         boolean reloadParam = params.getBoolean(RELOAD_MARK, false);
@@ -67,13 +65,9 @@ public class CheckPlannerWorker extends Worker {
             // назначу запуск рабочего, который проверит расписание на завтра
             OneTimeWorkRequest checkTomorrow = new OneTimeWorkRequest.Builder(CheckTomorrowWorker.class).addTag(MY_TAG).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
             WorkManager.getInstance().enqueueUniqueWork(MY_TAG, ExistingWorkPolicy.REPLACE, checkTomorrow);
-            App.getInstance().mWorkerStatus.postValue("Запланировал проверку");
-            Log.d("surprise", "CheckPlannerWorker doWork: here");
             MakeLog.writeToLog("Запланирована проверка через " + TimeUnit.MILLISECONDS.toHours(difference) + " часов");
         }
-        if (SalaryHandler.planeRegistration()) {
-            Log.d("surprise", "doWork: регистрация зарплаты запланирована");
-        }
+        SalaryHandler.planeRegistration();
         return Worker.Result.success();
     }
 }

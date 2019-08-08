@@ -3,7 +3,6 @@ package net.velor.rdc_utils.workers;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -17,6 +16,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 import utils.App;
+import utils.MakeLog;
 import utils.Notificator;
 
 public class RegisterShiftWorker extends Worker {
@@ -47,6 +47,7 @@ public class RegisterShiftWorker extends Worker {
                 notificator.sendSalaryNotification(start, finish);
                 // запланирую проверку на завтрашний день
                 SalaryHandler.checkTomorrow();
+                MakeLog.writeToLog("Отправлено уведомление о завершении смены");
             }
         }
         return Worker.Result.success();
