@@ -31,6 +31,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -454,20 +455,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void makeSchedule(XSSFRow row) {
+
+
+
         // получу расписание
         Iterator<Cell> cells = row.cellIterator();
         // пропущу строку с именем
         cells.next();
         // получу количество дней в выбранном месяце
         int daysCounter = sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        int doubleDaysCounter = daysCounter + 1;
+        int counter = 0;
         // составлю массив расписания
         ArrayList<String> scheduleList = new ArrayList<>();
         HashSet<String> shiftsList = new HashSet<>();
         Cell cell;
         CellType cellType;
         String value;
-        while (cells.hasNext() && daysCounter > 0) {
+        while (++counter < doubleDaysCounter + 1){
+            cell = row.getCell(counter);
+            if(cell != null){
+                cellType = cell.getCellTypeEnum();
+                if (cellType.equals(CellType.NUMERIC)) {
+                    value = String.valueOf(cell.getNumericCellValue());
+                } else if (cellType.equals(CellType.STRING)) {
+                    value = cell.getStringCellValue().trim();
+                } else {
+                    value = "";
+                }
+                scheduleList.add(value);
+                if (!TextUtils.isEmpty(value)) {
+                    shiftsList.add(value);
+                }
+            }
+            else{
+                scheduleList.add("");
+            }
+        }
+
+/*        while (cells.hasNext() && daysCounter > 0) {
+            Log.d("surprise", "MainActivity makeSchedule: day " + daysCounter);
             cell = cells.next();
+            Log.d("surprise", "MainActivity makeSchedule: " + cell.getColumnIndex());
             cellType = cell.getCellTypeEnum();
             if (cellType.equals(CellType.NUMERIC)) {
                 value = String.valueOf(cell.getNumericCellValue());
@@ -481,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 shiftsList.add(value);
             }
             --daysCounter;
-        }
+        }*/
         // отправлю список смен на обработку, надо зарегистрировать те, что ещё не зарегистрированы
         mMyViewModel.checkShifts(shiftsList);
         loadShifts();
