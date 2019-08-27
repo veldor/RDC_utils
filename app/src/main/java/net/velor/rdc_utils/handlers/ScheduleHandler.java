@@ -2,11 +2,15 @@ package net.velor.rdc_utils.handlers;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import net.velor.rdc_utils.R;
 import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.subclasses.WorkingPerson;
 import net.velor.rdc_utils.workers.CheckPersonsWorker;
@@ -51,6 +55,7 @@ public class ScheduleHandler {
     }
 
     public static void getWorkers(int day) {
+        Log.d("surprise", "getWorkers: " + day);
         DbWork db = App.getInstance().getDatabaseProvider();
         Cursor workers = db.getWorkers(day);
         ArrayList<WorkingPerson> persons = new ArrayList<>();
@@ -60,6 +65,14 @@ public class ScheduleHandler {
                 person.name = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_NAME));
                 person.role = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_POST));
                 person.shift_type = workers.getString(workers.getColumnIndex(DbWork.COL_SCHEDULE_TYPE));
+                switch (person.role){
+                    case "Врач":
+                        person.role_color = ContextCompat.getColor(App.getInstance(), R.color.doctor);
+                        break;
+                    case "Оператор":
+                        person.role_color = ContextCompat.getColor(App.getInstance(), R.color.operator);
+                        break;
+                }
                 persons.add(person);
             }
             while (workers.moveToNext());

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.SalaryActivity;
@@ -399,6 +400,8 @@ public class DbWork {
 
     public Cursor getWorkers(int day) {
         Calendar calendar = MainActivity.sCalendar;
+        Log.d("surprise", "getWorkers: month " + calendar.get(Calendar.MONTH));
+        Log.d("surprise", "getWorkers: year " + calendar.get(Calendar.YEAR));
         String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
         String[] selectionArgs = new String[]{date};
         return mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=?", selectionArgs, null, null, null, null);

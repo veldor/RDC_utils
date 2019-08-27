@@ -16,7 +16,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="0dp"
             android:textAlignment="center"
-            android:textSize="20sp" />
+            android:textSize="20sp"/>
         <ImageView
             android:id="@+id/shiftRound"
             android:layout_below="@id/dayNum"

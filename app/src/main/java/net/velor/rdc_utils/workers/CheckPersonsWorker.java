@@ -70,24 +70,27 @@ public class CheckPersonsWorker extends Worker {
                                     int daysCounter = MainActivity.sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
                                     Iterator<Cell> cells = row.cellIterator();
                                     // пропущу строку с именем
-                                    cells.next();
                                     Cell currentCell;
                                     CellType cellType;
                                     String value;
                                     int day = 0;
-                                    while (cells.hasNext() && daysCounter > 0) {
+                                    int dayCounter = 1;
+                                    while (daysCounter > 0) {
                                         ++day;
                                         value = null;
-                                        currentCell = cells.next();
-                                        cellType = currentCell.getCellTypeEnum();
-                                        if (cellType.equals(CellType.NUMERIC)) {
-                                            value = String.valueOf(currentCell.getNumericCellValue());
-                                        } else if (cellType.equals(CellType.STRING)) {
-                                            value = currentCell.getStringCellValue().trim();
-                                        }
-                                        if (value != null && !TextUtils.isEmpty(value)) {
-                                            // занесу данные о смене в список
-                                            ScheduleHandler.addDayToSchedule(day, person, post, value);
+                                        currentCell = row.getCell(dayCounter);
+                                        ++dayCounter;
+                                        if(currentCell != null){
+                                            cellType = currentCell.getCellTypeEnum();
+                                            if (cellType.equals(CellType.NUMERIC)) {
+                                                value = String.valueOf(currentCell.getNumericCellValue());
+                                            } else if (cellType.equals(CellType.STRING)) {
+                                                value = currentCell.getStringCellValue().trim();
+                                            }
+                                            if (value != null && !TextUtils.isEmpty(value)) {
+                                                // занесу данные о смене в список
+                                                ScheduleHandler.addDayToSchedule(day, person, post, value);
+                                            }
                                         }
                                         --daysCounter;
                                     }

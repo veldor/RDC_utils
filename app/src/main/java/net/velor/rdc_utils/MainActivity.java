@@ -455,9 +455,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void makeSchedule(XSSFRow row) {
-
-
-
         // получу расписание
         Iterator<Cell> cells = row.cellIterator();
         // пропущу строку с именем
