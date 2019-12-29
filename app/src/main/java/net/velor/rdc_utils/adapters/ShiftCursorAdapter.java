@@ -26,6 +26,7 @@ public class ShiftCursorAdapter extends CursorAdapter {
     public static final String COL_SHIFT_COLOR = "shift_color";
     public static final String COL_ALARM = "alarm";
     public static final String COL_ALARM_TIME = "alarm_time";
+    public static final String COL_SCHEDULE_COLOR_NAME = "shift_default_color";
 
     private final LayoutInflater mInflater;
     private final Context mContext;

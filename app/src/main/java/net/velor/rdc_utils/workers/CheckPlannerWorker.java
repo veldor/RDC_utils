@@ -37,6 +37,8 @@ public class CheckPlannerWorker extends Worker {
 
         // проверю, не изменился ли файл расписания
 
+
+
         // если задание уже запланировано- ничего не делаю
         Data params = getInputData();
         boolean reloadParam = params.getBoolean(RELOAD_MARK, false);

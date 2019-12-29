@@ -2,20 +2,28 @@ package net.velor.rdc_utils.view_models;
 
 import android.Manifest;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
+import net.velor.rdc_utils.handlers.FileHandler;
 import net.velor.rdc_utils.handlers.ScheduleHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
+import net.velor.rdc_utils.priv.Priv;
 import net.velor.rdc_utils.subclasses.WorkingPerson;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import utils.App;
@@ -51,10 +59,10 @@ public class ScheduleViewModel extends ViewModel {
     }
 
     public boolean sheetExists() {
-        return new File(App.DOWNLOAD_FOLDER_LOCATION, App.SHEET_FILE_NAME).exists();
+        return new File(App.DOWNLOAD_FOLDER_LOCATION, Priv.SHEET_FILE_NAME).exists();
     }
 
-    public void checkShifts(HashSet<String> shiftsList) {
+    public void checkShifts(HashMap<String, String> shiftsList) {
         ShiftsHandler.checkShift(shiftsList);
     }
 
@@ -78,5 +86,15 @@ public class ScheduleViewModel extends ViewModel {
 
     public LiveData<ArrayList<WorkingPerson>> showWorkers(int day) {
         return ScheduleHandler.showWorkers(day);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void load_schedule() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    }
+
+    public MutableLiveData<Integer> uploadSchedule(Uri uri) {
+        FileHandler.uploadSchedule(uri);
+        return App.getInstance().mSheetUpload;
     }
 }

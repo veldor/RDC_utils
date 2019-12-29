@@ -2,9 +2,7 @@ package net.velor.rdc_utils.handlers;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -55,7 +53,6 @@ public class ScheduleHandler {
     }
 
     public static void getWorkers(int day) {
-        Log.d("surprise", "getWorkers: " + day);
         DbWork db = App.getInstance().getDatabaseProvider();
         Cursor workers = db.getWorkers(day);
         ArrayList<WorkingPerson> persons = new ArrayList<>();
@@ -65,13 +62,21 @@ public class ScheduleHandler {
                 person.name = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_NAME));
                 person.role = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_POST));
                 person.shift_type = workers.getString(workers.getColumnIndex(DbWork.COL_SCHEDULE_TYPE));
-                switch (person.role){
+                switch (person.role) {
                     case "Врач":
                         person.role_color = ContextCompat.getColor(App.getInstance(), R.color.doctor);
                         break;
                     case "Оператор":
                         person.role_color = ContextCompat.getColor(App.getInstance(), R.color.operator);
                         break;
+                    case "Администратор":
+                        person.role_color = ContextCompat.getColor(App.getInstance(), R.color.administrator);
+                        break;
+                    case "Администратор колл-центра":
+                        person.role_color = ContextCompat.getColor(App.getInstance(), R.color.call_administrator);
+                        break;
+                    default:
+                        person.role_color = ContextCompat.getColor(App.getInstance(), R.color.others);
                 }
                 persons.add(person);
             }

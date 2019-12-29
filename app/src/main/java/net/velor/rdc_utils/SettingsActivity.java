@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import net.velor.rdc_utils.handlers.ForemanHandler;
+import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 
 import java.util.List;
 
@@ -177,7 +178,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     public static class SchedulePreferenceFragment extends PreferenceFragment {
 
-        private TimePreference mCheckTime;
         private SwitchPreference mCheckTomorrow;
         private SwitchPreference mCheckSalary;
         private SharedPreferences mPreferences;
@@ -187,13 +187,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             // тут добавлю настройку
-            mCheckTime = new TimePreference(getActivity(), null);
+            TimePreference checkTime = new TimePreference(getActivity(), null);
             PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(rootScreen);
-            mCheckTime.setKey(MainActivity.FIELD_SCHEDULE_CHECK_TIME);
-            mCheckTime.setTitle(R.string.schedule_setting_title);
+            checkTime.setKey(MainActivity.FIELD_SCHEDULE_CHECK_TIME);
+            checkTime.setTitle(R.string.schedule_setting_title);
             setHasOptionsMenu(true);
-            rootScreen.addPreference(mCheckTime);
+            rootScreen.addPreference(checkTime);
 
             mCheckTomorrow = new SwitchPreference(getActivity());
             mCheckTomorrow.setKey(MainActivity.FIELD_REMIND_TOMORROW);
@@ -426,6 +426,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(getActivity());
             setPreferenceScreen(rootScreen);
+
+            EditTextPreference ftpPass = new EditTextPreference(getActivity());
+            ftpPass.setKey(SharedPreferencesHandler.FTP_PASSWORD);
+            ftpPass.setTitle(R.string.set_ftp_message);
+            rootScreen.addPreference(ftpPass);
 
             mUsePin = new SwitchPreference(getActivity());
             mUsePin.setKey(EditPin.FIELD_USE_PIN);

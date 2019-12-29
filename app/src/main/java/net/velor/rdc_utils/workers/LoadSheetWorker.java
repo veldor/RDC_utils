@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import net.velor.rdc_utils.priv.Priv;
+
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -26,7 +28,7 @@ public class LoadSheetWorker extends Worker {
     public Result doWork() {
         App app = App.getInstance();
         // теперь- чтение
-        File file = new File(App.DOWNLOAD_FOLDER_LOCATION, App.SHEET_FILE_NAME);
+        File file = new File(App.DOWNLOAD_FOLDER_LOCATION, Priv.SHEET_FILE_NAME);
         if(file.exists()){
             Log.d("surprise", "LoadSheetWorker doWork: file downloaded, start parse");
             try {

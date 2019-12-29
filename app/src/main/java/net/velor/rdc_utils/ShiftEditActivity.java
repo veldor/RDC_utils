@@ -76,7 +76,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
 
     // режим
     private String mMode;
-    private TextInputEditText mFullNameView, mShortNameView;
+    private TextInputEditText mFullNameView, mShortNameView, mScheduleColorView;
     private long mId;
     private View mRoot;
 
@@ -98,6 +98,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
         // назначу переменные
         mFullNameView = findViewById(R.id.shift_full_name);
         mShortNameView = findViewById(R.id.shift_short_name);
+        mScheduleColorView = findViewById(R.id.schedule_shift_color);
         mShiftStartView = findViewById(R.id.shift_start_time_view);
         mShiftFinishView = findViewById(R.id.shift_finish_time_view);
         mColorView = findViewById(R.id.edit_shift_color_view);
@@ -114,6 +115,8 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
             mFullName = fullNameValue;
             String shortNameValue = data.get(ShiftCursorAdapter.COL_NAME_SHORT);
             mShortNameView.setText(shortNameValue);
+            String scheduleColorText = data.get(ShiftCursorAdapter.COL_SCHEDULE_COLOR_NAME);
+            mScheduleColorView.setText(scheduleColorText);
             mShortName = shortNameValue;
             String color = data.get(ShiftCursorAdapter.COL_SHIFT_COLOR);
             if (color != null) {

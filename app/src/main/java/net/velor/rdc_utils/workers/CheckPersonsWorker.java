@@ -49,9 +49,21 @@ public class CheckPersonsWorker extends Worker {
                                     post = "Оператор";
                                     break;
                                 case "Администраторы МРТ 1":
-                                    post = "Администратор";
+                                    post = "Администратор НВ";
+                                    break;
+                                case "Администраторы МРТ 2":
+                                    post = "Администратор А";
+                                    break;
+                                case "Процедурный кабинет":
+                                    post = "Процедурный";
+                                    break;
+                                case "Наркозы":
+                                    post = "Наркозы";
                                     break;
                                 case "Колл-центр":
+                                    post = "Администратор колл-центра";
+                                    break;
+                                case "Call-center":
                                     post = "Администратор колл-центра";
                                     break;
                                 case "УЗИ":
@@ -60,11 +72,14 @@ public class CheckPersonsWorker extends Worker {
                                 case "Консультанты":
                                     post = "Врач-консультант";
                                     break;
+                                case "Консультативный прием":
+                                    post = "Врач-консультант";
+                                    break;
                                 case "УВТ":
                                     post = "Врач УВТ";
                                     break;
                                 default:
-                                    // проверю, занесён ли врач в базу. Если нет- занесу
+                                    // проверю, занесён ли специалист в базу. Если нет- занесу
                                     ScheduleHandler.addPersonToBase(post, person);
                                     // проверю смены, которые он работает в этом месяце и занесу их в базу данных
                                     int daysCounter = MainActivity.sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -86,10 +101,11 @@ public class CheckPersonsWorker extends Worker {
                                                 value = String.valueOf(currentCell.getNumericCellValue());
                                             } else if (cellType.equals(CellType.STRING)) {
                                                 value = currentCell.getStringCellValue().trim();
+                                                value = value.toLowerCase();
                                             }
                                             if (value != null && !TextUtils.isEmpty(value)) {
                                                 // занесу данные о смене в список
-                                                ScheduleHandler.addDayToSchedule(day, person, post, value);
+                                                ScheduleHandler.addDayToSchedule(day, person, post, value.toLowerCase());
                                             }
                                         }
                                         --daysCounter;

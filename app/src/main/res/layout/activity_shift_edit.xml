@@ -47,6 +47,22 @@
                     android:maxLength="50" />
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/scheduleShiftColorLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/shortTextLayout">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/schedule_shift_color"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/schedule_shift_color_hint"
+                    android:inputType="text"
+                    android:maxLength="50" />
+            </android.support.design.widget.TextInputLayout>
+
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,7 +72,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/shortTextLayout">
+                app:layout_constraintTop_toBottomOf="@+id/scheduleShiftColorLayout">
 
                 <TableRow>
 

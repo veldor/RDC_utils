@@ -29,7 +29,7 @@ public class Notificator {
     private static final String TEST_CHANNEL_ID = "test";
     public static final int NEXT_DAY_SHIFT_NOTIFICATION = 0;
     public static final int SALARY_FILL_NOTIFICATION = 1;
-    private static final int TEST_NOTIFICATION = 2;
+    public static final int TEST_NOTIFICATION = 2;
     private final Context mContext;
     private final NotificationManager mNotificationManager;
     private final SharedPreferences mPreferences;
@@ -141,5 +141,24 @@ public class Notificator {
         Notification notification = notificationBuilder.build();
         mNotificationManager.notify(TEST_NOTIFICATION, notification);
         Log.d("surprise", "Notificator sendCustomNotification: and i work");
+    }
+    public void sendScheduleChangedNotification() {
+        Intent scheduleThisMonth = new Intent(mContext, MainActivity.class);
+        scheduleThisMonth.putExtra(MainActivity.SCHEDULE_MONTH_SELECT , MainActivity.SCHEDULE_THIS_MONTH);
+        PendingIntent fillThisMonthPending = PendingIntent.getActivity(mContext, 1, scheduleThisMonth, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent scheduleNextMonth = new Intent(mContext, MainActivity.class);
+        scheduleNextMonth.putExtra(MainActivity.SCHEDULE_MONTH_SELECT , MainActivity.SCHEDULE_NEXT_MONTH);
+        PendingIntent fillNextMonthPending = PendingIntent.getActivity(mContext, 0, scheduleNextMonth, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, TEST_CHANNEL_ID)
+                .setSmallIcon(R.drawable.logo_monochrom)
+                .setContentTitle("Обнаружено новое расписание")
+                .setAutoCancel(true)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("Выберите действие, чтобы загрузить расписание на данный или следующий месяц"))
+                .addAction(0, "Этот месяц", fillThisMonthPending)
+                .addAction(0, "Следующий месяц", fillNextMonthPending);
+        Notification notification = notificationBuilder.build();
+        mNotificationManager.notify(TEST_NOTIFICATION, notification);
     }
 }

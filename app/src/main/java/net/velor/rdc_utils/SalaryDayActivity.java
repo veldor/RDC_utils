@@ -224,10 +224,10 @@ public class SalaryDayActivity extends AppCompatActivity {
                 Log.d("surprise", "заполню данные из интента");
                 // проверю пришедшие данные
                 int day = mIntent.getIntExtra(DAY_FIELD, -1);
-                int month = mIntent.getIntExtra(MONTH_FIELD, -1);
+                int month = (mIntent.getIntExtra(MONTH_FIELD, -1) - 1);
                 int year = mIntent.getIntExtra(YEAR_FIELD, -1);
+                Log.d("surprise", "SalaryDayActivity loadInfo year is " + year);
                 int duration = mIntent.getIntExtra(DURATION, -1);
-                Log.d("surprise", "day is " + day + " month is " + month + " year is " + year + " duration is " + duration);
                 if (day >= 0 && month >= 0 && year >= 0) {
                     sYearValue = String.valueOf(year);
                     sMonthValue = String.valueOf(month);
@@ -239,6 +239,7 @@ public class SalaryDayActivity extends AppCompatActivity {
                     calendar.set(Calendar.MONTH, month);
                     calendar.set(Calendar.DATE, day);
                     String month_s = String.format("%1$tB", calendar);
+                    Log.d("surprise", "SalaryDayActivity loadInfo " + month_s);
                     mDateBtn.setText(String.format(Locale.ENGLISH, "%d %s %d года", day, month_s, year));
                     makeButtonReady(mDateBtn);
                 }

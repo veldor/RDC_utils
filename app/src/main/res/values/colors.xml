@@ -5,6 +5,9 @@
     <color name="colorAccent">#D81B60</color>
     <color name="colorHoliday">#FFDF00</color>
     <color name="white">#FFFFFF</color>
-    <color name="doctor">#B8FFB5</color>
-    <color name="operator">#C3BFFF</color>
+    <color name="doctor">#04FF00</color>
+    <color name="operator">#161AFF</color>
+    <color name="administrator">#FF8F07</color>
+    <color name="call_administrator">#FF68D1</color>
+    <color name="others">#FF1433</color>
 </resources>

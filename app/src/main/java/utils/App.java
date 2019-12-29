@@ -6,18 +6,23 @@ import android.arch.lifecycle.MutableLiveData;
 import android.net.Uri;
 import android.os.Environment;
 
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import net.velor.rdc_utils.database.DbWork;
 import net.velor.rdc_utils.handlers.ForemanHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
+import net.velor.rdc_utils.workers.CheckScheduleChangeWorker;
 import net.velor.rdc_utils.workers.LoadSheetWorker;
 import net.velor.rdc_utils.workers.ScheduleDownloadWorker;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 public class App extends Application {
     private static App mAppInstance;
@@ -27,9 +32,9 @@ public class App extends Application {
     private DbWork mDatabaseProvider;
     // переменная для хранения модели xlsx
     public static final File DOWNLOAD_FOLDER_LOCATION = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-    public static final String SHEET_FILE_NAME = "РДЦ_расписание.xlsx";
     public final MutableLiveData<XSSFWorkbook> mSheetData = new MutableLiveData<>();
     public final MutableLiveData<Integer> mSheetLoad = new MutableLiveData<>();
+    public final MutableLiveData<Integer> mSheetUpload = new MutableLiveData<>();
     public boolean mIsSheetLoading = false;
 
     // хранилище данных статуса рабочих
@@ -40,6 +45,9 @@ public class App extends Application {
     public static final int DOWNLOAD_STATUS_SUCCESSFUL_DOWNLOADED = 2;
     public static final int DOWNLOAD_STATUS_ERROR_DOWNLOAD = 1;
     private SharedPreferencesHandler mSharedPreferenceshandler;
+
+
+    private static final String SCHEDULE_CHECK_TAG = "schedule_check";
 
     public static App getInstance(){
         return mAppInstance;
@@ -70,6 +78,13 @@ public class App extends Application {
 
         // взамен обработки событий в сервисе запущу рабочего, который проверит актуальность данных
         ForemanHandler.startPlanner(true);
+
+        PeriodicWorkRequest myWorkRequest = new PeriodicWorkRequest.Builder(CheckScheduleChangeWorker.class, 20, TimeUnit.MINUTES)
+                .addTag(SCHEDULE_CHECK_TAG)
+                .build();
+        WorkManager wm = WorkManager.getInstance();
+        wm.cancelAllWorkByTag(SCHEDULE_CHECK_TAG);
+        wm.enqueue(myWorkRequest);
 
         // поправлю взаимодействие с Экселем, будь он неладен
         System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl");

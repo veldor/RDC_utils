@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.SalaryActivity;
@@ -20,6 +19,7 @@ public class DbWork {
 
     private static final String TABLE_SALARY_DAY = "salary_day";
     private static final String COL_SHIFT_SHORT_NAME = "name_short";
+    private static final String COL_SCHEDULE_COLOR_NAME = "shift_default_color";
     public static final String COL_PERSON_NAME = "person_name";
     public static final String COL_PERSON_POST = "person_post";
     private static final String COL_DAY = "day";
@@ -31,7 +31,7 @@ public class DbWork {
         mHelper = new DBHelper(context);
     }
 
-    private final int DB_VERSION = 3; // версия БД
+    private final int DB_VERSION = 4; // версия БД
     public static final String DB_NAME = "myDb";
     private final static String TABLE_SHIFTS = "shifts";
     private final static String TABLE_PERSONS = "persons";
@@ -77,7 +77,7 @@ public class DbWork {
         String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ?", COL_YEAR, COL_MONTH);
         String[] args = {String.valueOf(year), String.valueOf(month - 1)};
         Cursor collection = mConnection.query(TABLE_SALARY_DAY, null, selection, args, null, null, SD_COL_DAY);
-        if(collection.moveToFirst()){
+        if (collection.moveToFirst()) {
             do {
                 days.put(collection.getInt(collection.getColumnIndex(SD_COL_DAY)), true);
             }
@@ -98,9 +98,9 @@ public class DbWork {
         return mConnection.query(TABLE_SHIFTS, null, null, null, null, null, null);
     }
 
-    public Cursor getShiftByShiftName(String shiftName) {
-        String selection = String.format(Locale.ENGLISH, "%s = ?", COL_SHIFT_SHORT_NAME);
-        String[] args = {shiftName};
+    public Cursor getShiftByShiftName(String shiftName, String shiftColor) {
+        String selection = String.format(Locale.ENGLISH, "%s = ? AND %s = ?", COL_SHIFT_SHORT_NAME, COL_SCHEDULE_COLOR_NAME);
+        String[] args = {shiftName, shiftColor};
         return mConnection.query(TABLE_SHIFTS, null, selection, args, null, null, null);
     }
 
@@ -123,7 +123,7 @@ public class DbWork {
         return mConnection.query(TABLE_SALARY_DAY, null, selection, args, null, null, SD_COL_DAY);
     }
 
-    // ===================================== ДОБАВЛЮ СМЕНУ
+    // ===================================== ДОБАВЛЮ ТИП СМЕНЫ
     public void insertShift(ContentValues cv) {
         mConnection.insert(TABLE_SHIFTS, null, cv);
     }
@@ -331,6 +331,7 @@ public class DbWork {
         if (c.moveToFirst()) {
             values.put(ShiftCursorAdapter.COL_NAME_FULL, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_NAME_FULL)));
             values.put(ShiftCursorAdapter.COL_NAME_SHORT, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_NAME_SHORT)));
+            values.put(ShiftCursorAdapter.COL_SCHEDULE_COLOR_NAME, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_SCHEDULE_COLOR_NAME)));
             values.put(ShiftCursorAdapter.COL_SHIFT_START, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_START)));
             values.put(ShiftCursorAdapter.COL_SHIFT_FINISH, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_FINISH)));
             values.put(ShiftCursorAdapter.COL_SHIFT_COLOR, c.getString(c.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_COLOR)));
@@ -384,8 +385,8 @@ public class DbWork {
         Calendar calendar = MainActivity.sCalendar;
         String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
         // проверю, нет ли в базе этой записи
-        String[] selectionArgs = new String[]{date, post, person};
-        Cursor c = mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=? AND " + COL_PERSON_POST + "=? AND " + COL_PERSON_NAME + "=?", selectionArgs, null, null, null, null);
+        String[] selectionArgs = new String[]{date, person};
+        Cursor c = mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=? AND " + COL_PERSON_NAME + "=?", selectionArgs, null, null, null, null);
         if (c.getCount() == 0) {
             // добавлю нового работника в смену
             ContentValues mcv = new ContentValues();
@@ -400,8 +401,6 @@ public class DbWork {
 
     public Cursor getWorkers(int day) {
         Calendar calendar = MainActivity.sCalendar;
-        Log.d("surprise", "getWorkers: month " + calendar.get(Calendar.MONTH));
-        Log.d("surprise", "getWorkers: year " + calendar.get(Calendar.YEAR));
         String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
         String[] selectionArgs = new String[]{date};
         return mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=?", selectionArgs, null, null, null, null);
@@ -463,6 +462,7 @@ public class DbWork {
                     " name_short CHAR(50) NOT NULL," +
                     " shift_start CHAR(5), shift_end CHAR(5)," +
                     " shift_color CHAR(7)," +
+                    " shift_default_color CHAR(8)," +
                     " alarm BOOL DEFAULT '0'," +
                     " alarm_time CHAR(5) );");
 
@@ -494,7 +494,6 @@ public class DbWork {
                     db.execSQL("drop table sheduler");
 
                     // создам временную таблицу для данных типов смен
-
                     db.execSQL("create temporary table temp_" + TABLE_SHIFTS + " (" +
                             "_id integer primary key autoincrement," +
                             " name_full VARCHAR(50) NOT NULL," +
@@ -534,13 +533,13 @@ public class DbWork {
                     db.endTransaction();
                 }
             }
-            if(oldVersion == 2){
+            if (oldVersion == 2) {
                 db.beginTransaction();
                 try {
                     // создаю таблицу для хранения имён персонала
                     db.execSQL("create table " + TABLE_PERSONS + " (" +
                             COL_ID + " integer primary key autoincrement," +
-                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                                COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
                             COL_PERSON_POST + " VARCHAR(50) );");
                     // создаю таблицу данных работающих в определённый день
                     db.execSQL("create table " + TABLE_WORKING_PERSONS + " (" +
@@ -549,6 +548,37 @@ public class DbWork {
                             COL_PERSON_POST + " CHAR(50) NOT NULL," +
                             COL_DAY + " CHAR(10)," +
                             COL_SCHEDULE_TYPE + " VARCHAR(10) );");
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+            if (oldVersion == 3) {
+                db.beginTransaction();
+                try {
+// создам временную таблицу для данных типов смен
+                    db.execSQL("create temporary table temp_" + TABLE_SHIFTS + " (" +
+                            "_id integer primary key autoincrement," +
+                            " name_full VARCHAR(50) NOT NULL," +
+                            " name_short CHAR(50) NOT NULL," +
+                            " shift_start CHAR(5), shift_end CHAR(5)," +
+                            " shift_color CHAR(7)," +
+                            " alarm BOOL DEFAULT '0'," +
+                            " alarm_time CHAR(5) );");
+
+                    db.execSQL("insert into temp_" + TABLE_SHIFTS + " select _id, name_full, name_short, shift_start, shift_end, shift_color, alarm, alarm_time from " + TABLE_SHIFTS + ";");
+                    db.execSQL("drop table " + TABLE_SHIFTS);
+                    db.execSQL("create table " + TABLE_SHIFTS + " (" +
+                            "_id integer primary key autoincrement," +
+                            " name_full VARCHAR(50) NOT NULL," +
+                            " name_short CHAR(50) NOT NULL," +
+                            " shift_start CHAR(5), shift_end CHAR(5)," +
+                            " shift_color CHAR(7)," +
+                            " shift_default_color CHAR(8)," +
+                            " alarm BOOL DEFAULT '0'," +
+                            " alarm_time CHAR(5) );");
+                    db.execSQL("insert into " + TABLE_SHIFTS + " select _id, name_full, name_short, shift_start, shift_end, shift_color, shift_color, alarm, alarm_time from temp_" + TABLE_SHIFTS + ";");
+                    db.execSQL("drop table temp_" + TABLE_SHIFTS + ";");
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();

@@ -1,7 +1,5 @@
 package net.velor.rdc_utils.handlers;
 
-import android.util.Log;
-
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;

@@ -149,4 +149,8 @@
     <string name="check_salary_message">Напоминать о регистрации выручки</string>
     <string name="cc_message">Я работаю в колл-центре</string>
     <string name="who_works_message">Кто работает</string>
+    <string name="load_schedule_message">Добавить расписание</string>
+    <string name="sheet_uploading_dialog_title">Выгрузка расписания</string>
+    <string name="set_ftp_message">Пароль для выгрузки расписания</string>
+    <string name="schedule_shift_color_hint">Цвет из таблицы расписания</string>
 </resources>

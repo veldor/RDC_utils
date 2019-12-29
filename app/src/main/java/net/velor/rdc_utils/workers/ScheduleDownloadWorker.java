@@ -15,13 +15,13 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import net.velor.rdc_utils.R;
+import net.velor.rdc_utils.priv.Priv;
 
 import java.io.File;
 
 import utils.App;
 
 public class ScheduleDownloadWorker extends Worker {
-    private static final String LOADED_FILE_LINK = "https://veldor.000webhostapp.com/information/расписание.xlsx";
     private long mDownloadId;
 
     public ScheduleDownloadWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -35,7 +35,7 @@ public class ScheduleDownloadWorker extends Worker {
             App.getInstance().mSheetLoad.postValue(App.DOWNLOAD_STATUS_YET_DOWNLOADED);
         }
         else{
-            String downloadedApkFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + App.SHEET_FILE_NAME;
+            String downloadedApkFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + Priv.SHEET_FILE_NAME;
             File scheduleFile = new File(downloadedApkFilePath);
             if(scheduleFile.exists()){
                 // удалю файл, если он существует
@@ -45,7 +45,7 @@ public class ScheduleDownloadWorker extends Worker {
                 }
             }
             Uri downloadUri = Uri.parse("file://" + scheduleFile);
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(LOADED_FILE_LINK));
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(Priv.LOADED_FILE_LINK));
             request.setTitle(App.getInstance().getString(R.string.download_schedule_message));
             request.setDestinationUri(downloadUri);
             DownloadManager manager = (DownloadManager) App.getInstance().getSystemService(

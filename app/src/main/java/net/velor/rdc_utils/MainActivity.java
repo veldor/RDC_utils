@@ -1,7 +1,10 @@
 package net.velor.rdc_utils;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.NotificationManager;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
@@ -9,10 +12,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -53,11 +59,13 @@ import net.velor.rdc_utils.handlers.ShiftsHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
 import net.velor.rdc_utils.subclasses.WorkingPerson;
 import net.velor.rdc_utils.view_models.ScheduleViewModel;
+import net.velor.rdc_utils.workers.UploadScheduleWorker;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -65,18 +73,25 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Objects;
 
 import utils.App;
 import utils.LoginActivity;
+import utils.Notificator;
 import utils.Security;
 
+@SuppressWarnings("NumberEquality")
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, DayShiftDialog.AnswerDialogListener, NavigationView.OnNavigationItemSelectedListener {
     public static final String FIELD_REMIND_TOMORROW = "remind_tomorrow";
     public static final String FIELD_REMIND_SALARY = "remind_salary";
     public static final String FIELD_WORK_IN_CC = "callcenter";
+    public static final String SCHEDULE_MONTH_SELECT = "month_select";
+    public static final int SCHEDULE_THIS_MONTH = 1;
+    public static final int SCHEDULE_NEXT_MONTH = 2;
+    public static final int MENU_ITEM_LOAD_SCHEDULE = 4;
+    private static final int READ_REQUEST_CODE = 42;
     private int REQUEST_WRITE_READ = 3;
 
     // константы имён
@@ -113,21 +128,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private XSSFSheet mTable;
     private ArrayList<String> mPersonList;
     public static AlertDialog.Builder sShowWorkersDialogBuilder;
+    private AlertDialog mSheetUploadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main_activity);
 
         // определю корневой элемент
         mRootView = findViewById(R.id.rootView);
 
+        // зарегистрирую модель
+        mMyViewModel = ViewModelProviders.of(this).get(ScheduleViewModel.class);
+
         // Если не заполнены месяц и год- заполню их текущими значениями
+        sCalendar.set(Calendar.DATE, 15);
         if (sYear == 0) {
             sYear = sCalendar.get(Calendar.YEAR);
         }
         if (sMonth == 0) {
             sMonth = sCalendar.get(Calendar.MONTH) + 1;
+        }
+        // проверю, не активировано ли заполнение расписания
+        Intent activatingIntent = getIntent();
+        int scheduleAction = activatingIntent.getIntExtra(SCHEDULE_MONTH_SELECT, 0);
+        if (scheduleAction == SCHEDULE_THIS_MONTH) {
+            closeShiftNotification();
+            loadShiftsFromExcel();
+        } else if (scheduleAction == SCHEDULE_NEXT_MONTH) {
+            sCalendar = Calendar.getInstance();
+            sCalendar.set(Calendar.DATE, 15);
+            sCalendar.add(Calendar.MONTH, +1);
+            sMonth = sCalendar.get(Calendar.MONTH) + 1;
+            closeShiftNotification();
+            loadShiftsFromExcel();
         }
         // включу поддержку тулбара
         mToolbar = findViewById(R.id.toolbar);
@@ -144,21 +179,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // зарегистрирую модель
-        mMyViewModel = ViewModelProviders.of(this).get(ScheduleViewModel.class);
+    }
 
-        /*// проверю обновления
-        // проверю обновления
-        final LiveData<Boolean> version = mMyViewModel.startCheckUpdate();
-        version.observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if (aBoolean != null && aBoolean) {
-                    // показываю Snackbar с уведомлением
-                    makeUpdateSnackbar();
-                }
-            }
-        });*/
+    private void closeShiftNotification() {
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.cancel(Notificator.TEST_NOTIFICATION);
     }
 
     @Override
@@ -303,10 +328,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menu.add(0, MENU_ITEM_SHIFT_SETTINGS, 0, getString(R.string.shift_settings));
         menu.add(0, MENU_ITEM_LOAD_SHIFTS, 0, getString(R.string.load_shift_settings));
         menu.add(0, MENU_ITEM_RESET_NAME, 0, getString(R.string.reset_name_settings));
+        menu.add(0, MENU_ITEM_LOAD_SCHEDULE, 0, getString(R.string.load_schedule_message));
 
         return super.onCreateOptionsMenu(menu);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -321,8 +348,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mMyViewModel.resetName();
                 Toast.makeText(this, this.getString(R.string.name_reset_message), Toast.LENGTH_LONG).show();
                 break;
+            case MENU_ITEM_LOAD_SCHEDULE:
+                load_schedule();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void load_schedule() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        startActivityForResult(intent, READ_REQUEST_CODE);
+        showSheetUploadingDialog();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
+        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
+        // response to some other intent, and the code below shouldn't run at all.
+
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.
+            // Pull that URI using resultData.getData().
+            Uri uri;
+            if (data != null) {
+                uri = data.getData();
+                final MutableLiveData<Integer> status = mMyViewModel.uploadSchedule(uri);
+                status.observe(this, new Observer<Integer>() {
+                    @Override
+                    public void onChanged(@Nullable Integer integer) {
+                        if (integer != null) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_SUCCESS)) {
+                                    hideSheetUploadingDialog();
+                                    Toast.makeText(MainActivity.this, "Расписание загружено на сервер", Toast.LENGTH_LONG).show();
+                                    status.removeObservers(MainActivity.this);
+                                } else if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_FAILED)) {
+                                    hideSheetUploadingDialog();
+                                    Toast.makeText(MainActivity.this, "Расписание не загружено. Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
+                                    status.removeObservers(MainActivity.this);
+                                } else if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_ERROR)) {
+                                    hideSheetUploadingDialog();
+                                    Toast.makeText(MainActivity.this, "Ошибка загрузки расписания", Toast.LENGTH_LONG).show();
+                                    status.removeObservers(MainActivity.this);
+                                }
+                            } else {
+                                if (integer == UploadScheduleWorker.STATUS_UPLOADED_SUCCESS) {
+                                    hideSheetUploadingDialog();
+                                    Toast.makeText(MainActivity.this, "Расписание загружено на сервер", Toast.LENGTH_LONG).show();
+                                    status.removeObservers(MainActivity.this);
+                                } else if (integer == UploadScheduleWorker.STATUS_UPLOADED_FAILED) {
+                                    hideSheetUploadingDialog();
+                                    Toast.makeText(MainActivity.this, "Расписание не загружено. Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
+                                    status.removeObservers(MainActivity.this);
+                                } else if (integer == UploadScheduleWorker.STATUS_UPLOADED_ERROR) {
+                                    hideSheetUploadingDialog();
+                                    Toast.makeText(MainActivity.this, "Ошибка загрузки расписания", Toast.LENGTH_LONG).show();
+                                    status.removeObservers(MainActivity.this);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
     }
 
     private void loadShiftsFromExcel() {
@@ -399,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void selectPerson(String rowName) {
         selectPerson(sSheet.getSheetIndex(rowName));
-        ScheduleHandler.handlePersons(sSheet.getSheetAt(sSheet.getSheetIndex(rowName)));
+        //ScheduleHandler.handlePersons(sSheet.getSheetAt(sSheet.getSheetIndex(rowName)));
     }
 
     private void selectPerson(int which) {
@@ -408,6 +502,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // попробую получить сохранённое имя
         String name = SharedPreferencesHandler.getPerson();
         if (mTable != null) {
+            Log.d("surprise", "MainActivity selectPerson from here");
+            ScheduleHandler.handlePersons(sSheet.getSheetAt(sSheet.getSheetIndex(mTable.getSheetName())));
             // получу список всех работников
             mPersonList = new ArrayList<>();
             int length = mTable.getLastRowNum();
@@ -466,49 +562,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int counter = 0;
         // составлю массив расписания
         ArrayList<String> scheduleList = new ArrayList<>();
-        HashSet<String> shiftsList = new HashSet<>();
+        HashMap<String, String> shiftsList = new HashMap<>();
         Cell cell;
         CellType cellType;
         String value;
-        while (++counter < doubleDaysCounter + 1){
+        String argbColor = "00000000";
+        while (++counter < doubleDaysCounter + 1) {
             cell = row.getCell(counter);
-            if(cell != null){
+            if (cell != null) {
                 cellType = cell.getCellTypeEnum();
                 if (cellType.equals(CellType.NUMERIC)) {
                     value = String.valueOf(cell.getNumericCellValue());
+                    // получу цвет ячейки для дальнейшего использования при определении разных типов смен
+                    org.apache.poi.xssf.usermodel.XSSFColor cellColor = (XSSFColor) cell.getCellStyle().getFillForegroundColorColor();
+                    if (cellColor != null) {
+                        argbColor = cellColor.getARGBHex();
+                        Log.d("surprise", "MainActivity makeSchedule " + argbColor);
+                    }
                 } else if (cellType.equals(CellType.STRING)) {
                     value = cell.getStringCellValue().trim();
+                    // переведу в нижний регистр
+                    value = value.toLowerCase();
+                    // получу цвет ячейки для дальнейшего использования при определении разных типов смен
+                    org.apache.poi.xssf.usermodel.XSSFColor cellColor = (XSSFColor) cell.getCellStyle().getFillForegroundColorColor();
+                    if (cellColor != null) {
+                        argbColor = cellColor.getARGBHex();
+                    }
                 } else {
                     value = "";
                 }
                 scheduleList.add(value);
                 if (!TextUtils.isEmpty(value)) {
-                    shiftsList.add(value);
+                    shiftsList.put(value, argbColor);
                 }
-            }
-            else{
+            } else {
                 scheduleList.add("");
             }
         }
 
-/*        while (cells.hasNext() && daysCounter > 0) {
-            Log.d("surprise", "MainActivity makeSchedule: day " + daysCounter);
-            cell = cells.next();
-            Log.d("surprise", "MainActivity makeSchedule: " + cell.getColumnIndex());
-            cellType = cell.getCellTypeEnum();
-            if (cellType.equals(CellType.NUMERIC)) {
-                value = String.valueOf(cell.getNumericCellValue());
-            } else if (cellType.equals(CellType.STRING)) {
-                value = cell.getStringCellValue().trim();
-            } else {
-                value = "";
-            }
-            scheduleList.add(value);
-            if (!TextUtils.isEmpty(value)) {
-                shiftsList.add(value);
-            }
-            --daysCounter;
-        }*/
         // отправлю список смен на обработку, надо зарегистрировать те, что ещё не зарегистрированы
         mMyViewModel.checkShifts(shiftsList);
         loadShifts();
@@ -551,6 +642,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSheetLoadingDialog.show();
     }
 
+    private void showSheetUploadingDialog() {
+        if (mSheetUploadingDialog == null) {
+            // создам диалоговое окно
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setTitle(R.string.sheet_uploading_dialog_title)
+                    .setView(R.layout.sheet_loading_dialog_layout)
+                    .setCancelable(false);
+            mSheetUploadingDialog = dialogBuilder.create();
+        }
+        mSheetUploadingDialog.show();
+    }
+
     private void showPersonChooseDialog(ArrayList<String> personList) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, personList);
         // создам диалоговое окно
@@ -570,6 +673,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void hideSheetLoadingDialog() {
         if (mSheetLoadingDialog != null) {
             mSheetLoadingDialog.hide();
+        }
+    }
+
+    private void hideSheetUploadingDialog() {
+        if (mSheetUploadingDialog != null) {
+            mSheetUploadingDialog.hide();
         }
     }
 
@@ -713,7 +822,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         data.observe(MainActivity.this, new Observer<ArrayList<net.velor.rdc_utils.subclasses.WorkingPerson>>() {
             @Override
             public void onChanged(@Nullable ArrayList<WorkingPerson> workingPeople) {
-                if(workingPeople != null && workingPeople.size() > 0){
+                if (workingPeople != null && workingPeople.size() > 0) {
                     // создам представление
                     LinearLayout view = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_show_workers, mRootView, false);
                     RecyclerView recycler = view.findViewById(R.id.workersList);
@@ -812,6 +921,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public CharSequence getPageTitle(int position) {
             if (sNeedRename) {
                 Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.DATE, 15);
                 cal.set(Calendar.MONTH, sMonth);
                 cal.set(Calendar.YEAR, sYear);
                 switch (position) {
