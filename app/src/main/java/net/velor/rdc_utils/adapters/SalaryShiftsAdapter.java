@@ -3,12 +3,13 @@ package net.velor.rdc_utils.adapters;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import androidx.preference.PreferenceManager;
 
 import net.velor.rdc_utils.R;
 import net.velor.rdc_utils.SalaryActivity;
@@ -77,10 +78,10 @@ public class SalaryShiftsAdapter extends CursorAdapter {
 
         float hours = cursor.getFloat(cursor.getColumnIndex(DbWork.SD_COL_DURATION));
         // получу сумму, заработанную за день
-        float summForHours = hours * Float.valueOf(mForHour);
-        float summForContrasts = Integer.valueOf(contrastsSumm) * Float.valueOf(mContrastCost);
-        float summForDContrasts = Integer.valueOf(dContrastsSumm) * Float.valueOf(mDContrastCost);
-        float summForScreenings = Integer.valueOf(screeningsSumm) * Float.valueOf(mOncoscreeningCost);
+        float summForHours = hours * Float.parseFloat(mForHour);
+        float summForContrasts = Integer.parseInt(contrastsSumm) * Float.parseFloat(mContrastCost);
+        float summForDContrasts = Integer.parseInt(dContrastsSumm) * Float.parseFloat(mDContrastCost);
+        float summForScreenings = Integer.parseInt(screeningsSumm) * Float.parseFloat(mOncoscreeningCost);
         float ndfl = countPercent(summForHours, "13.");
         float totalSumm;
         if(mOverLimit){

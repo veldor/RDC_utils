@@ -6,8 +6,8 @@ import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import android.util.Base64;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ import javax.crypto.spec.PSource;
 /**
  * Created by azret.magometov on 08-Nov-16.
  */
-@TargetApi(Build.VERSION_CODES.M)
+@RequiresApi(api = Build.VERSION_CODES.M)
 final class SimpleCryptoUtils {
 	private static final String KEY_ALIAS = "pin_key";
 	private static final String KEY_STORE = "AndroidKeyStore";

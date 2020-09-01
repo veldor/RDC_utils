@@ -1,16 +1,9 @@
 package net.velor.rdc_utils;
 
-import android.arch.persistence.room.Ignore;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -20,12 +13,16 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
 import net.velor.rdc_utils.adapters.SalaryShiftsAdapter;
 import net.velor.rdc_utils.database.DbWork;
-import net.velor.rdc_utils.handlers.SalaryHandler;
 import net.velor.rdc_utils.widgets.SalaryWidget;
-
-import java.util.Objects;
 
 import utils.App;
 import utils.LoginActivity;
@@ -39,7 +36,6 @@ public class SalaryShiftsInfoActivity extends AppCompatActivity implements Loade
     private static int sMonth;
 
     @Override
-    @Ignore
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_salary_shifts_info);

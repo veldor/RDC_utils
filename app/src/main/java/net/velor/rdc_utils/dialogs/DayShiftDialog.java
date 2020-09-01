@@ -6,13 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import net.velor.rdc_utils.R;
 import net.velor.rdc_utils.ShiftEditActivity;
 import net.velor.rdc_utils.ShiftSettingsActivity;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -57,7 +59,7 @@ public class DayShiftDialog extends DialogFragment implements DialogInterface.On
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         try {
             mListener = (AnswerDialogListener) context;

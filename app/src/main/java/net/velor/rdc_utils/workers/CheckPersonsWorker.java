@@ -1,9 +1,9 @@
 package net.velor.rdc_utils.workers;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -17,7 +17,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 import java.util.Calendar;
-import java.util.Iterator;
 
 public class CheckPersonsWorker extends Worker {
     public CheckPersonsWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -61,8 +60,6 @@ public class CheckPersonsWorker extends Worker {
                                     post = "Наркозы";
                                     break;
                                 case "Колл-центр":
-                                    post = "Администратор колл-центра";
-                                    break;
                                 case "Call-center":
                                     post = "Администратор колл-центра";
                                     break;
@@ -70,8 +67,6 @@ public class CheckPersonsWorker extends Worker {
                                     post = "Врач УЗИ";
                                     break;
                                 case "Консультанты":
-                                    post = "Врач-консультант";
-                                    break;
                                 case "Консультативный прием":
                                     post = "Врач-консультант";
                                     break;
@@ -83,7 +78,6 @@ public class CheckPersonsWorker extends Worker {
                                     ScheduleHandler.addPersonToBase(post, person);
                                     // проверю смены, которые он работает в этом месяце и занесу их в базу данных
                                     int daysCounter = MainActivity.sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-                                    Iterator<Cell> cells = row.cellIterator();
                                     // пропущу строку с именем
                                     Cell currentCell;
                                     CellType cellType;

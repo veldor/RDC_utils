@@ -1,9 +1,9 @@
 package net.velor.rdc_utils.view_models;
 
 import android.Manifest;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
@@ -42,9 +42,9 @@ public class ReserveViewModel extends ViewModel {
                     .putInt(OPERATION_NAME, OPERATION_START_BACKUP)
                     .build();
             OneTimeWorkRequest loadCountersWork = new OneTimeWorkRequest.Builder(ReserveWorker.class).setInputData(inputData).build();
-            WorkManager.getInstance().enqueue(loadCountersWork);
+            WorkManager.getInstance(App.getInstance()).enqueue(loadCountersWork);
             // отслежу выполнение задачи
-            return WorkManager.getInstance().getWorkInfoByIdLiveData(loadCountersWork.getId());
+            return WorkManager.getInstance(App.getInstance()).getWorkInfoByIdLiveData(loadCountersWork.getId());
         }
         return null;
     }
@@ -56,8 +56,8 @@ public class ReserveViewModel extends ViewModel {
                     .putInt(OPERATION_NAME, OPERATION_START_RESTORE)
                     .build();
             OneTimeWorkRequest loadCountersWork = new OneTimeWorkRequest.Builder(ReserveWorker.class).setInputData(inputData).build();
-            WorkManager.getInstance().enqueue(loadCountersWork);
-            return WorkManager.getInstance().getWorkInfoByIdLiveData(loadCountersWork.getId());
+            WorkManager.getInstance(App.getInstance()).enqueue(loadCountersWork);
+            return WorkManager.getInstance(App.getInstance()).getWorkInfoByIdLiveData(loadCountersWork.getId());
         }
         return null;
     }

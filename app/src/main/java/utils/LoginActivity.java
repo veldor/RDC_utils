@@ -8,16 +8,19 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
-import android.support.v4.os.CancellationSignal;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.core.os.CancellationSignal;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import net.velor.rdc_utils.R;
 
@@ -39,11 +42,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this); // получаю настройки приложения, где должен храниться пин приложения
         mFingerprintDialog = findViewById(R.id.fingerprintUse);
-        if(mPreferences.contains(Fingerprint.FIELD_USE_FINGERPRINT) && (isFingerprintUsed = mPreferences.getBoolean(Fingerprint.FIELD_USE_FINGERPRINT, false))){
-            mFingerprintDialog.setVisibility(View.VISIBLE);
-        }
-        else{
-            mFingerprintDialog.setVisibility(View.GONE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(mPreferences.contains(Fingerprint.FIELD_USE_FINGERPRINT) && (isFingerprintUsed = mPreferences.getBoolean(Fingerprint.FIELD_USE_FINGERPRINT, false))){
+                mFingerprintDialog.setVisibility(View.VISIBLE);
+            }
+            else{
+                mFingerprintDialog.setVisibility(View.GONE);
+            }
         }
         mEnterPin = findViewById(R.id.enterPin);
 		mEnterPin.addTextChangedListener(new TextWatcher() {
@@ -58,7 +63,8 @@ public class LoginActivity extends AppCompatActivity {
 
 			}
 
-			@Override
+			@RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
 			public void afterTextChanged(Editable editable) {
 				if (editable.length() == 4) {
 					// проверяю соответствие введённого и сохранённого пин-кода
@@ -95,6 +101,7 @@ public class LoginActivity extends AppCompatActivity {
 		});
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() { // при возобновлении приложения
         super.onResume();
@@ -111,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void prepareSensor() {
         if (FingerprintUtils.isSensorStateAt(FingerprintUtils.mSensorState.READY, this)) { // если есть возможность входа по отпечатку пальцев- срабатывает данный блок
             FingerprintManagerCompat.CryptoObject cryptoObject = CryptoUtils.getCryptoObject(); // получу криптообьект для сканера отпечатков
@@ -154,6 +162,7 @@ public class LoginActivity extends AppCompatActivity {
         public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
         	// Успешная аутентификация

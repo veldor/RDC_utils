@@ -13,5 +13,6 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:text="@string/loading_month_message"/>
+        android:text="@string/loading_month_message"
+        android:gravity="center_horizontal" />
 </LinearLayout>

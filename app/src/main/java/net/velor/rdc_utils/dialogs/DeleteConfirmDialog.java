@@ -5,11 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import net.velor.rdc_utils.R;
+
+import org.jetbrains.annotations.NotNull;
 
 public class DeleteConfirmDialog extends DialogFragment implements DialogInterface.OnClickListener {
 
@@ -26,13 +28,13 @@ public class DeleteConfirmDialog extends DialogFragment implements DialogInterfa
                 .setTitle(getString(R.string.dialog_shift_delete_title))
                 .setMessage(getString(R.string.dialog_shift_delete_message))
                 .setPositiveButton(getString(R.string.dialog_shift_positive_btn_text), this)
-                .setNegativeButton(android.R.string.no, this);
+                .setNegativeButton(android.R.string.cancel, this);
 
         return adb.create();
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         try{
             mListener = (AnswerDialogListener) context;

@@ -2,7 +2,8 @@ package net.velor.rdc_utils.handlers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+
+import androidx.preference.PreferenceManager;
 
 import net.velor.rdc_utils.MainActivity;
 

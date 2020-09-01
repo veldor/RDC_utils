@@ -1,8 +1,7 @@
 package net.velor.rdc_utils.workers;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.util.Log;
+import androidx.annotation.NonNull;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -35,6 +34,10 @@ public class UploadScheduleWorker extends Worker {
         try {
             ftpClient.connect(Priv.FTP_URL, 21);
             String password = SharedPreferencesHandler.getFTPPassword();
+            if(password == null || password.isEmpty()){
+                App.getInstance().mSheetUpload.postValue(STATUS_UPLOADED_FAILED);
+                return Result.success();
+            }
             boolean bool = ftpClient.login(Priv.FTP_LOGIN, password);
             if (bool) {
                 ftpClient.changeWorkingDirectory(Priv.SCHEDULE_DIR);
@@ -48,6 +51,9 @@ public class UploadScheduleWorker extends Worker {
                 else{
                     App.getInstance().mSheetUpload.postValue(STATUS_UPLOADED_FAILED);
                 }
+            }
+            else{
+                App.getInstance().mSheetUpload.postValue(STATUS_UPLOADED_FAILED);
             }
         } catch (IOException e) {
             e.printStackTrace();

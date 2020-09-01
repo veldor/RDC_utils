@@ -7,10 +7,10 @@ import android.os.Handler;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
-import android.support.v4.os.CancellationSignal;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.core.os.CancellationSignal;
 import android.util.Base64;
 import android.util.Log;
 
@@ -38,6 +38,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
+@RequiresApi(api = Build.VERSION_CODES.M)
 public class Fingerprint {
 
     public static final String FIELD_USE_FINGERPRINT = "use_fingerprint";
@@ -61,21 +62,24 @@ public class Fingerprint {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public static SensorState checkSensorState(@NonNull Context context) { // нужно понять, готов ли сенсор к использованию
-        if (checkFingerprintCompatibility(context)) {
-            KeyguardManager keyguardManager =
-                    (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-            assert keyguardManager != null;
-            if (!keyguardManager.isKeyguardSecure()) {
-                return SensorState.NOT_BLOCKED; // если устройство не защищено пином, рисунком или паролем
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkFingerprintCompatibility(context)) {
+                KeyguardManager keyguardManager =
+                        (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+                assert keyguardManager != null;
+                if (!keyguardManager.isKeyguardSecure()) {
+                    return SensorState.NOT_BLOCKED; // если устройство не защищено пином, рисунком или паролем
+                }
+                FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(context);
+                if (!fingerprintManager.hasEnrolledFingerprints()) {
+                    return SensorState.NO_FINGERPRINTS; // если на устройстве нет отпечатков
+                }
+                return SensorState.READY;
+            } else {
+                return SensorState.NOT_SUPPORTED;
             }
-            FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(context);
-            if (!fingerprintManager.hasEnrolledFingerprints()) {
-                return SensorState.NO_FINGERPRINTS; // если на устройстве нет отпечатков
-            }
-            return SensorState.READY;
-        } else {
-            return SensorState.NOT_SUPPORTED;
         }
+        return null;
     }
 
     private static boolean getKeyStore() { // инициализирую хранилище для сохранения ключа пин-кода

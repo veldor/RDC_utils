@@ -11,17 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +21,18 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.whiteelephant.monthpicker.MonthPickerDialog;
 
 import net.velor.rdc_utils.database.DbWork;
@@ -367,10 +368,10 @@ public class SalaryActivity extends AppCompatActivity implements NavigationView.
             int dct = monthInfo.getInt(monthInfo.getColumnIndex(DbWork.SD_COL_DCONTRASTS));
             int os = monthInfo.getInt(monthInfo.getColumnIndex(DbWork.SD_COL_SCREENINGS));
             float revenue = monthInfo.getFloat(monthInfo.getColumnIndex(DbWork.SD_COL_REVENUE));
-            float summForHours = hours * Float.valueOf(mForHour);
-            float summForContrasts = ct * Float.valueOf(mContrastCost);
-            float summForDContrasts = dct * Float.valueOf(mDContrastCost);
-            float summForScreenings = os * Float.valueOf(mOncoscreeningCost);
+            float summForHours = hours * Float.parseFloat(mForHour);
+            float summForContrasts = ct * Float.parseFloat(mContrastCost);
+            float summForDContrasts = dct * Float.parseFloat(mDContrastCost);
+            float summForScreenings = os * Float.parseFloat(mOncoscreeningCost);
             double ndfl = countPercent(summForHours, NDFL_RATE);
             if (date < 16) {
                 // считаю сумму за день по обычной ставке, потом проверяю, если процен повышен- считаю по повышенной

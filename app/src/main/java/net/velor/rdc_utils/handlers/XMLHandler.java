@@ -132,7 +132,7 @@ public class XMLHandler {
                 Document shiftDom = dBuilder.parse(is);
                 // нахожу нужный день
                 Element targetDay = shiftDom.getElementById(String.valueOf(day));
-                return Integer.valueOf(targetDay.getAttribute(ATTRIBUTE_TYPE));
+                return Integer.parseInt(targetDay.getAttribute(ATTRIBUTE_TYPE));
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (IOException e) {

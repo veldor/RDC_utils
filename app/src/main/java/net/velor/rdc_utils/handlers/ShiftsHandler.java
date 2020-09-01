@@ -11,11 +11,8 @@ import net.velor.rdc_utils.SalaryDayActivity;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
 
-import org.apache.xmlbeans.impl.jam.mutable.MAnnotatedElement;
-
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import utils.App;

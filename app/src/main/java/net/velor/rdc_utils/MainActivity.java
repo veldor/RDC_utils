@@ -3,10 +3,6 @@ package net.velor.rdc_utils;
 import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,25 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -50,6 +27,31 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.navigation.NavigationView;
+
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.adapters.WorkersAdapter;
 import net.velor.rdc_utils.dialogs.DayShiftDialog;
@@ -63,6 +65,7 @@ import net.velor.rdc_utils.workers.UploadScheduleWorker;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -140,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mRootView = findViewById(R.id.rootView);
 
         // зарегистрирую модель
-        mMyViewModel = ViewModelProviders.of(this).get(ScheduleViewModel.class);
+        mMyViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
 
         // Если не заполнены месяц и год- заполню их текущими значениями
         sCalendar.set(Calendar.DATE, 15);
@@ -366,56 +369,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
-        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
-        // response to some other intent, and the code below shouldn't run at all.
 
-        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            // The document selected by the user won't be returned in the intent.
-            // Instead, a URI to that document will be contained in the return intent
-            // provided to this method as a parameter.
-            // Pull that URI using resultData.getData().
-            Uri uri;
-            if (data != null) {
-                uri = data.getData();
-                final MutableLiveData<Integer> status = mMyViewModel.uploadSchedule(uri);
-                status.observe(this, new Observer<Integer>() {
-                    @Override
-                    public void onChanged(@Nullable Integer integer) {
-                        if (integer != null) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_SUCCESS)) {
-                                    hideSheetUploadingDialog();
-                                    Toast.makeText(MainActivity.this, "Расписание загружено на сервер", Toast.LENGTH_LONG).show();
-                                    status.removeObservers(MainActivity.this);
-                                } else if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_FAILED)) {
-                                    hideSheetUploadingDialog();
-                                    Toast.makeText(MainActivity.this, "Расписание не загружено. Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
-                                    status.removeObservers(MainActivity.this);
-                                } else if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_ERROR)) {
-                                    hideSheetUploadingDialog();
-                                    Toast.makeText(MainActivity.this, "Ошибка загрузки расписания", Toast.LENGTH_LONG).show();
-                                    status.removeObservers(MainActivity.this);
-                                }
-                            } else {
-                                if (integer == UploadScheduleWorker.STATUS_UPLOADED_SUCCESS) {
-                                    hideSheetUploadingDialog();
-                                    Toast.makeText(MainActivity.this, "Расписание загружено на сервер", Toast.LENGTH_LONG).show();
-                                    status.removeObservers(MainActivity.this);
-                                } else if (integer == UploadScheduleWorker.STATUS_UPLOADED_FAILED) {
-                                    hideSheetUploadingDialog();
-                                    Toast.makeText(MainActivity.this, "Расписание не загружено. Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
-                                    status.removeObservers(MainActivity.this);
-                                } else if (integer == UploadScheduleWorker.STATUS_UPLOADED_ERROR) {
-                                    hideSheetUploadingDialog();
-                                    Toast.makeText(MainActivity.this, "Ошибка загрузки расписания", Toast.LENGTH_LONG).show();
-                                    status.removeObservers(MainActivity.this);
+        if (requestCode == READ_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                // The document selected by the user won't be returned in the intent.
+                // Instead, a URI to that document will be contained in the return intent
+                // provided to this method as a parameter.
+                // Pull that URI using resultData.getData().
+                Uri uri;
+                if (data != null) {
+                    uri = data.getData();
+                    final MutableLiveData<Integer> status = mMyViewModel.uploadSchedule(uri);
+                    status.observe(this, new Observer<Integer>() {
+                        @Override
+                        public void onChanged(@Nullable Integer integer) {
+                            if (integer != null) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                    if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_SUCCESS)) {
+                                        hideSheetUploadingDialog();
+                                        Toast.makeText(MainActivity.this, "Расписание загружено на сервер", Toast.LENGTH_LONG).show();
+                                        status.removeObservers(MainActivity.this);
+                                    } else if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_FAILED)) {
+                                        hideSheetUploadingDialog();
+                                        Toast.makeText(MainActivity.this, "Расписание не загружено. Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
+                                        status.removeObservers(MainActivity.this);
+                                    } else if (Objects.equals(integer, UploadScheduleWorker.STATUS_UPLOADED_ERROR)) {
+                                        hideSheetUploadingDialog();
+                                        Toast.makeText(MainActivity.this, "Ошибка загрузки расписания", Toast.LENGTH_LONG).show();
+                                        status.removeObservers(MainActivity.this);
+                                    }
+                                } else {
+                                    if (integer == UploadScheduleWorker.STATUS_UPLOADED_SUCCESS) {
+                                        hideSheetUploadingDialog();
+                                        Toast.makeText(MainActivity.this, "Расписание загружено на сервер", Toast.LENGTH_LONG).show();
+                                        status.removeObservers(MainActivity.this);
+                                    } else if (integer == UploadScheduleWorker.STATUS_UPLOADED_FAILED) {
+                                        hideSheetUploadingDialog();
+                                        Toast.makeText(MainActivity.this, "Расписание не загружено. Проверьте соединение с интернетом", Toast.LENGTH_LONG).show();
+                                        status.removeObservers(MainActivity.this);
+                                    } else if (integer == UploadScheduleWorker.STATUS_UPLOADED_ERROR) {
+                                        hideSheetUploadingDialog();
+                                        Toast.makeText(MainActivity.this, "Ошибка загрузки расписания", Toast.LENGTH_LONG).show();
+                                        status.removeObservers(MainActivity.this);
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
+            } else {
+                hideSheetUploadingDialog();
+                Toast.makeText(this, "Выбор файла расписания отменён", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -514,12 +521,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (row != null) {
                     cell = row.getCell(0);
                     if (cell != null) {
-                        // если имя совпадает- автоматически подставляю его
-                        if (!name.isEmpty() && cell.getStringCellValue().equals(name)) {
-                            makeSchedule(row);
-                            return;
+                        String value = cell.getStringCellValue();
+                        if (value != null) {
+                            value = value.trim();
+                            // если имя совпадает- автоматически подставляю его
+                            if (!name.isEmpty() && value.equals(name)) {
+                                Log.d("surprise", "MainActivity.java 529 selectPerson: autofill SCHEDULE");
+                                makeSchedule(row);
+                                return;
+                            }
+                            if (!value.isEmpty() && !mPersonList.contains(value.trim())){
+                                mPersonList.add(value.trim());
+                            }
                         }
-                        mPersonList.add(cell.getStringCellValue());
                     }
                 }
                 counter++;
@@ -534,23 +548,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void fillPersonName(int which) {
+    private void fillPersonName(String name) {
         // получу имя, попытаюсь протестировать его валидность
-        XSSFRow row = mTable.getRow(which);
-        if (row != null) {
-            XSSFCell cell = row.getCell(0);
-            if (cell.getCellTypeEnum().equals(CellType.STRING)) {
-                String personName = cell.getStringCellValue();
-                showPersonConfirmDialog(personName, row);
-            } else {
-                Toast.makeText(this, this.getString(R.string.cant_found_person_message), Toast.LENGTH_LONG).show();
+        Iterator<Row> rows = mTable.rowIterator();
+        while (rows.hasNext()){
+            Row row = rows.next();
+            if (row != null) {
+                Cell cell = row.getCell(0);
+                if (cell != null && cell.getCellTypeEnum().equals(CellType.STRING)) {
+                    String personName = cell.getStringCellValue().trim();
+                    if(personName.equals(name)){
+                        showPersonConfirmDialog(name, row);
+                        return;
+                    }
+                }
             }
-        } else {
-            Toast.makeText(this, this.getString(R.string.cant_found_person_message), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void makeSchedule(XSSFRow row) {
+    private void makeSchedule(Row row) {
         // получу расписание
         Iterator<Cell> cells = row.cellIterator();
         // пропущу строку с именем
@@ -571,6 +587,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             cell = row.getCell(counter);
             if (cell != null) {
                 cellType = cell.getCellTypeEnum();
+                Log.d("surprise", "MainActivity.java 579 makeSchedule: cell type is " + cellType);
                 if (cellType.equals(CellType.NUMERIC)) {
                     value = String.valueOf(cell.getNumericCellValue());
                     // получу цвет ячейки для дальнейшего использования при определении разных типов смен
@@ -592,11 +609,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     value = "";
                 }
                 scheduleList.add(value);
+                Log.d("surprise", "MainActivity.java 600 makeSchedule: add value to schedule " + value);
                 if (!TextUtils.isEmpty(value)) {
                     shiftsList.put(value, argbColor);
                 }
             } else {
                 scheduleList.add("");
+                Log.d("surprise", "MainActivity.java 600 makeSchedule: add empty value to schedule ");
             }
         }
 
@@ -607,7 +626,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawCalendar();
     }
 
-    private void showPersonConfirmDialog(final String personName, final XSSFRow row) {
+    private void showPersonConfirmDialog(final String personName, final Row row) {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle(R.string.confirm_person_dialog_title)
@@ -618,6 +637,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mMyViewModel.savePerson(personName);
                         Toast.makeText(MainActivity.this, getString(R.string.person_saved_message), Toast.LENGTH_LONG).show();
                         makeSchedule(row);
+                        if(mSheetLoadingDialog != null){
+                            mSheetLoadingDialog.dismiss();
+                            mSheetLoadingDialog.hide();
+                        }
                     }
                 })
                 .setNegativeButton(getString(R.string.decline_name_message), new DialogInterface.OnClickListener() {
@@ -655,15 +678,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showPersonChooseDialog(ArrayList<String> personList) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, personList);
+        Log.d("surprise", "MainActivity.java 673 showPersonChooseDialog: persons list is " + personList);
+        mPersonList = personList;
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mPersonList);
         // создам диалоговое окно
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle(R.string.choose_person_dialog_title)
                 .setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        fillPersonName(which);
+                        Log.d("surprise", "MainActivity.java 673 showPersonChooseDialog:saved persons list is " + mPersonList);
+                        Log.d("surprise", "MainActivity.java 680 onClick: selected " + which);
+                        String name = mPersonList.get(which);
+                        if(name.equals(
+                                "Врачи МРТ") ||
+                                name.equals("Операторы МРТ") ||
+                                name.equals("Администраторы МРТ 1") ||
+                                name.equals("Процедурный кабинет") ||
+                                name.equals("Наркозы") ||
+                                name.equals("УВТ") ||
+                                name.equals("Консультативный прием") ||
+                                name.equals("Консультанты") ||
+                                name.equals("Врач УЗИ") ||
+                                name.equals("Call-center") ||
+                                name.equals("Колл-центр") ||
+                                name.equals("Администраторы МРТ 2")
+                        )
+                        {
+                            Toast.makeText(MainActivity.this, "Выберите своё имя!", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            dialog.dismiss();
+                            fillPersonName(name);
+                        }
+
                     }
                 });
         dialogBuilder.create().show();

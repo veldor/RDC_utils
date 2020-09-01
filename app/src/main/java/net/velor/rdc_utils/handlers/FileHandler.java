@@ -9,6 +9,8 @@ import androidx.work.WorkManager;
 
 import net.velor.rdc_utils.workers.UploadScheduleWorker;
 
+import utils.App;
+
 public class FileHandler {
     public static Uri file_uri;
     private static final int READ_REQUEST_CODE = 42;
@@ -22,7 +24,7 @@ public class FileHandler {
         OneTimeWorkRequest myWorkRequest = new OneTimeWorkRequest.Builder(UploadScheduleWorker.class)
                 .setConstraints(constraints)
                 .build();
-        WorkManager.getInstance().enqueue(myWorkRequest);
+        WorkManager.getInstance(App.getInstance()).enqueue(myWorkRequest);
     }
 
 

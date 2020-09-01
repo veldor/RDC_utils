@@ -1,10 +1,12 @@
 package net.velor.rdc_utils;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -14,12 +16,13 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.support.v7.app.ActionBar;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import net.velor.rdc_utils.handlers.ForemanHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
@@ -128,7 +131,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * Set up the {@link android.app.ActionBar}, if the API is available.
      */
     private void setupActionBar() {
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -417,6 +420,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         private SharedPreferences mPreferences;
         private SwitchPreference mUsePin;
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -471,6 +475,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             });
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onResume() {
             super.onResume();
@@ -491,6 +496,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);

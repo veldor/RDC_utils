@@ -2,10 +2,11 @@ package utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
- public final class Security {
+import androidx.preference.PreferenceManager;
+
+public final class Security {
 	public static final Integer LOGIN_REQUIRED = 1;
 	private static final String LOGGING_STATUS = "logging_status";
 	private static final String LOGGING_TIME = "logging_time";

@@ -6,8 +6,8 @@ import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.Nullable;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.annotation.Nullable;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 import android.util.Base64;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
-@TargetApi(Build.VERSION_CODES.M)
+@androidx.annotation.RequiresApi(api = Build.VERSION_CODES.M)
 final class CryptoUtils {
 
 	private static final String KEY_ALIAS = "key_for_pin";

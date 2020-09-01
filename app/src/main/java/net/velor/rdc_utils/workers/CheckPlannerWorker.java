@@ -1,7 +1,7 @@
 package net.velor.rdc_utils.workers;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
@@ -50,8 +50,8 @@ public class CheckPlannerWorker extends Worker {
             String time = SharedPreferencesHandler.getScheduleCheckTime();
             assert time != null;
             String[] time_array = time.split(":");
-            int hour = Integer.valueOf(time_array[0]);
-            int minutes = Integer.valueOf(time_array[1]);
+            int hour = Integer.parseInt(time_array[0]);
+            int minutes = Integer.parseInt(time_array[1]);
 
             // Проверю, если позже времени установки проверяльщика- установлю его на следующий день
             int now_hour = cal.get(HOUR_OF_DAY);
@@ -69,7 +69,7 @@ public class CheckPlannerWorker extends Worker {
             long difference = plannedTime - currentTime;
             // назначу запуск рабочего, который проверит расписание на завтра
             OneTimeWorkRequest checkTomorrow = new OneTimeWorkRequest.Builder(CheckTomorrowWorker.class).addTag(MY_TAG).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
-            WorkManager.getInstance().enqueueUniqueWork(MY_TAG, ExistingWorkPolicy.REPLACE, checkTomorrow);
+            WorkManager.getInstance(App.getInstance()).enqueueUniqueWork(MY_TAG, ExistingWorkPolicy.REPLACE, checkTomorrow);
             MakeLog.writeToLog("Запланирована проверка через " + TimeUnit.MILLISECONDS.toHours(difference) + " часов");
         }
         SalaryHandler.planeRegistration();

@@ -2,15 +2,19 @@ package utils;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import net.velor.rdc_utils.R;
 
@@ -78,6 +82,7 @@ public class EditPin extends AppCompatActivity {
 
 	private void validatePins() {
 		new Handler().post(new Runnable() {
+			@RequiresApi(api = Build.VERSION_CODES.M)
 			@Override
 			public void run() {
 				// проверю, что в оба поля введено по 4 цифры и они совпадают

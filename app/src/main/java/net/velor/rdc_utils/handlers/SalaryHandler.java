@@ -2,8 +2,8 @@ package net.velor.rdc_utils.handlers;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.preference.PreferenceManager;
 
+import androidx.preference.PreferenceManager;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
@@ -112,7 +112,7 @@ public class SalaryHandler {
         MakeLog.writeToLog("Запланирована регистрация зарплаты через " + TimeUnit.MILLISECONDS.toHours(difference) + " часов");
         // планирую проверку
         OneTimeWorkRequest registerSalary = new OneTimeWorkRequest.Builder(RegisterShiftWorker.class).addTag(CheckPlannerWorker.SALARY_REGISTER_TAG).setInitialDelay(difference, TimeUnit.MILLISECONDS).build();
-        WorkManager.getInstance().enqueueUniqueWork(CheckPlannerWorker.SALARY_REGISTER_TAG, ExistingWorkPolicy.REPLACE, registerSalary);
+        WorkManager.getInstance(App.getInstance()).enqueueUniqueWork(CheckPlannerWorker.SALARY_REGISTER_TAG, ExistingWorkPolicy.REPLACE, registerSalary);
     }
 
     public static String countSalary(Cursor salaryDay, boolean isUpRevenue) {
@@ -132,13 +132,13 @@ public class SalaryHandler {
 
             // получу сумму, заработанную за день
             assert forHour != null;
-            float summForHours = hours * Float.valueOf(forHour);
+            float summForHours = hours * Float.parseFloat(forHour);
             assert contrastCost != null;
-            float summForContrasts = Integer.valueOf(contrastsSumm) * Float.valueOf(contrastCost);
+            float summForContrasts = Integer.parseInt(contrastsSumm) * Float.parseFloat(contrastCost);
             assert dContrastCost != null;
-            float summForDContrasts = Integer.valueOf(dContrastsSumm) * Float.valueOf(dContrastCost);
+            float summForDContrasts = Integer.parseInt(dContrastsSumm) * Float.parseFloat(dContrastCost);
             assert oncoscreeningCost != null;
-            float summForScreenings = Integer.valueOf(screeningsSumm) * Float.valueOf(oncoscreeningCost);
+            float summForScreenings = Integer.parseInt(screeningsSumm) * Float.parseFloat(oncoscreeningCost);
             float ndfl = countPercent(summForHours, "13.");
             float totalSumm;
             if(isUpRevenue){
@@ -161,7 +161,7 @@ public class SalaryHandler {
         if(days.moveToFirst()){
             do{
                 // получу сумму, заработанную за месяц
-                medianGain = Float.valueOf(days.getString(days.getColumnIndex(DbWork.SM_COL_MEDIAN_GAIN)));
+                medianGain = Float.parseFloat(days.getString(days.getColumnIndex(DbWork.SM_COL_MEDIAN_GAIN)));
             }
             while (days.moveToNext());
         }
@@ -170,7 +170,7 @@ public class SalaryHandler {
         String limit = prefsManager.getString(SalaryActivity.FIELD_UP_LIMIT, null);
         float neededMedian = 0;
         if(limit != null && !limit.isEmpty()){
-            neededMedian = Float.valueOf(limit);
+            neededMedian = Float.parseFloat(limit);
         }
         return medianGain >= neededMedian;
     }

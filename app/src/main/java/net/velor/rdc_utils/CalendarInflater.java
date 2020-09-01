@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
-import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -16,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;

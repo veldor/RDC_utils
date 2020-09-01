@@ -1,8 +1,8 @@
 package net.velor.rdc_utils.handlers;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.database.Cursor;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -29,7 +29,7 @@ public class ScheduleHandler {
         // запущу рабочего, который сделает всё как надо :)
         sSheet = sheet;
         OneTimeWorkRequest.Builder personsPlanner = new OneTimeWorkRequest.Builder(CheckPersonsWorker.class);
-        WorkManager.getInstance().enqueue(personsPlanner.build());
+        WorkManager.getInstance(App.getInstance()).enqueue(personsPlanner.build());
     }
 
     public static void addPersonToBase(String post, String person) {
@@ -48,7 +48,7 @@ public class ScheduleHandler {
                 .putInt(CHECKED_DAY, day)
                 .build();
         OneTimeWorkRequest.Builder getWorkersWorker = new OneTimeWorkRequest.Builder(GetWorkersWorker.class).setInputData(myData);
-        WorkManager.getInstance().enqueue(getWorkersWorker.build());
+        WorkManager.getInstance(App.getInstance()).enqueue(getWorkersWorker.build());
         return mWorkersData;
     }
 

@@ -1,8 +1,9 @@
 package net.velor.rdc_utils.adapters;
 
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.databinding.DataBindingUtil;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -40,7 +41,7 @@ public class WorkersAdapter extends RecyclerView.Adapter<WorkersAdapter.ViewHold
         return mWorkingPeople.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder{
 
         private final WorkerLinearItemBinding mBinding;
 

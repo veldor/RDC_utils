@@ -35,7 +35,7 @@ public class CashHandler {
     }
 
     public static float countPercent(Float full, String percent) {
-        return full / 100 * Float.valueOf(percent);
+        return full / 100 * Float.parseFloat(percent);
     }
     public static double countPercent(Float full, Double percent) {
         return full / 100 * percent;

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import utils.App;
+
 public class ForemanHandler {
     private static final String PERIODIC_CHECK_TAG = "periodic_check";
 
@@ -27,7 +29,7 @@ public class ForemanHandler {
             startPeriodicalPlanner.setInputData(myData);
             startPlanner.setInputData(myData);
         }
-        WorkManager wm = WorkManager.getInstance();
+        WorkManager wm = WorkManager.getInstance(App.getInstance());
         wm.cancelAllWorkByTag(PERIODIC_CHECK_TAG);
         wm.enqueue(startPlanner.build());
         wm.enqueue(startPeriodicalPlanner.build());
@@ -38,7 +40,7 @@ public class ForemanHandler {
     public static boolean isMyWorkerRunning(String tag) {
         List<WorkInfo> status;
         try {
-            status = WorkManager.getInstance().getWorkInfosByTag(tag).get();
+            status = WorkManager.getInstance(App.getInstance()).getWorkInfosByTag(tag).get();
             for (WorkInfo workStatus : status) {
                 if (workStatus.getState() == WorkInfo.State.RUNNING
                         || workStatus.getState() == WorkInfo.State.ENQUEUED) {

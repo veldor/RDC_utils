@@ -6,8 +6,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
 
 /**
  * Created by azret.magometov on 19-Dec-16.
@@ -17,6 +18,7 @@ public final class FingerprintUtils {
     private FingerprintUtils() {
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public static boolean enableToUse(Context context) {
     	// проверю доступность сканера отпечатков
 		if(FingerprintUtils.isSensorStateAt(mSensorState.READY, context)){

@@ -30,7 +30,7 @@ public class SalaryCalculator {
                 float tariffMedian = 0;
                 value = prefs.getString(SalaryActivity.FIELD_UP_LIMIT, "0");
                 if(value != null){
-                    tariffMedian = Float.valueOf(value);
+                    tariffMedian = Float.parseFloat(value);
                 }
 
                 // посчитаю НДФЛ
@@ -38,7 +38,7 @@ public class SalaryCalculator {
                 float payForHour = 0;
                 value = prefs.getString(SalaryActivity.FIELD_PAY_FOR_HOUR, "0");
                 if(value != null){
-                    payForHour = Float.valueOf(value);
+                    payForHour = Float.parseFloat(value);
                 }
                 float hoursSumm = payForHour * hours;
                 double ndflRate = CashHandler.countPercent(hoursSumm, SalaryActivity.NDFL_RATE);
@@ -48,7 +48,7 @@ public class SalaryCalculator {
                     float contrastCost;
                     value = prefs.getString(SalaryActivity.FIELD_PAY_FOR_CONTRAST, "0");
                     if(value != null){
-                        contrastCost = Float.valueOf(value);
+                        contrastCost = Float.parseFloat(value);
                         salary += contrastCost * contrastsCount;
                     }
                 }
@@ -57,7 +57,7 @@ public class SalaryCalculator {
                     float dContrastCost = 0;
                     value = prefs.getString(SalaryActivity.FIELD_PAY_FOR_DYNAMIC_CONTRAST, "0");
                     if(value != null){
-                        dContrastCost = Float.valueOf(value);
+                        dContrastCost = Float.parseFloat(value);
                     }
                     salary += dContrastCost * dContrastsCount;
                 }
@@ -66,7 +66,7 @@ public class SalaryCalculator {
                     float oncoscreeningCost;
                     value = prefs.getString(SalaryActivity.FIELD_PAY_FOR_ONCOSCREENINGS, "0");
                     if(value != null){
-                        oncoscreeningCost = Float.valueOf(value);
+                        oncoscreeningCost = Float.parseFloat(value);
                         salary += oncoscreeningCost * oncoscreeningCount;
                     }
                 }

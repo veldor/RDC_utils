@@ -19,7 +19,7 @@
             android:textSize="60sp"/>
     </LinearLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3"
@@ -54,9 +54,9 @@
             android:textAlignment="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/salarySumm" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -66,34 +66,34 @@
             android:id="@+id/contrastsSumm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/contrast_mini"
             android:gravity="center"
             android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/dynamicContrastsSumm"
             app:layout_constraintTop_toTopOf="parent"
-            android:drawableLeft="@drawable/contrast_mini" />
+            app:drawableLeftCompat="@drawable/contrast_mini"
+            app:drawableStartCompat="@drawable/contrast_mini" />
 
         <TextView
             android:id="@+id/dynamicContrastsSumm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/contrast_plus_mini"
             android:gravity="center"
             android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/oncoscreeningsSumm"
             app:layout_constraintTop_toBottomOf="@+id/contrastsSumm"
-            android:drawableLeft="@drawable/contrast_plus_mini" />
+            app:drawableLeftCompat="@drawable/contrast_plus_mini"
+            app:drawableStartCompat="@drawable/contrast_plus_mini" />
 
         <TextView
             android:id="@+id/oncoscreeningsSumm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/human_mini"
             android:gravity="center"
             android:textAlignment="center"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dynamicContrastsSumm"
-            android:drawableLeft="@drawable/human_mini" />
-    </android.support.constraint.ConstraintLayout>
+            app:drawableStartCompat="@drawable/human_mini"
+            app:drawableLeftCompat="@drawable/human_mini" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

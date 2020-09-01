@@ -2,7 +2,7 @@ package net.velor.rdc_utils.workers;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -63,8 +63,8 @@ public class CheckTomorrowWorker extends Worker {
                     sb.append(String.format(Locale.ENGLISH, " Завершение смены: в %s часов.", finish));
                     //активирую регистрацию смены
                     String[] time_array = finish.split(":");
-                    int hour = Integer.valueOf(time_array[0]);
-                    int minutes = Integer.valueOf(time_array[1]);
+                    int hour = Integer.parseInt(time_array[0]);
+                    int minutes = Integer.parseInt(time_array[1]);
                     Calendar cal = Calendar.getInstance();
                     cal.add(Calendar.DATE, 1);
                     cal.set(Calendar.HOUR_OF_DAY, hour);
