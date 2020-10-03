@@ -28,6 +28,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -107,7 +108,7 @@ public class ShiftEditActivity extends AppCompatActivity implements DeleteConfir
 
         // если выбран режим обновления- загружу данные смены
 
-        Switch alarmSwitcher;
+        SwitchCompat alarmSwitcher;
         if (mMode.equals(MODE_UPDATE)) {
             mId = i.getLongExtra(ShiftCursorAdapter.COL_ID, 0);
             Map<String, String> data = mDb.getShift(mId);
