@@ -1,24 +1,24 @@
 package net.velor.rdc_utils;
 
 import android.Manifest;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.work.Data;
 import androidx.work.WorkInfo;
 
@@ -46,7 +46,7 @@ public class ReserveActivity extends AppCompatActivity {
 
         // подключу модель
 
-        mMyViewModel = ViewModelProviders.of(this).get(ReserveViewModel.class);
+        mMyViewModel = new ViewModelProvider(this).get(ReserveViewModel.class);
         // для работы потребуется доступ к хранилищу данных, запрошу его
         LiveData<Boolean> rightsChecker = mMyViewModel.checkRights();
         if(rightsChecker != null){

@@ -3,10 +3,10 @@ package net.velor.rdc_utils;
 import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,25 +16,25 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.core.view.GravityCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -53,6 +53,7 @@ import android.widget.Toast;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.adapters.WorkersAdapter;
 import net.velor.rdc_utils.dialogs.DayShiftDialog;
+import net.velor.rdc_utils.handlers.ExcelHandler;
 import net.velor.rdc_utils.handlers.ScheduleHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
@@ -129,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<String> mPersonList;
     public static AlertDialog.Builder sShowWorkersDialogBuilder;
     private AlertDialog mSheetUploadingDialog;
+    private ExcelHandler mExcelHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mRootView = findViewById(R.id.rootView);
 
         // зарегистрирую модель
-        mMyViewModel = ViewModelProviders.of(this).get(ScheduleViewModel.class);
+        mMyViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
 
         // Если не заполнены месяц и год- заполню их текущими значениями
         sCalendar.set(Calendar.DATE, 15);
@@ -178,6 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // зарегистрирую пункты  меню для обработки
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // todo delete after test
+        loadShiftsFromExcel();
 
     }
 
@@ -417,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
             }
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void loadShiftsFromExcel() {
@@ -443,6 +449,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     public void onChanged(@Nullable XSSFWorkbook sheets) {
                                         if (sheets != null) {
                                             sSheet = sheets;
+                                            mExcelHandler = new ExcelHandler(sheets);
                                             handle.removeObservers(MainActivity.this);
                                             hideSheetLoadingDialog();
                                             selectMonth();

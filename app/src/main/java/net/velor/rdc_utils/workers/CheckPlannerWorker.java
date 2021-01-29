@@ -1,7 +1,7 @@
 package net.velor.rdc_utils.workers;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;

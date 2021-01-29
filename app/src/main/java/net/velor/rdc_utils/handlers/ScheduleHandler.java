@@ -1,8 +1,8 @@
 package net.velor.rdc_utils.handlers;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.database.Cursor;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
