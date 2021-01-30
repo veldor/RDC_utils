@@ -57,6 +57,7 @@ import com.google.android.material.navigation.NavigationView;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.adapters.WorkersAdapter;
 import net.velor.rdc_utils.dialogs.DayShiftDialog;
+import net.velor.rdc_utils.handlers.ExcelHandler;
 import net.velor.rdc_utils.handlers.ScheduleHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
@@ -194,6 +195,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         }
+
+        // todo удалить после тестов
+        Log.d("surprise", "MainActivity onCreate 200: load shifts");
+        loadShiftsFromExcel();
 
     }
 
@@ -466,6 +471,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             handle.removeObservers(MainActivity.this);
                                             hideSheetLoadingDialog();
                                             selectMonth();
+                                            ExcelHandler handler = new ExcelHandler(sheets);
                                         }
                                     }
                                 });
