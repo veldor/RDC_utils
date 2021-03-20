@@ -39,15 +39,24 @@
                 android:id="@+id/personName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
                 android:text="@{person.name}"
+                android:textAlignment="center"
                 android:textColor="@{person.role_color}"
                 android:textSize="25sp"
-                android:textAlignment="center"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/statusColorView"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/personRole"
-                android:gravity="center_horizontal" />
+                app:layout_constraintTop_toBottomOf="@+id/personRole" />
+
+            <TextView
+                android:id="@+id/statusColorView"
+                android:layout_width="10dp"
+                android:layout_height="0dp"
+                android:background="@{person.scheduleColorParsed}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/shiftType"

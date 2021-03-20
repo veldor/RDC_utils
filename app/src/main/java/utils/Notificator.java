@@ -129,7 +129,7 @@ public class Notificator {
             nc.enableVibration(true);
             mNotificationManager.createNotificationChannel(nc);
         }
-        App.getInstance().getSharedPreferenceshandler().notificationChannelsCreated();
+        App.getInstance().getSharedPreferencesHandler().notificationChannelsCreated();
         sendCustomNotification("Привет", "Я- приложение РДЦ. Буду считать вашу зарплату и отправлять вам напоминания о рабочих днях. И ещё много полезных вещей в перспективе. Надеюсь, мы сработаемся :)");
     }
 

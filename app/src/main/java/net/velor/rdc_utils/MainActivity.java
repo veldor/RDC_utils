@@ -1,6 +1,7 @@
 package net.velor.rdc_utils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
@@ -12,10 +13,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -54,6 +54,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.navigation.NavigationView;
 
+import net.velor.rdc_utils.adapters.PersonAdapter;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.adapters.WorkersAdapter;
 import net.velor.rdc_utils.dialogs.DayShiftDialog;
@@ -62,24 +63,18 @@ import net.velor.rdc_utils.handlers.ScheduleHandler;
 import net.velor.rdc_utils.handlers.SharedPreferencesHandler;
 import net.velor.rdc_utils.handlers.ShiftsHandler;
 import net.velor.rdc_utils.handlers.XMLHandler;
+import net.velor.rdc_utils.subclasses.ScheduleMonth;
+import net.velor.rdc_utils.subclasses.ShiftType;
 import net.velor.rdc_utils.subclasses.WorkingPerson;
 import net.velor.rdc_utils.view_models.ScheduleViewModel;
 import net.velor.rdc_utils.workers.UploadScheduleWorker;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -98,14 +93,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int SCHEDULE_NEXT_MONTH = 2;
     public static final int MENU_ITEM_LOAD_SCHEDULE = 4;
     private static final int READ_REQUEST_CODE = 42;
-    private int REQUEST_WRITE_READ = 3;
+    private final int REQUEST_WRITE_READ = 3;
 
     // константы имён
     public static final String FIELD_SCHEDULE_CHECK_TIME = "schedule_check_time";
 
     private static final int MENU_ITEM_SHIFT_SETTINGS = 1;
     private static final int MENU_ITEM_LOAD_SHIFTS = 2;
-    private static final int MENU_ITEM_RESET_NAME = 3;
+    private static final int MENU_ITEM_RESET_MONTH = 3;
 
     private static final int PAGE_COUNT = 5;
 
@@ -118,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean sNeedRename;
 
     // хранилище доступных типов смен
-    private HashMap<String, HashMap<String, String>> mShifts = new HashMap<>();
+    private final HashMap<String, HashMap<String, String>> mShifts = new HashMap<>();
     private DayShiftDialog mDayTypeDialog;
     private ArrayList<String> mShiftValues;
     private ArrayList<Integer> mShiftIds;
@@ -131,11 +126,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // переменные для работы с Экселем
     private AlertDialog mSheetLoadingDialog;
     private static XSSFWorkbook sSheet;
-    private XSSFSheet mTable;
-    private ArrayList<String> mPersonList;
     public static AlertDialog.Builder sShowWorkersDialogBuilder;
     private AlertDialog mSheetUploadingDialog;
+    private ExcelHandler mExcelHanlder;
 
+    @SuppressLint("BatteryLife")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,11 +190,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         }
-
-        // todo удалить после тестов
-        Log.d("surprise", "MainActivity onCreate 200: load shifts");
-        loadShiftsFromExcel();
-
     }
 
     private void closeShiftNotification() {
@@ -217,17 +207,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // загружу данные о сменах, создам диалог выбора типа смены, подключу менеджер страниц
         loadShifts();
     }
-
-/*    private void makeUpdateSnackbar() {
-        Snackbar updateSnackbar = Snackbar.make(mRootView, getString(R.string.snackbar_found_update_message), Snackbar.LENGTH_INDEFINITE);
-        updateSnackbar.setAction(getString(R.string.snackbar_update_action_message), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMyViewModel.initializeUpdate();
-            }
-        });
-        updateSnackbar.show();
-    }*/
 
     // ===================================== ЗАГРУЗКА ТИПОВ СМЕН ======================================================
 
@@ -348,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, MENU_ITEM_SHIFT_SETTINGS, 0, getString(R.string.shift_settings));
         menu.add(0, MENU_ITEM_LOAD_SHIFTS, 0, getString(R.string.load_shift_settings));
-        menu.add(0, MENU_ITEM_RESET_NAME, 0, getString(R.string.reset_name_settings));
+        menu.add(0, MENU_ITEM_RESET_MONTH, 0, getString(R.string.reset_month_settings));
         menu.add(0, MENU_ITEM_LOAD_SCHEDULE, 0, getString(R.string.load_schedule_message));
 
         return super.onCreateOptionsMenu(menu);
@@ -365,9 +344,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case MENU_ITEM_LOAD_SHIFTS:
                 loadShiftsFromExcel();
                 break;
-            case MENU_ITEM_RESET_NAME:
+            case MENU_ITEM_RESET_MONTH:
                 mMyViewModel.resetName();
-                Toast.makeText(this, this.getString(R.string.name_reset_message), Toast.LENGTH_LONG).show();
+                mMyViewModel.clearMonth();
+                drawCalendar();
+                // покажу кнопку заполнения данных за месяц
                 break;
             case MENU_ITEM_LOAD_SCHEDULE:
                 load_schedule();
@@ -469,9 +450,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         if (sheets != null) {
                                             sSheet = sheets;
                                             handle.removeObservers(MainActivity.this);
+                                            mExcelHanlder = new ExcelHandler(sheets);
                                             hideSheetLoadingDialog();
                                             selectMonth();
-                                            ExcelHandler handler = new ExcelHandler(sheets);
                                         }
                                     }
                                 });
@@ -489,187 +470,76 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void selectMonth() {
-        ArrayList<String> months = new ArrayList<>();
-        // получу имя текущего месяца
-        String month = DateFormat.format("LLLL", sCalendar).toString();
-        Iterator<Sheet> monthSheets = sSheet.sheetIterator();
-        String[] parts;
-        Sheet next;
-        String value;
-        String possibleMonth = "";
-        while (monthSheets.hasNext()) {
-            next = monthSheets.next();
-            value = next.getSheetName();
-            months.add(value);
-            // разберу имя
-            parts = TextUtils.split(value, " ");
-            if (parts.length == 2) {
-                // проверю, не подходит ли данный месяц для автоматического заполнения
-                if (parts[0].toLowerCase().trim().equals(month.toLowerCase().trim()) && parts[1].trim().equals(String.valueOf(sYear))) {
-                    possibleMonth = value;
-                }
-            }
-        }
-        if (possibleMonth.isEmpty()) {
-            showMonthChooseDialog(months);
+        ScheduleMonth possibleMonth = mExcelHanlder.getPossibleMonth();
+//
+        if (possibleMonth == null) {
+            showMonthChooseDialog();
         } else {
-            showPossibleMonthDialog(possibleMonth, months);
+            confirmMonthDialog(possibleMonth);
         }
     }
 
-    private void selectPerson(String rowName) {
-        selectPerson(sSheet.getSheetIndex(rowName));
-        //ScheduleHandler.handlePersons(sSheet.getSheetAt(sSheet.getSheetIndex(rowName)));
-    }
-
-    private void selectPerson(int which) {
-        // выберу нужный лист
-        mTable = sSheet.getSheetAt(which);
-        // попробую получить сохранённое имя
-        String name = SharedPreferencesHandler.getPerson();
-        if (mTable != null) {
-            Log.d("surprise", "MainActivity selectPerson from here");
-            ScheduleHandler.handlePersons(sSheet.getSheetAt(sSheet.getSheetIndex(mTable.getSheetName())));
-            // получу список всех работников
-            mPersonList = new ArrayList<>();
-            int length = mTable.getLastRowNum();
-            int counter = 0;
-            XSSFCell cell;
-            while (counter < length) {
-                XSSFRow row = mTable.getRow(counter);
-                if (row != null) {
-                    cell = row.getCell(0);
-                    if (cell != null) {
-                        String value = cell.getStringCellValue();
-                        if (value != null) {
-                            value = value.trim();
-                            // если имя совпадает- автоматически подставляю его
-                            if (!name.isEmpty() && value.equals(name)) {
-                                Log.d("surprise", "MainActivity.java 529 selectPerson: autofill SCHEDULE");
-                                makeSchedule(row);
-                                return;
-                            }
-                            if (!value.isEmpty() && !mPersonList.contains(value.trim())){
-                                mPersonList.add(value.trim());
-                            }
-                        }
-                    }
-                }
-                counter++;
-            }
-            if (!mPersonList.isEmpty()) {
-                showPersonChooseDialog(mPersonList);
+    private void selectPerson() {
+        // если есть сохранённое значение и оно присуствует в списке- сразу гружу смены
+        if(mExcelHanlder.isPersonExists(SharedPreferencesHandler.getPerson())){
+            makeSchedule();
+        }
+        else{
+            // получу список персон
+            ArrayList<WorkingPerson> personList = mExcelHanlder.getPersons();
+            if (personList.size() > 0) {
+                showPersonChooseDialog(personList);
             } else {
-                Toast.makeText(this, "Cant found data", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Toast.makeText(this, "Cant find month", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void fillPersonName(String name) {
-        // получу имя, попытаюсь протестировать его валидность
-        Iterator<Row> rows = mTable.rowIterator();
-        while (rows.hasNext()){
-            Row row = rows.next();
-            if (row != null) {
-                Cell cell = row.getCell(0);
-                if (cell != null && cell.getCellTypeEnum().equals(CellType.STRING)) {
-                    String personName = cell.getStringCellValue().trim();
-                    if(personName.equals(name)){
-                        showPersonConfirmDialog(name, row);
-                        return;
-                    }
-                }
+                Toast.makeText(this, "Не найдены сведения о работниках", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void makeSchedule(Row row) {
-        // получу расписание
-        Iterator<Cell> cells = row.cellIterator();
-        // пропущу строку с именем
-        cells.next();
-        // получу количество дней в выбранном месяце
-        int daysCounter = sCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        int doubleDaysCounter = daysCounter + 1;
-        int counter = 0;
-        // составлю массив расписания
-        ArrayList<String> scheduleList = new ArrayList<>();
-        HashMap<String, String> shiftsList = new HashMap<>();
-        Cell cell;
-        CellType cellType;
-        String value;
-        String argbColor = "00000000";
-        while (++counter < doubleDaysCounter + 1) {
-            cell = row.getCell(counter);
-            if (cell != null) {
-                cellType = cell.getCellTypeEnum();
-                Log.d("surprise", "MainActivity.java 579 makeSchedule: cell type is " + cellType);
-                if (cellType.equals(CellType.NUMERIC)) {
-                    value = String.valueOf(cell.getNumericCellValue());
-                    // получу цвет ячейки для дальнейшего использования при определении разных типов смен
-                    org.apache.poi.xssf.usermodel.XSSFColor cellColor = (XSSFColor) cell.getCellStyle().getFillForegroundColorColor();
-                    if (cellColor != null) {
-                        argbColor = cellColor.getARGBHex();
-                        Log.d("surprise", "MainActivity makeSchedule " + argbColor);
-                    }
-                } else if (cellType.equals(CellType.STRING)) {
-                    value = cell.getStringCellValue().trim();
-                    // переведу в нижний регистр
-                    value = value.toLowerCase();
-                    // получу цвет ячейки для дальнейшего использования при определении разных типов смен
-                    org.apache.poi.xssf.usermodel.XSSFColor cellColor = (XSSFColor) cell.getCellStyle().getFillForegroundColorColor();
-                    if (cellColor != null) {
-                        argbColor = cellColor.getARGBHex();
-                    }
-                } else {
-                    value = "";
-                }
-                scheduleList.add(value);
-                Log.d("surprise", "MainActivity.java 600 makeSchedule: add value to schedule " + value);
-                if (!TextUtils.isEmpty(value)) {
-                    shiftsList.put(value, argbColor);
-                }
-            } else {
-                scheduleList.add("");
-                Log.d("surprise", "MainActivity.java 600 makeSchedule: add empty value to schedule ");
-            }
-        }
+    private void makeSchedule() {
+
+        mExcelHanlder.makeSchedule();
 
         // отправлю список смен на обработку, надо зарегистрировать те, что ещё не зарегистрированы
-        mMyViewModel.checkShifts(shiftsList);
+        //mMyViewModel.checkShifts(mExcelHanlder.getShiftsList());
+        // получу список типов смен
+        mMyViewModel.checkShifts(mExcelHanlder.getShiftsList());
         loadShifts();
-        mMyViewModel.fillMonth(scheduleList);
+        mMyViewModel.fillMonth(mExcelHanlder.getScheduleList());
         drawCalendar();
     }
 
-    private void showPersonConfirmDialog(final String personName, final Row row) {
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setTitle(R.string.confirm_person_dialog_title)
-                .setMessage(String.format(this.getString(R.string.confirm_name_message), personName))
-                .setPositiveButton(getString(R.string.name_accept_message), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mMyViewModel.savePerson(personName);
-                        Toast.makeText(MainActivity.this, getString(R.string.person_saved_message), Toast.LENGTH_LONG).show();
-                        makeSchedule(row);
-                        if(mSheetLoadingDialog != null){
-                            mSheetLoadingDialog.dismiss();
-                            mSheetLoadingDialog.hide();
+    private void confirmPersonDialog() {
+        final WorkingPerson selectedPerson = mExcelHanlder.getSelectedPerson();
+        if (selectedPerson != null) {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            String selectedValue = selectedPerson.role + " : " + selectedPerson.name;
+            dialogBuilder.setTitle(R.string.confirm_person_dialog_title)
+                    .setMessage(String.format(this.getString(R.string.confirm_name_message), selectedValue))
+                    .setPositiveButton(getString(R.string.name_accept_message), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mMyViewModel.savePerson(selectedPerson.role + ";" + selectedPerson.name);
+                            //mMyViewModel.savePerson(personName);
+                            Toast.makeText(MainActivity.this, getString(R.string.person_saved_message), Toast.LENGTH_LONG).show();
+                            if (mSheetLoadingDialog != null) {
+                                mSheetLoadingDialog.dismiss();
+                                mSheetLoadingDialog.hide();
+                                makeSchedule();
+                            }
                         }
-                    }
-                })
-                .setNegativeButton(getString(R.string.decline_name_message), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showPersonChooseDialog(mPersonList);
-                    }
-                });
-        mSheetLoadingDialog = dialogBuilder.create();
-        mSheetLoadingDialog.show();
+                    })
+                    .setNegativeButton(getString(R.string.decline_name_message), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showPersonChooseDialog(mExcelHanlder.getPersons());
+                        }
+                    });
+            mSheetLoadingDialog = dialogBuilder.create();
+            mSheetLoadingDialog.show();
+        } else {
+            Toast.makeText(this, "Не выбран работник", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showSheetLoadingDialog() {
@@ -696,41 +566,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSheetUploadingDialog.show();
     }
 
-    private void showPersonChooseDialog(ArrayList<String> personList) {
-        Log.d("surprise", "MainActivity.java 673 showPersonChooseDialog: persons list is " + personList);
-        mPersonList = personList;
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mPersonList);
+    private void showPersonChooseDialog(final ArrayList<WorkingPerson> personList) {
+        PersonAdapter adapter = new PersonAdapter(personList);
         // создам диалоговое окно
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         dialogBuilder.setTitle(R.string.choose_person_dialog_title)
                 .setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.d("surprise", "MainActivity.java 673 showPersonChooseDialog:saved persons list is " + mPersonList);
-                        Log.d("surprise", "MainActivity.java 680 onClick: selected " + which);
-                        String name = mPersonList.get(which);
-                        if(name.equals(
-                                "Врачи МРТ") ||
-                                name.equals("Операторы МРТ") ||
-                                name.equals("Администраторы МРТ 1") ||
-                                name.equals("Процедурный кабинет") ||
-                                name.equals("Наркозы") ||
-                                name.equals("УВТ") ||
-                                name.equals("Консультативный прием") ||
-                                name.equals("Консультанты") ||
-                                name.equals("Врач УЗИ") ||
-                                name.equals("Call-center") ||
-                                name.equals("Колл-центр") ||
-                                name.equals("Администраторы МРТ 2")
-                        )
-                        {
-                            Toast.makeText(MainActivity.this, "Выберите своё имя!", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            dialog.dismiss();
-                            fillPersonName(name);
-                        }
-
+                        dialog.dismiss();
+                        // занесу всю информацию о пациентах в базу
+                        Log.d("surprise", "MainActivity onClick 579: insert all data to base");
+                        ScheduleHandler.handlePersons(mExcelHanlder.getTable());
+                        // подтверждение выбора
+                        mExcelHanlder.setPerson(personList.get(which));
+                        confirmPersonDialog();
                     }
                 });
         dialogBuilder.create().show();
@@ -749,28 +599,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void showPossibleMonthDialog(final String date, final ArrayList<String> months) {
-        // создам диалоговое окно
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setTitle(R.string.month_found_dialog_title)
-                .setMessage(String.format(getString(R.string.found_month_message), date))
-                .setPositiveButton(getString(R.string.date_accept_message), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // загружу имена из выбранного месяца
-                        selectPerson(date);
-                    }
-                })
-                .setNegativeButton(getString(R.string.date_decline_message), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showMonthChooseDialog(months);
-                    }
-                });
-        dialogBuilder.create().show();
+    private void confirmMonthDialog(final ScheduleMonth month) {
+        if (month != null) {
+            // создам диалоговое окно
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setTitle(R.string.month_found_dialog_title)
+                    .setMessage(String.format(getString(R.string.found_month_message), month.name))
+                    .setPositiveButton(getString(R.string.date_accept_message), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mMyViewModel.clearMonth();
+                            // загружу имена из выбранного месяца
+                            mExcelHanlder.selectMonth(month.name);
+                            selectPerson();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.date_decline_message), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showMonthChooseDialog();
+                        }
+                    });
+            dialogBuilder.create().show();
+        }
     }
 
-    private void showMonthChooseDialog(ArrayList<String> months) {
+    private void showMonthChooseDialog() {
+        final String[] months = mExcelHanlder.getMonths();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, months);
         // создам диалоговое окно
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -779,7 +634,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        selectPerson(which);
+                        mExcelHanlder.selectMonth(months[which]);
+                        confirmMonthDialog(mExcelHanlder.getSelectedMonth());
                     }
                 });
         dialogBuilder.create().show();
@@ -858,6 +714,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setNeutralButton(R.string.who_works_message, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Log.d("surprise", "MainActivity onClick 714: show workers...");
                         ScheduleHandler.discardWorkers();
                         showWorkersDialog(dayId);
                     }
@@ -926,22 +783,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         int itemId = menuItem.getItemId();
-        switch (itemId) {
-            case R.id.salary:
-                //  запускаю расписание
-                startActivity(new Intent(this, SalaryActivity.class));
-                break;
-            case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-            case R.id.reserve:
-                Intent startReserveIntent = new Intent(this, ReserveActivity.class);
-                startReserveIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(startReserveIntent);
-                break;
-            case R.id.about:
-                startActivity(new Intent(this, AboutActivity.class));
-                break;
+        if (itemId == R.id.salary) {//  запускаю расписание
+            startActivity(new Intent(this, SalaryActivity.class));
+        } else if (itemId == R.id.settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+        } else if (itemId == R.id.reserve) {
+            Intent startReserveIntent = new Intent(this, ReserveActivity.class);
+            startReserveIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(startReserveIntent);
+        } else if (itemId == R.id.about) {
+            startActivity(new Intent(this, AboutActivity.class));
         }
         // закрою боковое меню
         mDrawer.closeDrawer(GravityCompat.START);
@@ -957,6 +808,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+        @NotNull
         @Override
         public Fragment getItem(int i) {
             return PageFragment.newInstance(i);
@@ -1040,13 +892,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void delayCalendarDraw() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 drawCalendar();
             }
-        }, 100);
+        }, 300);
     }
 
 

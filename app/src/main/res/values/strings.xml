@@ -136,7 +136,7 @@
     <string name="name_accept_message">Yes, it\'s me</string>
     <string name="decline_name_message">No, select again</string>
     <string name="person_saved_message">Person saved. You may reset it in preferences.</string>
-    <string name="reset_name_settings">Reset name</string>
+    <string name="reset_month_settings">Reset month</string>
     <string name="name_reset_message">Saved name successfully reset</string>
     <string name="day_info_date">%d %s %d year</string>
     <string name="day_info_type_holiday">Holiday.</string>

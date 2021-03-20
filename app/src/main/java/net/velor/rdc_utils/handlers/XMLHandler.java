@@ -1,10 +1,11 @@
 package net.velor.rdc_utils.handlers;
 
 import android.database.Cursor;
-import android.text.TextUtils;
+import android.graphics.Color;
 
 import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.subclasses.ShiftType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,7 +76,7 @@ public class XMLHandler {
         }
     }
 
-    public XMLHandler(ArrayList<String> shifts) {
+    public XMLHandler(ArrayList<ShiftType> shifts) {
         if (!shifts.isEmpty()) {
             // смены есть
             // получу список существующих смен
@@ -95,12 +96,14 @@ public class XMLHandler {
                 xml.append("<day id='");
                 xml.append(counter);
                 xml.append("' type='");
-                String value = shifts.get(counter - 1);
-                if(TextUtils.isEmpty(value)){
+                ShiftType shiftItem = shifts.get(counter - 1);
+                if (shiftItem == null) {
                     xml.append(-1);
-                }
-                else{
-                    xml.append(existentShifts.get(value));
+                } else {
+                    // тут небольшая хитрость- цвет смены изначально получается в argb, нужно конвертировать его в rgb
+                    int requiredColor = Color.parseColor("#" + shiftItem.scheduleColor);
+                    String hexColor = String.format("#%06X", (0xFFFFFF & requiredColor));
+                    xml.append(existentShifts.get(shiftItem.scheduleName + ";" + hexColor));
                 }
                 xml.append("'/>");
             }
@@ -174,7 +177,7 @@ public class XMLHandler {
         return dayElement.getAttribute(ATTRIBUTE_TYPE);
     }
 
-    public void save(){
+    public void save() {
         App.getInstance().getDatabaseProvider().updateSchedule(String.valueOf(MainActivity.sYear), String.valueOf(MainActivity.sMonth), mShifts);
     }
 }

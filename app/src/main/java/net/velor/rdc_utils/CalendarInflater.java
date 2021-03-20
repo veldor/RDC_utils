@@ -152,11 +152,11 @@ class CalendarInflater {
                             circle.getDrawable().setColorFilter(new PorterDuffColorFilter(Color.parseColor(color), PorterDuff.Mode.SRC_IN));
                         }
                         // плюсую смену в счётчик
-                        if(countedShifts.get(Integer.valueOf(type)) > 0){
-                            countedShifts.put(Integer.valueOf(type), countedShifts.get(Integer.valueOf(type)) + 1);
+                        if(countedShifts.get(Integer.parseInt(type)) > 0){
+                            countedShifts.put(Integer.parseInt(type), countedShifts.get(Integer.parseInt(type)) + 1);
                         }
                         else {
-                            countedShifts.put(Integer.valueOf(type), 1);
+                            countedShifts.put(Integer.parseInt(type), 1);
                         }
                     }
                     else{

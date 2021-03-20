@@ -2,6 +2,9 @@ package net.velor.rdc_utils.handlers;
 
 import androidx.lifecycle.MutableLiveData;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.util.Log;
+
 import androidx.core.content.ContextCompat;
 
 import androidx.work.Data;
@@ -37,9 +40,9 @@ public class ScheduleHandler {
         db.insertPerson(post, person);
     }
 
-    public static void addDayToSchedule(int day, String person, String post, String value) {
+    public static void addDayToSchedule(int day, String person, String post, String value, String cellColor) {
         DbWork db = App.getInstance().getDatabaseProvider();
-        db.insertDayToSchedule(post, person, day, value);
+        db.insertDayToSchedule(post, person, day, value, cellColor);
     }
 
     public static MutableLiveData<ArrayList<WorkingPerson>> showWorkers(int day) {
@@ -59,6 +62,9 @@ public class ScheduleHandler {
         if (workers.moveToFirst()) {
             do {
                 WorkingPerson person = new WorkingPerson();
+                person.scheduleColor = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_DAY_COLOR));
+                Log.d("surprise", "ScheduleHandler getWorkers 66: schedule color is " + person.scheduleColor);
+                person.scheduleColorParsed = Color.parseColor(person.scheduleColor);
                 person.name = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_NAME));
                 person.role = workers.getString(workers.getColumnIndex(DbWork.COL_PERSON_POST));
                 person.shift_type = workers.getString(workers.getColumnIndex(DbWork.COL_SCHEDULE_TYPE));

@@ -2,6 +2,7 @@ package net.velor.rdc_utils.workers;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
@@ -11,8 +12,10 @@ import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.handlers.ScheduleHandler;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
@@ -28,6 +31,7 @@ public class CheckPersonsWorker extends Worker {
     public Result doWork() {
         XSSFSheet sheet = ScheduleHandler.sSheet;
         if (sheet != null) {
+            Log.d("surprise", "CheckPersonsWorker doWork 33: check persons");
             // получу список всех работников
             int length = sheet.getLastRowNum();
             String post = "";
@@ -46,6 +50,9 @@ public class CheckPersonsWorker extends Worker {
                                     break;
                                 case "Операторы МРТ":
                                     post = "Оператор";
+                                    break;
+                                case "Администраторы МРТ":
+                                    post = "Администратор";
                                     break;
                                 case "Администраторы МРТ 1":
                                     post = "Администратор НВ";
@@ -99,7 +106,7 @@ public class CheckPersonsWorker extends Worker {
                                             }
                                             if (value != null && !TextUtils.isEmpty(value)) {
                                                 // занесу данные о смене в список
-                                                ScheduleHandler.addDayToSchedule(day, person, post, value.toLowerCase());
+                                                ScheduleHandler.addDayToSchedule(day, person, post, value.toLowerCase(), getCellColor(currentCell));
                                             }
                                         }
                                         --daysCounter;
@@ -112,5 +119,17 @@ public class CheckPersonsWorker extends Worker {
             }
         }
         return Worker.Result.success();
+    }
+
+    private String getCellColor(Cell cell) {
+        CellStyle style = cell.getCellStyle();
+        if (style != null) {
+            org.apache.poi.ss.usermodel.Color rawColor = cell.getCellStyle().getFillForegroundColorColor();
+            if (rawColor != null) {
+                XSSFColor trueColor = (XSSFColor) rawColor;
+                return trueColor.getARGBHex();
+            }
+        }
+        return "ffffffff";
     }
 }

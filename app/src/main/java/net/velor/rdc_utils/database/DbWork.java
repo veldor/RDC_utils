@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.SalaryActivity;
@@ -22,6 +23,7 @@ public class DbWork {
     private static final String COL_SCHEDULE_COLOR_NAME = "shift_default_color";
     public static final String COL_PERSON_NAME = "person_name";
     public static final String COL_PERSON_POST = "person_post";
+    public static final String COL_PERSON_DAY_COLOR = "shift_color";
     private static final String COL_DAY = "day";
     public static final String COL_SCHEDULE_TYPE = "schedule_type";
     private final DBHelper mHelper;
@@ -31,7 +33,7 @@ public class DbWork {
         mHelper = new DBHelper(context);
     }
 
-    private final int DB_VERSION = 4; // версия БД
+    public final int DB_VERSION = 7; // версия БД
     public static final String DB_NAME = "myDb";
     private final static String TABLE_SHIFTS = "shifts";
     private final static String TABLE_PERSONS = "persons";
@@ -362,6 +364,10 @@ public class DbWork {
         // удалю смену
         mConnection.delete(TABLE_SHIFTS, ShiftCursorAdapter.COL_ID + " = " + mId, null);
     }
+    public void deleteWholeMonthShifts(long mId) {
+        // удалю смену
+        mConnection.delete(TABLE_SHIFTS, ShiftCursorAdapter.COL_ID + " = " + mId, null);
+    }
 
     public void getConnection() {
         mConnection = mHelper.getWritableDatabase();
@@ -381,7 +387,13 @@ public class DbWork {
         c.close();
     }
 
-    public void insertDayToSchedule(String post, String person, int day, String value) {
+    public void insertDayToSchedule(String post, String person, int day, String value, String cellColor) {
+        if(cellColor == null){
+            cellColor = "#FFFF00";
+        }
+        else{
+            cellColor = "#" + cellColor.substring(2);
+        }
         Calendar calendar = MainActivity.sCalendar;
         String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
         // проверю, нет ли в базе этой записи
@@ -394,6 +406,7 @@ public class DbWork {
             mcv.put(COL_PERSON_POST, post);
             mcv.put(COL_DAY, date);
             mcv.put(COL_SCHEDULE_TYPE, value);
+            mcv.put(COL_PERSON_DAY_COLOR, cellColor);
             mConnection.insert(TABLE_WORKING_PERSONS, null, mcv);
         }
         c.close();
@@ -404,6 +417,12 @@ public class DbWork {
         String date = calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + day;
         String[] selectionArgs = new String[]{date};
         return mConnection.query(TABLE_WORKING_PERSONS, null, COL_DAY + "=?", selectionArgs, null, null, null, null);
+    }
+
+    public void deleteWholeMonthShifts(int year, int month) {
+        mConnection.execSQL("DELETE from scheduler WHERE c_year = " + year + " AND c_month = " + month + ";");
+        Calendar calendar = MainActivity.sCalendar;
+        mConnection.execSQL("DELETE from working_persons WHERE day LIKE '" + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "%';");
     }
 
     private class DBHelper extends SQLiteOpenHelper {
@@ -477,6 +496,7 @@ public class DbWork {
                     COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
                     COL_PERSON_POST + " CHAR(50) NOT NULL," +
                     COL_DAY + " CHAR(10)," +
+                    " shift_color CHAR(7)," +
                     COL_SCHEDULE_TYPE + " VARCHAR(10) );");
         }
 
@@ -583,6 +603,58 @@ public class DbWork {
                 } finally {
                     db.endTransaction();
                 }
+            }
+            if(oldVersion == 4){
+                db.beginTransaction();
+                try {
+// создам временную таблицу для данных типов смен
+                    db.execSQL("create temporary table temp_" + TABLE_WORKING_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                            COL_DAY + " CHAR(10)," +
+                            COL_SCHEDULE_TYPE + " VARCHAR(10) );");
+
+                    db.execSQL("insert into temp_" + TABLE_WORKING_PERSONS + " select _id, person_name, person_post, day, schedule_type from " + TABLE_WORKING_PERSONS + ";");
+                    db.execSQL("drop table " + TABLE_WORKING_PERSONS);
+                    db.execSQL("create table " + TABLE_WORKING_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                            COL_DAY + " CHAR(10)," +
+                            COL_SCHEDULE_TYPE + " VARCHAR(10) );");
+                    db.execSQL("insert into " + TABLE_WORKING_PERSONS + " select _id, person_name, person_post, day, schedule_type from temp_" + TABLE_WORKING_PERSONS + ";");
+                    db.execSQL("drop table temp_" + TABLE_WORKING_PERSONS + ";");
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
+            if(oldVersion == 6){
+                db.beginTransaction();
+// создам временную таблицу для данных типов смен
+                    db.execSQL("create temporary table temp_" + TABLE_WORKING_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                            COL_DAY + " CHAR(10)," +
+                            " shift_color CHAR(7)," +
+                            COL_SCHEDULE_TYPE + " VARCHAR(10) );");
+
+                    db.execSQL("insert into temp_" + TABLE_WORKING_PERSONS + " select working_persons._id, working_persons.person_name, working_persons.person_post, working_persons.day, '#ffffff',  working_persons.schedule_type  from " + TABLE_WORKING_PERSONS + ";");
+                    db.execSQL("drop table " + TABLE_WORKING_PERSONS);
+                    db.execSQL("create table " + TABLE_WORKING_PERSONS + " (" +
+                            COL_ID + " integer primary key autoincrement," +
+                            COL_PERSON_NAME + " VARCHAR(50) NOT NULL," +
+                            COL_PERSON_POST + " CHAR(50) NOT NULL," +
+                            COL_DAY + " CHAR(10)," +
+                            " shift_color CHAR(7)," +
+                            COL_SCHEDULE_TYPE + " VARCHAR(10) );");
+                    db.execSQL("insert into " + TABLE_WORKING_PERSONS + " select _id, person_name, person_post, day, shift_color, schedule_type from temp_" + TABLE_WORKING_PERSONS + ";");
+                    db.execSQL("drop table temp_" + TABLE_WORKING_PERSONS + ";");
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
             }
         }
     }

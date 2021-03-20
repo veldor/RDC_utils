@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Log;
 
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
@@ -59,6 +60,7 @@ public class App extends Application {
         MyBackupAgent.requestBackup();
         // подключу провайдер базы данных
         mDatabaseProvider = new DbWork(getApplicationContext());
+        Log.d("surprise", "App onCreate 62: db version is " + mDatabaseProvider.DB_VERSION);
         mDatabaseProvider.getConnection();
 
         // подключу провайдер настроек
@@ -80,7 +82,7 @@ public class App extends Application {
         PeriodicWorkRequest myWorkRequest = new PeriodicWorkRequest.Builder(CheckScheduleChangeWorker.class, 20, TimeUnit.MINUTES)
                 .addTag(SCHEDULE_CHECK_TAG)
                 .build();
-        WorkManager wm = WorkManager.getInstance();
+        WorkManager wm = WorkManager.getInstance(this);
         wm.cancelAllWorkByTag(SCHEDULE_CHECK_TAG);
         wm.enqueue(myWorkRequest);
 
@@ -94,21 +96,21 @@ public class App extends Application {
         return mDatabaseProvider;
     }
 
-    public SharedPreferencesHandler getSharedPreferenceshandler(){
+    public SharedPreferencesHandler getSharedPreferencesHandler(){
         return mSharedPreferenceshandler;
     }
 
     public LiveData<Integer> downloadSheet(){
         // если загрузка таблицы ещё не выполнялась в этой сессии- запущу загрузчик
         OneTimeWorkRequest downloadSchedule = new OneTimeWorkRequest.Builder(ScheduleDownloadWorker.class).build();
-        WorkManager.getInstance().enqueue(downloadSchedule);
+        WorkManager.getInstance(this).enqueue(downloadSchedule);
         return mSheetLoad;
     }
 
     public LiveData<XSSFWorkbook> handleSheet() {
         // Запущу работника
         OneTimeWorkRequest startLoadSheet = new OneTimeWorkRequest.Builder(LoadSheetWorker.class).build();
-        WorkManager.getInstance().enqueue(startLoadSheet);
+        WorkManager.getInstance(this).enqueue(startLoadSheet);
         // отмечу, что загружается таблица
         mIsSheetLoading = true;
         return mSheetData;

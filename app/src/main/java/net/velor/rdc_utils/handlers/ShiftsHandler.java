@@ -10,7 +10,9 @@ import net.velor.rdc_utils.MainActivity;
 import net.velor.rdc_utils.SalaryDayActivity;
 import net.velor.rdc_utils.adapters.ShiftCursorAdapter;
 import net.velor.rdc_utils.database.DbWork;
+import net.velor.rdc_utils.subclasses.ShiftType;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,13 +43,11 @@ public class ShiftsHandler {
         existentShift.close();
     }
 
-    public static void checkShift(HashMap<String, String> shiftsList) {
-        for(Map.Entry<String, String> entry : shiftsList.entrySet()) {
-            String name = entry.getKey();
-            String color = entry.getValue();
+    public static void checkShift(ArrayList<ShiftType> list) {
+        for(ShiftType st : list) {
+            String name = st.scheduleName;
+            String color = st.scheduleColor;
             checkShift(name, color);
-            // do what you have to do here
-            // In your case, another loop.
         }
     }
 
@@ -60,7 +60,8 @@ public class ShiftsHandler {
             do {
                 // получу идентификатор и название смены
                 id = existentShifts.getInt(existentShifts.getColumnIndex(ShiftCursorAdapter.COL_ID));
-                name = existentShifts.getString(existentShifts.getColumnIndex(ShiftCursorAdapter.COL_NAME_SHORT));
+                name = existentShifts.getString(existentShifts.getColumnIndex(ShiftCursorAdapter.COL_NAME_SHORT) )+ ";" +  existentShifts.getString(existentShifts.getColumnIndex(ShiftCursorAdapter.COL_SHIFT_COLOR));
+                Log.d("surprise", "ShiftsHandler getShiftsWithNames 64: NAME IS " + name);
                 result.put(name, String.valueOf(id));
             }
             while (existentShifts.moveToNext());

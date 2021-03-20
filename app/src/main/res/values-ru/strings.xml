@@ -131,7 +131,7 @@
     <string name="confirm_name_message">%s - это ваше имя?</string>
     <string name="confirm_person_dialog_title">Подтвердите имя</string>
     <string name="person_saved_message">Имя сохранено. Можете сбросить его в настройках.</string>
-    <string name="reset_name_settings">Сбросить имя</string>
+    <string name="reset_month_settings">Сбросить месяц</string>
     <string name="name_reset_message">Сохранённое имя сброшено</string>
     <string name="day_info_date">%d %s %d года.</string>
     <string name="day_info_type_holiday">Выходной.</string>
