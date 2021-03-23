@@ -1,12 +1,11 @@
 package utils;
 
 import android.app.Application;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import android.net.Uri;
 import android.os.Environment;
-import android.util.Log;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -60,7 +59,6 @@ public class App extends Application {
         MyBackupAgent.requestBackup();
         // подключу провайдер базы данных
         mDatabaseProvider = new DbWork(getApplicationContext());
-        Log.d("surprise", "App onCreate 62: db version is " + mDatabaseProvider.DB_VERSION);
         mDatabaseProvider.getConnection();
 
         // подключу провайдер настроек
@@ -72,9 +70,6 @@ public class App extends Application {
             // создам каналы
             notificator.createNotificationChannels();
         }
-
-        // запускаю сервис приложения
-        //ServiceApplication.startMe(this, ServiceApplication.OPERATION_PLANE_SHIFT_REMINDER);
 
         // взамен обработки событий в сервисе запущу рабочего, который проверит актуальность данных
         ForemanHandler.startPlanner(true);

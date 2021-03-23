@@ -38,12 +38,36 @@ public class Notificator {
     public Notificator(Context context) {
         mContext = context;
         mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // создам канал уведомлений о сменах
+            NotificationChannel nc = new NotificationChannel(SHIFTS_CHANNEL_ID, mContext.getString(R.string.shift_notifications_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            nc.setDescription(mContext.getString(R.string.shifts_reminder));
+            nc.enableLights(true);
+            nc.setLightColor(Color.RED);
+            nc.enableVibration(true);
+            mNotificationManager.createNotificationChannel(nc);
+            // создам канал уведомлений о зарплате
+            nc = new NotificationChannel(SALARY_CHANNEL_ID, mContext.getString(R.string.salary_notifications_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            nc.setDescription(mContext.getString(R.string.salary_reminder));
+            nc.enableLights(true);
+            nc.setLightColor(Color.BLUE);
+            nc.enableVibration(true);
+            mNotificationManager.createNotificationChannel(nc);
+            // создам канал тестовых уведомлений
+            nc = new NotificationChannel(TEST_CHANNEL_ID, mContext.getString(R.string.test_notifications_channel), NotificationManager.IMPORTANCE_DEFAULT);
+            nc.setDescription(mContext.getString(R.string.test_reminder));
+            nc.enableLights(true);
+            nc.setLightColor(Color.GREEN);
+            nc.enableVibration(true);
+            mNotificationManager.createNotificationChannel(nc);
+        }
         mPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
     }
 
     public void sendShiftNotification(String title, String info, String text, boolean alarmEnabled, String[] alarmTimeArray) {
         // проверю, разрешено ли уведомлять о сменах
         if(mPreferences.getBoolean(MainActivity.FIELD_REMIND_TOMORROW, true)){
+            Log.d("surprise", "Notificator sendShiftNotification 47: i here");
             // при нажатии на уведомление запушу главную активность смен
             Intent startMainIntent = new Intent(mContext, MainActivity.class);
             PendingIntent startMainPending = PendingIntent.getActivity(mContext, 0, startMainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -68,7 +92,12 @@ public class Notificator {
             }
 
             Notification notification = notificationBuilder.build();
+            Log.d("surprise", "Notificator sendShiftNotification 72: notify about shift");
             mNotificationManager.notify(NEXT_DAY_SHIFT_NOTIFICATION, notification);
+            Log.d("surprise", "Notificator sendShiftNotification 74: notified");
+        }
+        else{
+            Log.d("surprise", "Notificator sendShiftNotification 74: is silent");
         }
     }
 

@@ -29,7 +29,6 @@ public class CheckTomorrowWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        MakeLog.writeToLog("Проведена проверка завтрашней смены");
         // проверю, не нужно ли завтра на работу
         Calendar calendar = Calendar.getInstance();
         // получу завтрашнее число
